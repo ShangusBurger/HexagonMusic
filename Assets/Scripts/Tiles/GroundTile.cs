@@ -105,10 +105,17 @@ public class GroundTile : MonoBehaviour
         if (tower != null)
         {
             pulse.continuous = false;
-            if (!tower.towerActivatedThisBeat)
+            if (!tower.towerAlreadyActivatedThisBeat)
             {
                 tower.goalTime = TempoHandler.nextBeatTime;
                 tower.PlayScheduledClip();
+
+                // Notify the tower that a pulse has been received
+                if (!pulse.source)
+                {
+                    tower.OnPulseReceived(pulse);
+                }
+                
             }
             
         }

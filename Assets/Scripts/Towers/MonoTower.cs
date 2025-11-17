@@ -10,6 +10,19 @@ public class MonoTower : Tower
         base.Update();
     }
 
+    internal override void OnPulseReceived(Pulse incomingPulse)
+    {
+        base.OnPulseReceived(incomingPulse);
+
+        // Create a new pulse in the redirect direction
+        if (directions.Count > 0)
+        {
+            Pulse redirectedPulse = new Pulse(directions[0], source: true);
+            tile.SchedulePulse(redirectedPulse);
+        }
+    }
+}
+
     //Adds 3 'shock waves' of signal by enqueuing tiles to be beat in the TempoHandler
    /*  internal override void UpdateSignalEffects()
     {
@@ -41,4 +54,4 @@ public class MonoTower : Tower
             affectedTiles.Add(zTile);
         }
     } */
-}
+

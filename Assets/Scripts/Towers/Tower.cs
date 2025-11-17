@@ -12,31 +12,26 @@ public class Tower : MonoBehaviour
     public AudioSource[] _audioSources;
     public AudioClip playbackClip;
     private int sourceToggle;
-    public bool towerActivatedThisBeat;
+    public bool towerAlreadyActivatedThisBeat;
 
     //tower effects
     public GroundTile tile;
-    public List<(Tower, int)> affectedTowers = new List<(Tower, int)>();
+    //used for directing pulses for mono/duo towers
+    public List<int> directions;
 
     internal virtual void Start()
     {
         goalTime = TempoHandler.startDSPTime + TempoHandler.barLength;
         sourceToggle = 0;
-
-        UpdateAudioSignalEffects(null);
+        directions = new List<int>();
     }
 
     internal virtual void Update()
     {
         if (AudioSettings.dspTime > goalTime)
         {
-            towerActivatedThisBeat = false;
+            towerAlreadyActivatedThisBeat = false;
         }
-    }
-
-    void OnEnable()
-    {
-        GroundTile.OnTowerUpdated += UpdateAudioSignalEffects;
     }
 
     //Schedules play for the audio clip for this tower, toggling between audio sources
@@ -48,24 +43,28 @@ public class Tower : MonoBehaviour
         sourceToggle = 1 - sourceToggle;
     }
 
-    internal virtual void OfferSetTower() { 
-        
+    // Called when a pulse hits this tower
+    internal virtual void OnPulseReceived(Pulse incomingPulse)
+    {
+        // Base implementation does nothing
+        // Override in child classes to implement specific behavior
     }
 
-    internal virtual void UpdateAudioSignalEffects(Coordinate updatedCoordinate)
+    // Helper method to set a single direction
+    public void SetDirection(int direction)
     {
-
+        directions.Clear();
+        directions.Add(direction);
     }
 
-    /* internal void TriggerDependentTowers()
+    // Helper method to add a direction
+    public void AddDirection(int direction)
     {
-        foreach (var (tower, distance) in affectedTowers)
+        if (!directions.Contains(direction))
         {
-            tower.goalTime = this.goalTime + ((double)distance * TempoHandler.beatLength);
-            //tower.ScheduleBeat();
+            directions.Add(direction);
         }
-    } */
-
+    }
 }
 
 public enum TowerType

@@ -15,7 +15,7 @@ public class SelectionHandler : MonoBehaviour
     private Dictionary<Vector2, GameObject> tileObjects = new Dictionary<Vector2, GameObject>();
     [SerializeField] private GameObject towerSelectCanvas;
     public static SelectionHandler Instance;
-    List<GroundTile> highlightedTiles = new List<GroundTile>();
+    List<GroundTile> lowlightedTiles = new List<GroundTile>();
 
     void Awake()
     {
@@ -131,28 +131,35 @@ public class SelectionHandler : MonoBehaviour
             //Only update if we're hovering over a different tile
             if (collidedTile != currentHoveredTile)
             {
-                // Remove highlight from previous tile
+                // Remove highlight from previous tile and clear all lowlighted tiles
                 if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
                 {
                     currentHoveredTile.Deselect();
-                    foreach (GroundTile tile in highlightedTiles)
-                    {
-                        tile.Deselect();
-                        highlightedTiles.Clear();
-                    }
                 }
+                
+                foreach (GroundTile tile in lowlightedTiles)
+                {
+                    tile.Deselect();
+                }
+                lowlightedTiles.Clear();
 
                 // Highlight new tile (only if it's not selected)
                 currentHoveredTile = collidedTile;
                 if (currentHoveredTile != currentSelectedTile)
                 {
                     currentHoveredTile.Highlight();
-                    List<Coordinate> coordsBetween = Coordinates.Instance.GetLine(currentSelectedTile.tileCoordinate, currentHoveredTile.tileCoordinate);
+                    int bestDirection = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, currentHoveredTile.tileCoordinate);
+                    Coordinate targetCoord = GetFurthestCoordinateInDirection(currentSelectedTile.tileCoordinate, bestDirection);
+                    List<Coordinate> coordsBetween = Coordinates.Instance.GetLine(currentSelectedTile.tileCoordinate, targetCoord);
+                    
                     foreach (Coordinate coord in coordsBetween)
                     {
                         GroundTile coordTile = coord.go.GetComponent<GroundTile>();
-                        highlightedTiles.Add(coordTile);
-                        coordTile.Lowlight();
+                        if (coordTile != currentSelectedTile && coordTile != null)
+                        {
+                            lowlightedTiles.Add(coordTile);
+                            coordTile.Lowlight();
+                        }
                     }
                 }
             }
@@ -165,7 +172,31 @@ public class SelectionHandler : MonoBehaviour
                 currentHoveredTile.Deselect();
                 currentHoveredTile = null;
             }
+            foreach (GroundTile tile in lowlightedTiles)
+            {
+                tile.Deselect();
+            }
         }
+    }
+
+    Coordinate GetFurthestCoordinateInDirection(Coordinate origin, int direction)
+    {
+        Coordinate furthest = null;
+        int distance = 1;
+        
+        // Keep checking neighbors in this direction until we run out of valid tiles
+        while (distance < 100) // Safety limit
+        {
+            Coordinate next = Coordinates.Instance.GetNeighbor(origin, direction, distance);
+            if (next == null)
+            {
+                break;
+            }
+            furthest = next;
+            distance++;
+        }
+        
+        return furthest;
     }
     
     void HandleMonoTowerClick()
@@ -178,18 +209,37 @@ public class SelectionHandler : MonoBehaviour
             if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.GetComponent<GroundTile>() != null)
             {
                 GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
-                if (collidedTile != currentSelectedTile)
+                
+                // Store the direction in the tower
+                if (currentSelectedTile != null && currentSelectedTile.tower != null)
                 {
-                    // Deselect previous tile
-                    if (currentSelectedTile != null)
-                    {
-                        currentSelectedTile.Deselect();
-                    }
+                    int direction = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, collidedTile.tileCoordinate);
+                    currentSelectedTile.tower.SetDirection(direction);
 
-                    // Select new tile
-                    currentSelectedTile = collidedTile;
                 }
-                currentSelectedTile.Select();
+                
+                // Clear all lowlighted tiles
+                foreach (GroundTile tile in lowlightedTiles)
+                {
+                    tile.Deselect();
+                }
+                lowlightedTiles.Clear();
+                
+                // Deselect hovered tile
+                if (currentHoveredTile != null)
+                {
+                    currentHoveredTile.Deselect();
+                    currentHoveredTile = null;
+                }
+                
+                // Deselect current tile
+                if (currentSelectedTile != null)
+                {
+                    currentSelectedTile.Deselect();
+                    currentSelectedTile = null;
+                }
+                
+                // Return to free mode
                 currentMouseState = MouseState.Free;
             }
         }
