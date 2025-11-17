@@ -2,21 +2,49 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using CubeCoordinates;
 
 public class SelectionHandler : MonoBehaviour
 {
     //Mouse States
-    private MouseState currentMouseState = MouseState.Free;
+    public static MouseState currentMouseState = MouseState.Free;
 
     //Handling Tile Selection
     public static GroundTile currentHoveredTile = null;
     public static GroundTile currentSelectedTile = null;
     private Dictionary<Vector2, GameObject> tileObjects = new Dictionary<Vector2, GameObject>();
-    
+    [SerializeField] private GameObject towerSelectCanvas;
+    public static SelectionHandler Instance;
+    List<GroundTile> highlightedTiles = new List<GroundTile>();
+
+    void Awake()
+    {
+        currentMouseState = MouseState.Free;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Update()
     {
-        HandleMouseHover();
-        HandleMouseClick();
+        Debug.Log("Current Mouse State: " + currentMouseState);
+        switch (currentMouseState)
+        {
+            case MouseState.Free:
+                HandleMouseHover();
+                HandleMouseClick();
+                break;
+            case MouseState.SetMonoTower:
+                HandleMonoTowerHover();
+                HandleMonoTowerClick();
+                break;
+        }
+        
     }
     
     void HandleMouseHover()
@@ -24,10 +52,10 @@ public class SelectionHandler : MonoBehaviour
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = Camera.main.ScreenPointToRay(mousePos);
         
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        // Handles hovering over hex tiles only
+        if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.GetComponent<GroundTile>() != null)
         {
             GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
-            //Vector2 hexCoord = WorldToHexCoordinate(worldPos);
 
             //Only update if we're hovering over a different tile
             if (collidedTile != currentHoveredTile)
@@ -56,7 +84,7 @@ public class SelectionHandler : MonoBehaviour
             }
         }
     }
-    
+
     void HandleMouseClick()
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)
@@ -64,7 +92,7 @@ public class SelectionHandler : MonoBehaviour
             Vector3 mousePos = Mouse.current.position.ReadValue();
             Ray ray = Camera.main.ScreenPointToRay(mousePos);
 
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.GetComponent<GroundTile>() != null)
             {
                 GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
                 if (collidedTile != currentSelectedTile)
@@ -82,75 +110,94 @@ public class SelectionHandler : MonoBehaviour
             }
         }
     }
+
+    public static void OfferTowerPlacement(GroundTile tile)
+    {
+        Instance.towerSelectCanvas.SetActive(true);
+        Instance.towerSelectCanvas.transform.position = new Vector3(tile.transform.position.x, Instance.towerSelectCanvas.transform.position.y, tile.transform.position.z);
+        Instance.towerSelectCanvas.GetComponent<TowerSelection>().SetTargetTile(tile);
+    }
+
+    void HandleMonoTowerHover()
+    {
+        Vector2 mousePos = Mouse.current.position.ReadValue();
+        Ray ray = Camera.main.ScreenPointToRay(mousePos);
+
+        // Handles hovering over hex tiles only
+        if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.GetComponent<GroundTile>() != null)
+        {
+            GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
+
+            //Only update if we're hovering over a different tile
+            if (collidedTile != currentHoveredTile)
+            {
+                // Remove highlight from previous tile
+                if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
+                {
+                    currentHoveredTile.Deselect();
+                    foreach (GroundTile tile in highlightedTiles)
+                    {
+                        tile.Deselect();
+                        highlightedTiles.Clear();
+                    }
+                }
+
+                // Highlight new tile (only if it's not selected)
+                currentHoveredTile = collidedTile;
+                if (currentHoveredTile != currentSelectedTile)
+                {
+                    currentHoveredTile.Highlight();
+                    List<Coordinate> coordsBetween = Coordinates.Instance.GetLine(currentSelectedTile.tileCoordinate, currentHoveredTile.tileCoordinate);
+                    foreach (Coordinate coord in coordsBetween)
+                    {
+                        GroundTile coordTile = coord.go.GetComponent<GroundTile>();
+                        highlightedTiles.Add(coordTile);
+                        coordTile.Lowlight();
+                    }
+                }
+            }
+        }
+        else
+        {
+            // Mouse is not over any tile, remove hover highlight
+            if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
+            {
+                currentHoveredTile.Deselect();
+                currentHoveredTile = null;
+            }
+        }
+    }
     
-    // void SelectTile(Vector2 hexCoord)
-    // {
-    //     // Remove selection from previous tile
-    //     if (currentSelectedTile != new Vector2(-9999, -9999))
-    //     {
-    //         SetTileMaterial(currentSelectedTile, defaultMaterial);
-    //     }
-        
-    //     // Select new tile
-    //     currentSelectedTile = hexCoord;
-    //     SetTileMaterial(currentSelectedTile, selectedMaterial);
-    // }
-    
-    // Material GetTileMaterial(Vector2 hexCoord)
-    // {
-    //     if (hexCoord == currentSelectedTile)
-    //         return selectedMaterial;
-    //     else
-    //         return defaultMaterial;
-    // }
-    
-    // void SetTileMaterial(Vector2 hexCoord, Material material)
-    // {
-    //     if (tileObjects.TryGetValue(hexCoord, out GameObject tileObj))
-    //     {
-    //         Renderer renderer = tileObj.GetComponent<Renderer>();
-    //         if (renderer != null)
-    //         {
-    //             renderer.material = material;
-    //         }
-    //     }
-    // }
-    
-    // Your existing coordinate conversion methods
-    // public Vector2 WorldToHexCoordinate(Vector3 worldPos)
-    // {
-    //     float size = hexTileSize;
-        
-    //     float q = (2f/3f * worldPos.x) / size;
-    //     float r = (-1f/3f * worldPos.x + Mathf.Sqrt(3f)/3f * worldPos.z) / size;
-        
-    //     return HexRound(q, r);
-    // }
-    
-    // Vector2 HexRound(float q, float r)
-    // {
-    //     float s = -q - r;
-        
-    //     int rq = Mathf.RoundToInt(q);
-    //     int rr = Mathf.RoundToInt(r);
-    //     int rs = Mathf.RoundToInt(s);
-        
-    //     float q_diff = Mathf.Abs(rq - q);
-    //     float r_diff = Mathf.Abs(rr - r);
-    //     float s_diff = Mathf.Abs(rs - s);
-        
-    //     if (q_diff > r_diff && q_diff > s_diff)
-    //         rq = -rr - rs;
-    //     else if (r_diff > s_diff)
-    //         rr = -rq - rs;
-        
-    //     return new Vector2(rq, rr);
-    // }
+    void HandleMonoTowerClick()
+    {
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            Vector3 mousePos = Mouse.current.position.ReadValue();
+            Ray ray = Camera.main.ScreenPointToRay(mousePos);
+
+            if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.GetComponent<GroundTile>() != null)
+            {
+                GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
+                if (collidedTile != currentSelectedTile)
+                {
+                    // Deselect previous tile
+                    if (currentSelectedTile != null)
+                    {
+                        currentSelectedTile.Deselect();
+                    }
+
+                    // Select new tile
+                    currentSelectedTile = collidedTile;
+                }
+                currentSelectedTile.Select();
+                currentMouseState = MouseState.Free;
+            }
+        }
+    }
 }
 
 public enum MouseState
 {
     Free,
-    HoldTower,
-    HoldConnector
+    SetMonoTower,
 }

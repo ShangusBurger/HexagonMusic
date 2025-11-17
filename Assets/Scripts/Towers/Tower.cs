@@ -12,11 +12,12 @@ public class Tower : MonoBehaviour
     public AudioSource[] _audioSources;
     public AudioClip playbackClip;
     private int sourceToggle;
+    public bool towerActivatedThisBeat;
 
     //tower effects
     public GroundTile tile;
     public List<(Tower, int)> affectedTowers = new List<(Tower, int)>();
-    
+
     internal virtual void Start()
     {
         goalTime = TempoHandler.startDSPTime + TempoHandler.barLength;
@@ -27,21 +28,15 @@ public class Tower : MonoBehaviour
 
     internal virtual void Update()
     {
-        
+        if (AudioSettings.dspTime > goalTime)
+        {
+            towerActivatedThisBeat = false;
+        }
     }
 
     void OnEnable()
     {
         GroundTile.OnTowerUpdated += UpdateAudioSignalEffects;
-    }
-
-    internal virtual void ScheduleBeat()
-    {
-        PlayScheduledClip();
-        foreach (int direction in tile.pulses)
-        {
-            Coordinates.Instance.GetNeighbor(tile.tileCoordinate, direction, 1).go.GetComponent<GroundTile>().SchedulePulse(direction);
-        }
     }
 
     //Schedules play for the audio clip for this tower, toggling between audio sources
@@ -53,17 +48,28 @@ public class Tower : MonoBehaviour
         sourceToggle = 1 - sourceToggle;
     }
 
+    internal virtual void OfferSetTower() { 
+        
+    }
+
     internal virtual void UpdateAudioSignalEffects(Coordinate updatedCoordinate)
     {
 
     }
-    
-    internal void TriggerDependentTowers()
+
+    /* internal void TriggerDependentTowers()
     {
         foreach (var (tower, distance) in affectedTowers)
         {
             tower.goalTime = this.goalTime + ((double)distance * TempoHandler.beatLength);
-            tower.ScheduleBeat();
+            //tower.ScheduleBeat();
         }
-    }
+    } */
+
+}
+
+public enum TowerType
+{
+    Source,
+    Mono
 }

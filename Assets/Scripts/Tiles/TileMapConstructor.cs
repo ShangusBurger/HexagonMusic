@@ -3,9 +3,10 @@ using UnityEngine;
 
 public class TileMapConstructor : MonoBehaviour
 {
+    public static TileMapConstructor Instance;
+
     // Prefab for the tile to be instantiated
     public GameObject tilePrefab;
-    
     
     // Default grid size for instantiating via rows/columns
     [SerializeField] private Vector2Int defaultGridSizeRect;
@@ -15,21 +16,24 @@ public class TileMapConstructor : MonoBehaviour
 
     //Start with main tower in center
     [SerializeField] private bool startWithCenterTower = true;
-    public GameObject centralTowerPrefab;
 
     public static Container allTiles;
 
-
+    // Prefabs for Towers
+    public GameObject defaultTowerPrefab;
+    public GameObject sourceTowerPrefab;
+    public GameObject monoTowerPrefab;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Instance = this;
         allTiles = ConstructGrid();
         
         if (startWithCenterTower)
         {
             GroundTile centerTile = Coordinates.Instance.GetContainer().GetCoordinate(Vector3.zero).go.GetComponent<GroundTile>();
-            centerTile.AddTowerToTile(centralTowerPrefab);
+            centerTile.AddTowerToTile(TowerType.Source);
         }
     }
 

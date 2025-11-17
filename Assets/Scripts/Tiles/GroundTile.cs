@@ -10,6 +10,7 @@ public class GroundTile : MonoBehaviour
 {
     //Selection Colors
     [SerializeField] private Color highlightMaterialColor;
+    [SerializeField] private Color lowlightMaterialColor;
     [SerializeField] private Color selectedMaterialColor;
     [SerializeField] private Color beatMaterialColor;
     private Renderer tileRenderer;
@@ -18,8 +19,8 @@ public class GroundTile : MonoBehaviour
     //Tile Contents and Identity
     public Coordinate tileCoordinate;
     public Tower tower;
-    public List<int> pulses; //List of directions toward which the signal is flowing on the next pulse of the beat
-    public List<int> pulsesCached;
+    public List<Pulse> pulses; //List of directions toward which the signal is flowing on the next pulse of the beat
+    public List<Pulse> pulsesCached;
     public int beatsUntilPulse = -1;
 
 
@@ -29,13 +30,15 @@ public class GroundTile : MonoBehaviour
     public static event Action<Coordinate> OnTowerUpdated;
 
     [SerializeField] private GameObject defaultTowerPrefab;
+    [SerializeField] private GameObject sourceTowerPrefab;
+    [SerializeField] private GameObject monoTowerPrefab;
 
     void Start()
     {
         tileRenderer = GetComponentInChildren<Renderer>();
         beatsUntilPulse = -1;
-        pulses = new List<int>();
-        pulsesCached = new List<int>();
+        pulses = new List<Pulse>();
+        pulsesCached = new List<Pulse>();
 
         if (tileRenderer != null)
         {
@@ -53,14 +56,25 @@ public class GroundTile : MonoBehaviour
         // if pulse happened last frame, propagate pulse to next tiles on next beat
         if (pulsesCached.Count != 0)
         {
-            foreach (int direction in pulsesCached)
+            if (SelectionHandler.currentSelectedTile != this)
+                tileRenderer.material.color = beatMaterialColor;
+
+            //for each pulse cached, either return it to the list with delay, or send it to next tile
+            foreach (Pulse pulse in pulsesCached)
             {
-                PropagatePulse(direction);
+                if (pulse.delay > 0)
+                {
+                    pulse.delay -= 1;
+                    pulses.Add(pulse);
+                    continue;
+                }
+                //whether or not the pulse actually continues to another tile is handled in PropagatePulse()
+                PropagatePulse(pulse);
             }
             pulsesCached.Clear();
         }
         
-        
+        //when a beat is triggered, add pulses to cache to be handled next tick, return normal state of tile
         if (triggerBeatNextUpdate)
         {
             triggerBeatNextUpdate = false;
@@ -68,15 +82,12 @@ public class GroundTile : MonoBehaviour
             //if active pulse on tile, do stuff, add to cache to be sent onward next update
             if (pulses.Count > 0)
             {
-                foreach (int direction in pulses)
+                foreach (Pulse p in pulses)
                 {
-                    if (tower == null)
-                        pulsesCached.Add(direction);
+                    pulsesCached.Add(p);
                 }
                 pulses.Clear();
 
-                if (SelectionHandler.currentSelectedTile != this)
-                    tileRenderer.material.color = beatMaterialColor;
                 return;
             }
 
@@ -84,21 +95,32 @@ public class GroundTile : MonoBehaviour
             {
                 tileRenderer.material.color = originalColor;
             }
-
         }
     }
 
-    public void SchedulePulse(int direction)
+    public void SchedulePulse(Pulse pulse)
     {
-        pulses.Add(direction);
+        pulse.originTile = tileCoordinate;
+        pulses.Add(pulse);
+        if (tower != null)
+        {
+            pulse.continuous = false;
+            if (!tower.towerActivatedThisBeat)
+            {
+                tower.goalTime = TempoHandler.nextBeatTime;
+                tower.PlayScheduledClip();
+            }
+            
+        }
     }
 
     public void Highlight()
     {
-        if (tileRenderer != null)
-        {
-            tileRenderer.material.color = highlightMaterialColor;
-        }
+        tileRenderer.material.color = highlightMaterialColor;
+    }
+    public void Lowlight()
+    {
+        tileRenderer.material.color = lowlightMaterialColor;
     }
     public void Select()
     {
@@ -109,7 +131,7 @@ public class GroundTile : MonoBehaviour
 
         if (tower == null && defaultTowerPrefab != null)
         {
-            AddTowerToTile();
+            SelectionHandler.OfferTowerPlacement(this);
             OnTowerUpdated?.Invoke(TileMapConstructor.allTiles.GetCoordinateFromWorldPosition(transform.position));
         }
     }
@@ -127,15 +149,16 @@ public class GroundTile : MonoBehaviour
         triggerBeatNextUpdate = true;
     }
 
-    void PropagatePulse(int direction)
+    public void PropagatePulse(Pulse pulse)
     {
-        if (Coordinates.Instance.GetNeighbor(tileCoordinate, direction, 1) != null)
+        if (Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1) != null && (pulse.continuous || pulse.source))
         {
-            Coordinates.Instance.GetNeighbor(tileCoordinate, direction, 1).go.GetComponent<GroundTile>().SchedulePulse(direction);
+            Pulse nextPulse = new Pulse(pulse.direction);
+            Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1).go.GetComponent<GroundTile>().SchedulePulse(nextPulse);
         }
     }
 
-    public void Remove()
+    public void RemoveTower()
     {
         if (tower != null)
         {
@@ -150,10 +173,21 @@ public class GroundTile : MonoBehaviour
         tower.tile = this;
     }
 
-    public void AddTowerToTile(GameObject towerPrefab)
+    public void AddTowerToTile(TowerType type)
     {
-        tower = Instantiate(towerPrefab, transform).GetComponent<Tower>();
-        tower.tile = this;
+        switch (type)
+        {
+            case TowerType.Source:
+                tower = Instantiate(TileMapConstructor.Instance.sourceTowerPrefab, transform).GetComponent<Tower>();
+                tower.tile = this;
+                break;
+            case TowerType.Mono:
+                tower = Instantiate(TileMapConstructor.Instance.monoTowerPrefab, transform).GetComponent<Tower>();
+                tower.tile = this;
+                SelectionHandler.currentMouseState = MouseState.SetMonoTower;
+                break;
+        }
+        
     }
 
 }
