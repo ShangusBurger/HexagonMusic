@@ -15,7 +15,7 @@ public class TempoHandler : MonoBehaviour
     public static double barLength;
     public static double beatLength; 
     
-    public static int signatureHi = 12;
+    public static int signatureHi = 24;
     public static int signatureLo = 8;
     public static int barNumber = 0;
     public static int beatNumber = 0;
@@ -23,13 +23,13 @@ public class TempoHandler : MonoBehaviour
     
 
     //Test metronome
-    public float gain = 0.5F;
+    /* public float gain = 0.5F;
     private double nextTick = 0.0F;
     private float amp = 0.0F;
     private float phase = 0.0F;
     private double sampleRate = 0.0F;
     private int accent;
-    private bool running = false;
+    private bool running = false; */
 
     // GameObject containers
     public static List<List<GroundTile>> tilesToBeat = new List<List<GroundTile>>();
@@ -37,11 +37,11 @@ public class TempoHandler : MonoBehaviour
 
     void Start()
     {
-        accent = signatureHi;
+        //accent = signatureHi;
         startDSPTime = AudioSettings.dspTime;
-        sampleRate = AudioSettings.outputSampleRate;
-        nextTick = startDSPTime * sampleRate;
-        running = true;
+        //sampleRate = AudioSettings.outputSampleRate;
+        //nextTick = startDSPTime * sampleRate;
+        //running = true;
         beatLength = 60.0 / bpm * 4.0f / signatureLo;
         barLength = beatLength * signatureHi;
         nextBeatTime = startDSPTime + beatLength;

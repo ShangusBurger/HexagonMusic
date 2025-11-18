@@ -20,19 +20,22 @@ public class GroundTile : MonoBehaviour
     public Coordinate tileCoordinate;
     public Tower tower;
     public List<Pulse> pulses; //List of directions toward which the signal is flowing on the next pulse of the beat
-    public List<Pulse> pulsesCached;
+    public List<Pulse> pulsesCached; //List of pulses to be processed on the next update
     public int beatsUntilPulse = -1;
 
 
     //Handling Updates
     private bool triggerBeatNextUpdate = false;
-    private bool propigatePulseNextUpdate = false;
     public static event Action<Coordinate> OnTowerUpdated;
 
-    [SerializeField] private GameObject defaultTowerPrefab;
-    [SerializeField] private GameObject sourceTowerPrefab;
-    [SerializeField] private GameObject monoTowerPrefab;
+    // Fading variables
+    [SerializeField] private float fadeDuration = 1f; // Duration of fade in seconds
+    private bool isFading = false;
+    private float fadeTimer = 0f;
+    private Color fadeStartColor;
+    private Color fadeTargetColor;
 
+    // Instantiates Lists and sets variables when tilemap is created
     void Start()
     {
         tileRenderer = GetComponentInChildren<Renderer>();
@@ -46,6 +49,7 @@ public class GroundTile : MonoBehaviour
         }
     }
 
+    // Subscribe to beat event in TempoHandler
     void OnEnable()
     {
         TempoHandler.TriggerBeat += BeatRecieved;
@@ -53,6 +57,23 @@ public class GroundTile : MonoBehaviour
 
     void Update()
     {
+        // Handle color fading
+        if (isFading)
+        {
+            fadeTimer += Time.deltaTime;
+            float t = Mathf.Clamp01(fadeTimer / fadeDuration);
+            
+            if (SelectionHandler.currentSelectedTile != this)
+            {
+                tileRenderer.material.color = Color.Lerp(fadeStartColor, fadeTargetColor, t);
+            }
+
+            if (t >= 1f)
+            {
+                isFading = false;
+            }
+        }
+
         // if pulse happened last frame, propagate pulse to next tiles on next beat
         if (pulsesCached.Count != 0)
         {
@@ -79,7 +100,7 @@ public class GroundTile : MonoBehaviour
         {
             triggerBeatNextUpdate = false;
 
-            //if active pulse on tile, do stuff, add to cache to be sent onward next update
+            //if active pulse on tile, add to cache to be sent onward next update
             if (pulses.Count > 0)
             {
                 foreach (Pulse p in pulses)
@@ -88,26 +109,35 @@ public class GroundTile : MonoBehaviour
                 }
                 pulses.Clear();
 
-                return;
-            }
-
-            if (tileRenderer.material.color == beatMaterialColor && SelectionHandler.currentSelectedTile != this)
-            {
-                tileRenderer.material.color = originalColor;
+                if (SelectionHandler.currentSelectedTile != this)
+                {
+                    StartFade(beatMaterialColor, originalColor);
+                }
             }
         }
     }
 
+    private void StartFade(Color from, Color to)
+    {
+        tileRenderer.material.color = from;
+        fadeStartColor = from;
+        fadeTargetColor = to;
+        fadeTimer = 0f;
+        isFading = true;
+    }
+
+    // used to create a new Pulse, either on this tile or to propagate to another tile
     public void SchedulePulse(Pulse pulse)
     {
         pulse.originTile = tileCoordinate;
         pulses.Add(pulse);
+
+        //play tower sound (and redirect pulse according to tower rules) if there is a tower on this tile
         if (tower != null)
         {
             pulse.continuous = false;
             if (!tower.towerAlreadyActivatedThisBeat)
             {
-                tower.goalTime = TempoHandler.nextBeatTime;
                 tower.PlayScheduledClip();
 
                 // Notify the tower that a pulse has been received
@@ -115,9 +145,7 @@ public class GroundTile : MonoBehaviour
                 {
                     tower.OnPulseReceived(pulse);
                 }
-                
             }
-            
         }
     }
 
@@ -129,6 +157,8 @@ public class GroundTile : MonoBehaviour
     {
         tileRenderer.material.color = lowlightMaterialColor;
     }
+
+    //Called from SelectionHandler when this tile is selected
     public void Select()
     {
         if (tileRenderer != null)
@@ -136,11 +166,14 @@ public class GroundTile : MonoBehaviour
             tileRenderer.material.color = selectedMaterialColor;
         }
 
-        if (tower == null && defaultTowerPrefab != null)
+        if (tower == null)
         {
             SelectionHandler.OfferTowerPlacement(this);
             OnTowerUpdated?.Invoke(TileMapConstructor.allTiles.GetCoordinateFromWorldPosition(transform.position));
+            return;
         }
+
+        SelectionHandler.OpenTowerUI(this);
     }
 
     public void Deselect()
@@ -171,12 +204,14 @@ public class GroundTile : MonoBehaviour
         {
             Destroy(tower.gameObject);
             tower = null;
+            Deselect();
+            SelectionHandler.currentSelectedTile = null;
         }
     }
 
     public void AddTowerToTile()
     {
-        tower = Instantiate(defaultTowerPrefab, transform).GetComponent<Tower>();
+        tower = Instantiate(TileMapConstructor.Instance.sourceTowerPrefab, transform).GetComponent<Tower>();
         tower.tile = this;
     }
 
@@ -192,6 +227,10 @@ public class GroundTile : MonoBehaviour
                 tower = Instantiate(TileMapConstructor.Instance.monoTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
                 SelectionHandler.currentMouseState = MouseState.SetMonoTower;
+                break;
+            case TowerType.Splitter:
+                tower = Instantiate(TileMapConstructor.Instance.splitterTowerPrefab, transform).GetComponent<Tower>();
+                tower.tile = this;
                 break;
         }
         

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using CubeCoordinates;
+using UnityEngine.UI;
 
 public class SelectionHandler : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class SelectionHandler : MonoBehaviour
     public static GroundTile currentSelectedTile = null;
     private Dictionary<Vector2, GameObject> tileObjects = new Dictionary<Vector2, GameObject>();
     [SerializeField] private GameObject towerSelectCanvas;
+    [SerializeField] private GameObject towerUICanvas;
     public static SelectionHandler Instance;
     List<GroundTile> lowlightedTiles = new List<GroundTile>();
 
@@ -85,6 +87,7 @@ public class SelectionHandler : MonoBehaviour
         }
     }
 
+    // Handles clicking on tiles to select them
     void HandleMouseClick()
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)
@@ -108,9 +111,20 @@ public class SelectionHandler : MonoBehaviour
                 }
                 currentSelectedTile.Select();
             }
+            else if (!Physics.Raycast(ray, out hit))
+            {
+                // Clicked outside any tile, hide tower selection canvas
+                if (TowerSelection.Instance.gameObject.activeSelf && currentSelectedTile != null)
+                {
+                    TowerSelection.Instance.gameObject.SetActive(false);
+                    currentSelectedTile.Deselect();
+                }
+                
+            }
         }
     }
 
+    // Opens the tower selection canvas at the tile's position. Buttons continue the UI.
     public static void OfferTowerPlacement(GroundTile tile)
     {
         Instance.towerSelectCanvas.SetActive(true);
@@ -118,6 +132,14 @@ public class SelectionHandler : MonoBehaviour
         Instance.towerSelectCanvas.GetComponent<TowerSelection>().SetTargetTile(tile);
     }
 
+    public static void OpenTowerUI(GroundTile tile)
+    {
+        Instance.towerUICanvas.SetActive(true);
+        Instance.towerUICanvas.transform.position = new Vector3(tile.transform.position.x, Instance.towerSelectCanvas.transform.position.y, tile.transform.position.z);
+        Instance.towerUICanvas.GetComponent<TowerUI>().SetTargetTile(tile);
+    }
+
+    // Handles hovering when setting direction for Mono Tower
     void HandleMonoTowerHover()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
@@ -199,6 +221,7 @@ public class SelectionHandler : MonoBehaviour
         return furthest;
     }
     
+    // Handles clicking when setting direction for Mono Tower
     void HandleMonoTowerClick()
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)

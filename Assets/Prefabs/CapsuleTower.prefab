@@ -265,9 +265,9 @@ GameObject:
   - component: {fileID: 7044555038288560308}
   - component: {fileID: 1391864280964726405}
   - component: {fileID: 2962817409258140665}
-  - component: {fileID: 8819485345353753110}
+  - component: {fileID: 2677663916589081015}
   m_Layer: 0
-  m_Name: SphereTower
+  m_Name: CapsuleTower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -296,7 +296,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9057431189203469463}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &2962817409258140665
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -316,7 +316,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 437fdf7e04275ae47ada8116bfe57655, type: 2}
+  - {fileID: 2100000, guid: c87a976c6ff0c1b4cbee8158020f1b7a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -338,7 +338,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &8819485345353753110
+--- !u!114 &2677663916589081015
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -347,14 +347,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 9057431189203469463}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5060596e9a65ec942aec1fc2b5990f64, type: 3}
+  m_Script: {fileID: 11500000, guid: 7fdad911e2c53f543b312d7d9cc90e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   goalTime: 0
   _audioSources:
   - {fileID: 3568778329882750925}
   - {fileID: 1319045277087054885}
-  playbackClip: {fileID: 8300000, guid: e77cc49654c1da548b88143ff9af3a56, type: 3}
+  playbackClip: {fileID: 8300000, guid: d3ed1a253d6379648a1c9b22d1166e36, type: 3}
   towerAlreadyActivatedThisBeat: 0
   tile: {fileID: 0}
   directions: 

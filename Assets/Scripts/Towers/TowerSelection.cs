@@ -5,12 +5,29 @@ using UnityEngine.UI;
 
 public class TowerSelection : MonoBehaviour
 {
-    [SerializeField] private Button button1;
+    [SerializeField] private Button monoButton;
+    [SerializeField] private Button sourceButton;
+    [SerializeField] private Button splitterButton;
+
+    public static TowerSelection Instance;
+
+    public void Start()
+    {
+        Instance = this;
+    }
 
     public void SetTargetTile(GroundTile tile)
     {
-        button1.onClick.RemoveAllListeners();
-        button1.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Mono));
-        button1.onClick.AddListener(() => this.gameObject.SetActive(false));
+        monoButton.onClick.RemoveAllListeners();
+        monoButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Mono));
+        monoButton.onClick.AddListener(() => this.gameObject.SetActive(false));
+
+        sourceButton.onClick.RemoveAllListeners();
+        sourceButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Source));  
+        sourceButton.onClick.AddListener(() => this.gameObject.SetActive(false));
+
+        splitterButton.onClick.RemoveAllListeners();
+        splitterButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Splitter));  
+        splitterButton.onClick.AddListener(() => this.gameObject.SetActive(false));
     }
 }

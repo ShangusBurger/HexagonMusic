@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SourceTower : Tower
 {
-    [SerializeField] private int sourceTowerReach = 12;
+    //[SerializeField] private int sourceTowerReach = 12;
     internal override void Start()
     {
         base.Start();

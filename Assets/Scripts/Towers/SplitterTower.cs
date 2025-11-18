@@ -3,14 +3,8 @@ using System.Collections.Generic;
 using CubeCoordinates;
 using UnityEngine;
 
-public class MonoTower : Tower
+public class SplitterTower : Tower
 {
-    private LibPdInstance pdInstance;
-    internal override void Start()
-    {
-        base.Start();
-        pdInstance = GetComponent<LibPdInstance>();
-    }
     internal override void Update()
     {
         base.Update();
@@ -18,13 +12,21 @@ public class MonoTower : Tower
 
     internal override void OnPulseReceived(Pulse incomingPulse)
     {
+
         base.OnPulseReceived(incomingPulse);
+        directions.Clear();
+        directions.Add((incomingPulse.direction + 1) % 6);
+        directions.Add((incomingPulse.direction + 5) % 6);
 
         // Create a new pulse in the redirect direction
         if (directions.Count > 0)
         {
-            Pulse redirectedPulse = new Pulse(directions[0], source: true);
-            tile.SchedulePulse(redirectedPulse);
+            Pulse redirectedPulse;
+            foreach (int direction in directions)
+            {
+                redirectedPulse = new Pulse(direction, source: true);
+                tile.SchedulePulse(redirectedPulse);
+            }
         }
     }
 
@@ -32,8 +34,6 @@ public class MonoTower : Tower
     {
         goalTime = TempoHandler.nextBeatTime;
         base.PlayScheduledClip();
-
-        //pdInstance.SendBang("bang");
     }
 }
 

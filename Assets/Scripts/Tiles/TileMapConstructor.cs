@@ -23,6 +23,7 @@ public class TileMapConstructor : MonoBehaviour
     public GameObject defaultTowerPrefab;
     public GameObject sourceTowerPrefab;
     public GameObject monoTowerPrefab;
+    public GameObject splitterTowerPrefab;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

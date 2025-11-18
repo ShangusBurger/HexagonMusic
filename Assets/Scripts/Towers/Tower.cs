@@ -34,9 +34,11 @@ public class Tower : MonoBehaviour
         }
     }
 
-    //Schedules play for the audio clip for this tower, toggling between audio sources
+    //Schedules play for the audio clip (and resets goal time) for this tower, toggling between audio sources
     internal virtual void PlayScheduledClip()
     {
+        towerAlreadyActivatedThisBeat = true;
+        
         _audioSources[sourceToggle].clip = playbackClip;
         _audioSources[sourceToggle].PlayScheduled(goalTime);
 
@@ -70,5 +72,6 @@ public class Tower : MonoBehaviour
 public enum TowerType
 {
     Source,
-    Mono
+    Mono,
+    Splitter
 }
