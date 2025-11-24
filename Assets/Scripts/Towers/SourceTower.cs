@@ -14,17 +14,24 @@ public class SourceTower : Tower
             PlayScheduledClip();
         }
     }
-    
+
+    void OnPlayButtonPressed()
+    {
+        TriggerPulses();
+        
+        goalTime += TempoHandler.beatLength;
+        PlayScheduledClip();
+    }    
     internal override void Update()
     {
         base.Update();
         //schedules next beat once the instrument has sounded
-        if (AudioSettings.dspTime > goalTime)
-        {
-            TriggerPulses();
-            goalTime += TempoHandler.barLength;
-            PlayScheduledClip();
-        }
+        // if (AudioSettings.dspTime > goalTime)
+        // {
+        //     TriggerPulses();
+        //     goalTime += TempoHandler.barLength;
+        //     PlayScheduledClip();
+        // }
     }
 
     void TriggerPulses()
