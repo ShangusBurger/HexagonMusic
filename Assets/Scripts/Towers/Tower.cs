@@ -16,7 +16,7 @@ public class Tower : MonoBehaviour
 
     //tower effects
     public GroundTile tile;
-    //used for directing pulses for mono/duo towers
+    //used for directing pulses for mono/duo/lobber towers
     public List<int> directions;
 
     internal virtual void Start()
@@ -24,6 +24,7 @@ public class Tower : MonoBehaviour
         goalTime = TempoHandler.startDSPTime + TempoHandler.barLength;
         sourceToggle = 0;
         directions = new List<int>();
+        towerAlreadyActivatedThisBeat = false;
     }
 
     internal virtual void Update()
@@ -73,5 +74,6 @@ public enum TowerType
 {
     Source,
     Mono,
-    Splitter
+    Splitter,
+    Lobber
 }

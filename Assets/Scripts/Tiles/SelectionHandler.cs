@@ -13,7 +13,6 @@ public class SelectionHandler : MonoBehaviour
     //Handling Tile Selection
     public static GroundTile currentHoveredTile = null;
     public static GroundTile currentSelectedTile = null;
-    private Dictionary<Vector2, GameObject> tileObjects = new Dictionary<Vector2, GameObject>();
     [SerializeField] private GameObject towerSelectCanvas;
     [SerializeField] private GameObject towerUICanvas;
     public static SelectionHandler Instance;
@@ -44,6 +43,10 @@ public class SelectionHandler : MonoBehaviour
             case MouseState.SetMonoTower:
                 HandleMonoTowerHover();
                 HandleMonoTowerClick();
+                break;
+            case MouseState.SetLobberTower:
+                HandleLobberTowerHover();
+                HandleLobberTowerClick();
                 break;
         }
         
@@ -159,10 +162,7 @@ public class SelectionHandler : MonoBehaviour
                     currentHoveredTile.Deselect();
                 }
                 
-                foreach (GroundTile tile in lowlightedTiles)
-                {
-                    tile.Deselect();
-                }
+                SelectionUtility.DeselectListOfTiles(lowlightedTiles);
                 lowlightedTiles.Clear();
 
                 // Highlight new tile (only if it's not selected)
@@ -194,10 +194,7 @@ public class SelectionHandler : MonoBehaviour
                 currentHoveredTile.Deselect();
                 currentHoveredTile = null;
             }
-            foreach (GroundTile tile in lowlightedTiles)
-            {
-                tile.Deselect();
-            }
+            SelectionUtility.DeselectListOfTiles(lowlightedTiles);
         }
     }
 
@@ -242,10 +239,7 @@ public class SelectionHandler : MonoBehaviour
                 }
                 
                 // Clear all lowlighted tiles
-                foreach (GroundTile tile in lowlightedTiles)
-                {
-                    tile.Deselect();
-                }
+                SelectionUtility.DeselectListOfTiles(lowlightedTiles);
                 lowlightedTiles.Clear();
                 
                 // Deselect hovered tile
@@ -267,10 +261,158 @@ public class SelectionHandler : MonoBehaviour
             }
         }
     }
+
+    void HandleLobberTowerHover()
+    {
+        Vector2 mousePos = Mouse.current.position.ReadValue();
+        Ray ray = Camera.main.ScreenPointToRay(mousePos);
+
+        if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.GetComponent<GroundTile>() != null)
+        {
+            GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
+
+            // Find the tile that best matches the direction AND distance toward the mouse
+            GroundTile targetTile = null;
+            LobberTower lobberTower = currentSelectedTile.tower as LobberTower;
+            if (lobberTower != null)
+            {
+                // Get the best direction toward the hovered tile
+                int bestDirection = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, collidedTile.tileCoordinate);
+                
+                // Calculate the distance from tower to mouse position
+                float cubeDistance = Cubes.GetDistanceBetweenTwoCubes(currentSelectedTile.tileCoordinate.cube, collidedTile.tileCoordinate.cube);
+                
+                // Clamp the distance to valid lob range
+                int targetDistance = Mathf.Clamp(Mathf.RoundToInt(cubeDistance), lobberTower.minLobDistance, lobberTower.maxLobDistance);
+                
+                // Get the tile at that distance in that direction
+                Coordinate targetCoord = Coordinates.Instance.GetNeighbor(currentSelectedTile.tileCoordinate, bestDirection, targetDistance);
+                if (targetCoord != null && lobberTower.IsValidLobTarget(targetCoord))
+                {
+                    targetTile = targetCoord.go.GetComponent<GroundTile>();
+                }
+            }
+
+            // Only update if we found a different target tile
+            if (targetTile != currentHoveredTile)
+            {
+                // Remove highlight from previous tile and clear all lowlighted tiles
+                if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
+                {
+                    currentHoveredTile.Deselect();
+                }
+                
+                SelectionUtility.DeselectListOfTiles(lowlightedTiles);
+                lowlightedTiles.Clear();
+
+                // Set the new hovered tile
+                currentHoveredTile = targetTile;
+                
+                // Highlight and show path if we have a valid target
+                if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
+                {
+                    currentHoveredTile.Highlight();
+                    
+                    // Show the path the pulse will travel along
+                    int direction = GetLobDirection(currentSelectedTile.tileCoordinate, currentHoveredTile.tileCoordinate);
+                    if (direction != -1)
+                    {
+                        // Lowlight tiles in the direction the pulse will continue
+                        Coordinate currentCoord = currentHoveredTile.tileCoordinate;
+                        int distance = 1;
+                        
+                        while (distance <= 10) // Show up to 10 tiles ahead
+                        {
+                            Coordinate nextCoord = Coordinates.Instance.GetNeighbor(currentCoord, direction, distance);
+                            if (nextCoord == null) break;
+                            
+                            GroundTile nextTile = nextCoord.go.GetComponent<GroundTile>();
+                            if (nextTile != null && nextTile != currentSelectedTile)
+                            {
+                                lowlightedTiles.Add(nextTile);
+                                nextTile.Lowlight();
+                            }
+                            
+                            distance++;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // Mouse is not over any tile, remove hover highlight
+            if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
+            {
+                currentHoveredTile.Deselect();
+                currentHoveredTile = null;
+            }
+            SelectionUtility.DeselectListOfTiles(lowlightedTiles);
+            lowlightedTiles.Clear();
+        }
+    }
+
+    void HandleLobberTowerClick()
+    {
+    if (Mouse.current.leftButton.wasPressedThisFrame)
+    {
+        // Use the currently highlighted tile (which is already the best match). No need to raycast again. Will only trigger if hovering over tile.
+        if (currentHoveredTile != null && currentSelectedTile != null && currentSelectedTile.tower != null)
+        {
+            LobberTower lobberTower = currentSelectedTile.tower as LobberTower;
+            if (lobberTower != null)
+            {
+                lobberTower.SetTargetTile(currentHoveredTile.tileCoordinate);
+            }
+            
+            // Clear all lowlighted tiles
+            SelectionUtility.DeselectListOfTiles(lowlightedTiles);
+            lowlightedTiles.Clear();
+            
+            // Deselect hovered tile
+            if (currentHoveredTile != null)
+            {
+                currentHoveredTile.Deselect();
+                currentHoveredTile = null;
+            }
+            
+            // Deselect current tile
+            if (currentSelectedTile != null)
+            {
+                currentSelectedTile.Deselect();
+                currentSelectedTile = null;
+            }
+            
+            // Return to free mode
+            currentMouseState = MouseState.Free;
+        }
+    }
+}
+
+    // Helper method to determine which direction a target is in (similar to LobberTower's private method)
+    int GetLobDirection(Coordinate origin, Coordinate target)
+    {
+        if (target == null || origin == null)
+            return -1;
+
+        float distance = Cubes.GetDistanceBetweenTwoCubes(origin.cube, target.cube);
+
+        for (int dir = 0; dir < 6; dir++)
+        {
+            Coordinate checkCoord = Coordinates.Instance.GetNeighbor(origin, dir, (int)distance);
+            if (checkCoord != null && checkCoord.cube == target.cube)
+            {
+                return dir;
+            }
+        }
+
+        return -1;
+    }
 }
 
 public enum MouseState
 {
     Free,
     SetMonoTower,
+    SetLobberTower
 }

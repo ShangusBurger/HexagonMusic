@@ -8,6 +8,8 @@ public class TowerSelection : MonoBehaviour
     [SerializeField] private Button monoButton;
     [SerializeField] private Button sourceButton;
     [SerializeField] private Button splitterButton;
+    [SerializeField] private Button lobberButton;
+    
 
     public static TowerSelection Instance;
 
@@ -29,5 +31,9 @@ public class TowerSelection : MonoBehaviour
         splitterButton.onClick.RemoveAllListeners();
         splitterButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Splitter));  
         splitterButton.onClick.AddListener(() => this.gameObject.SetActive(false));
+
+        lobberButton.onClick.RemoveAllListeners();
+        lobberButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Lobber));  
+        lobberButton.onClick.AddListener(() => this.gameObject.SetActive(false));
     }
 }

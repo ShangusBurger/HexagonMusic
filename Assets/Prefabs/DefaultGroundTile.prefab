@@ -126,15 +126,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faaeecddbe969d2458d86b034a76d43c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GroundTile
-  highlightMaterialColor: {r: 1, g: 0.68867916, b: 0.8339578, a: 1}
-  lowlightMaterialColor: {r: 1, g: 0.44905663, b: 0.49914235, a: 1}
+  highlightMaterialColor: {r: 1, g: 0.45098042, b: 0.49803925, a: 1}
+  lowlightMaterialColor: {r: 1, g: 0.7028302, b: 0.7283019, a: 1}
   selectedMaterialColor: {r: 0.20167309, g: 0.4808039, b: 0.6226415, a: 1}
   beatMaterialColor: {r: 1, g: 0.6213613, b: 0, a: 0.8235294}
   tower: {fileID: 0}
   beatsUntilPulse: -1
-  defaultTowerPrefab: {fileID: 9057431189203469463, guid: cfcbadbbbc395194ba2963e848d32a90, type: 3}
-  sourceTowerPrefab: {fileID: 0}
-  monoTowerPrefab: {fileID: 0}
+  fadeDuration: 1
 --- !u!135 &5413712515568741557
 SphereCollider:
   m_ObjectHideFlags: 0

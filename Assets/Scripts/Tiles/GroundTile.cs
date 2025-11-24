@@ -77,18 +77,35 @@ public class GroundTile : MonoBehaviour
         // if pulse happened last frame, propagate pulse to next tiles on next beat
         if (pulsesCached.Count != 0)
         {
-            if (SelectionHandler.currentSelectedTile != this)
-                tileRenderer.material.color = beatMaterialColor;
-
             //for each pulse cached, either return it to the list with delay, or send it to next tile
             foreach (Pulse pulse in pulsesCached)
             {
                 if (pulse.delay > 0)
                 {
                     pulse.delay -= 1;
-                    pulses.Add(pulse);
+    
+                    //if delay is now 0 and a tower exists on the tile, play tower sound and notify tower of pulse, otherwise re-add to pulse list to propigate
+                    if (pulse.delay == 0 && tower != null)
+                    {
+                        if (!tower.towerAlreadyActivatedThisBeat)
+                        {
+                            tower.PlayScheduledClip();
+                        }
+                        if (!pulse.source)
+                        {
+                            tower.OnPulseReceived(pulse);
+                        }
+                    }
+                    else
+                    {
+                        pulses.Add(pulse);
+                    }
                     continue;
                 }
+                if (SelectionHandler.currentSelectedTile != this)
+                    tileRenderer.material.color = beatMaterialColor;
+                    StartFade(beatMaterialColor, originalColor);
+                
                 //whether or not the pulse actually continues to another tile is handled in PropagatePulse()
                 PropagatePulse(pulse);
             }
@@ -102,17 +119,12 @@ public class GroundTile : MonoBehaviour
 
             //if active pulse on tile, add to cache to be sent onward next update
             if (pulses.Count > 0)
-            {
+            {  
                 foreach (Pulse p in pulses)
                 {
                     pulsesCached.Add(p);
                 }
                 pulses.Clear();
-
-                if (SelectionHandler.currentSelectedTile != this)
-                {
-                    StartFade(beatMaterialColor, originalColor);
-                }
             }
         }
     }
@@ -133,7 +145,7 @@ public class GroundTile : MonoBehaviour
         pulses.Add(pulse);
 
         //play tower sound (and redirect pulse according to tower rules) if there is a tower on this tile
-        if (tower != null)
+        if (tower != null && pulse.delay <= 0)
         {
             pulse.continuous = false;
             if (!tower.towerAlreadyActivatedThisBeat)
@@ -231,6 +243,11 @@ public class GroundTile : MonoBehaviour
             case TowerType.Splitter:
                 tower = Instantiate(TileMapConstructor.Instance.splitterTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
+                break;
+            case TowerType.Lobber:
+                tower = Instantiate(TileMapConstructor.Instance.lobberTowerPrefab, transform).GetComponent<Tower>();
+                tower.tile = this;
+                SelectionHandler.currentMouseState = MouseState.SetLobberTower;
                 break;
         }
         

@@ -23,7 +23,7 @@ public class MonoTower : Tower
         // Create a new pulse in the redirect direction
         if (directions.Count > 0)
         {
-            Pulse redirectedPulse = new Pulse(directions[0], source: true);
+            Pulse redirectedPulse = new Pulse(directions[0], source: true, delay: incomingPulse.delay);
             tile.SchedulePulse(redirectedPulse);
         }
     }
