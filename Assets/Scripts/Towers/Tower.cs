@@ -14,6 +14,7 @@ public class Tower : MonoBehaviour
     internal int sourceToggle;
     public bool towerAlreadyActivatedThisBeat;
     internal LibPdInstance pdInstance;
+    public bool isMuted = false;
 
     //tower effects
     public GroundTile tile;
@@ -45,8 +46,11 @@ public class Tower : MonoBehaviour
     {
         towerAlreadyActivatedThisBeat = true;
         
-        _audioSources[sourceToggle].clip = playbackClip;
-        _audioSources[sourceToggle].PlayScheduled(goalTime);
+        if (!isMuted)
+        {
+            _audioSources[sourceToggle].clip = playbackClip;
+            _audioSources[sourceToggle].PlayScheduled(goalTime);
+        }
 
         sourceToggle = 1 - sourceToggle;
     }
@@ -72,6 +76,11 @@ public class Tower : MonoBehaviour
         {
             directions.Add(direction);
         }
+    }
+
+    public void ToggleMute()
+    {
+        isMuted = !isMuted;
     }
 }
 

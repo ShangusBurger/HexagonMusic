@@ -7,6 +7,11 @@ public class EdgeCameraScroller : MonoBehaviour
     public float moveSpeed = 5f;
     public float edgeThreshold = 50f; // Distance from screen edge in pixels
     public float smoothTime = 0.3f;   // Time for smooth movement
+
+    [Header("Camera Zoom Settings")]
+    public float zoomSpeed = 5f;
+    public float minY = 10;
+    public float maxY = 30; 
     
     [Header("Camera Bounds (Optional) XY > XZ Plane")]
     public bool useBounds = false;
@@ -24,8 +29,8 @@ public class EdgeCameraScroller : MonoBehaviour
     void Update()
     {
         HandleEdgeScrolling();
-        MoveCamera();
         HandleZoom();
+        MoveCamera();
     }
     
     void HandleEdgeScrolling()
@@ -73,10 +78,20 @@ public class EdgeCameraScroller : MonoBehaviour
         }
     }
     
+    void HandleZoom()
+    {
+        float scrollInput = Mouse.current.scroll.ReadValue().y;
+
+        if (scrollInput != 0f)
+        {
+            targetPosition.y -= scrollInput * zoomSpeed * Time.deltaTime;
+            targetPosition.y = Mathf.Clamp(targetPosition.y, minY, maxY);
+        }
+    }
     void MoveCamera()
     {
-        // Smoothly move camera to target position
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+        // Apply both movements
+        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);;
     }
     
     // Optional: Visual debug for bounds
@@ -89,10 +104,5 @@ public class EdgeCameraScroller : MonoBehaviour
             Vector3 size = new Vector3(maxBounds.x - minBounds.x, 0, maxBounds.y - minBounds.y);
             Gizmos.DrawWireCube(center, size);
         }
-    }
-
-    void HandleZoom()
-    {
-        
     }
 }

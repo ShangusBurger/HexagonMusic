@@ -9,6 +9,7 @@ public class TowerSelection : MonoBehaviour
     [SerializeField] private Button sourceButton;
     [SerializeField] private Button splitterButton;
     [SerializeField] private Button lobberButton;
+    [SerializeField] private Button sprayerButton;
     
 
     public static TowerSelection Instance;
