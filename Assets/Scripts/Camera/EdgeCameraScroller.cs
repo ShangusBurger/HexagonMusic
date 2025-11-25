@@ -25,6 +25,7 @@ public class EdgeCameraScroller : MonoBehaviour
     {
         HandleEdgeScrolling();
         MoveCamera();
+        HandleZoom();
     }
     
     void HandleEdgeScrolling()
@@ -88,5 +89,10 @@ public class EdgeCameraScroller : MonoBehaviour
             Vector3 size = new Vector3(maxBounds.x - minBounds.x, 0, maxBounds.y - minBounds.y);
             Gizmos.DrawWireCube(center, size);
         }
+    }
+
+    void HandleZoom()
+    {
+        
     }
 }

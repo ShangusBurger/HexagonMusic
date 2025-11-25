@@ -28,8 +28,12 @@ public class MonoTower : Tower
 
     internal override void PlayScheduledClip()
     {
-        goalTime = TempoHandler.nextBeatTime;
-        base.PlayScheduledClip();
+        //goalTime = TempoHandler.nextBeatTime;
+        //base.PlayScheduledClip();
+        towerAlreadyActivatedThisBeat = true;
+        pdInstance.SendFloat("trigger", (float)(TempoHandler.nextBeatTime - AudioSettings.dspTime));
+        Debug.Log("I've been shot!");
+        sourceToggle = 1 - sourceToggle;
     }
 }
 

@@ -27,6 +27,7 @@ public class GroundTile : MonoBehaviour
     //Handling Updates
     private bool triggerBeatNextUpdate = false;
     public static event Action<Coordinate> OnTowerUpdated;
+    private double visualDelay = 0.0;
 
     // Fading variables
     [SerializeField] private float fadeDuration = 1f; // Duration of fade in seconds
@@ -57,14 +58,17 @@ public class GroundTile : MonoBehaviour
 
     void Update()
     {
+        visualDelay -= (double) Time.deltaTime;
         // Handle color fading
         if (isFading)
         {
             fadeTimer += Time.deltaTime;
             float t = Mathf.Clamp01(fadeTimer / fadeDuration);
             
-            if (SelectionHandler.currentSelectedTile != this)
+            if (SelectionHandler.currentSelectedTile != this && SelectionHandler.currentHoveredTile != this)
+            {
                 tileRenderer.material.color = Color.Lerp(fadeStartColor, fadeTargetColor, t);
+            }
 
             if (t >= 1f)
             {
@@ -73,14 +77,15 @@ public class GroundTile : MonoBehaviour
         }
 
         // if pulse happened last frame, propagate pulse to next tiles on next beat
-        if (pulsesCached.Count != 0)
+        if (pulsesCached.Count != 0 && visualDelay <= 0)
         {
             //for each pulse cached, either return it to the list with delay, or send it to next tile
             foreach (Pulse pulse in pulsesCached)
             {
-                if (pulse.delay > 0)
+                if (pulse.delay > 0 && pulse.life != 0)
                 {
                     pulse.delay -= 1;
+                    pulse.life--;
     
                     //if delay is now 0 and a tower exists on the tile, play tower sound and notify tower of pulse, otherwise re-add to pulse list to propigate
                     if (pulse.delay == 0 && tower != null)
@@ -100,9 +105,8 @@ public class GroundTile : MonoBehaviour
                     }
                     continue;
                 }
-                if (SelectionHandler.currentSelectedTile != this)
-                    tileRenderer.material.color = beatMaterialColor;
-                    StartFade(beatMaterialColor, originalColor);
+                
+                StartFade(beatMaterialColor, originalColor);
                 
                 //whether or not the pulse actually continues to another tile is handled in PropagatePulse()
                 PropagatePulse(pulse);
@@ -114,6 +118,7 @@ public class GroundTile : MonoBehaviour
         if (triggerBeatNextUpdate)
         {
             triggerBeatNextUpdate = false;
+            visualDelay = TempoHandler.beatLength * 3/4;
 
             //if active pulse on tile, add to cache to be sent onward next update
             if (pulses.Count > 0)
@@ -129,7 +134,7 @@ public class GroundTile : MonoBehaviour
 
     private void StartFade(Color from, Color to)
     {
-        if (SelectionHandler.currentSelectedTile != this)
+        if (SelectionHandler.currentSelectedTile != this && SelectionHandler.currentHoveredTile != this)
         {
             tileRenderer.material.color = from;
         }
@@ -143,6 +148,12 @@ public class GroundTile : MonoBehaviour
     // used to create a new Pulse, either on this tile or to propagate to another tile
     public void SchedulePulse(Pulse pulse)
     {
+        foreach (Pulse p in pulses)
+        {
+            if (p.direction == pulse.direction && p.delay == pulse.delay && !pulse.source)
+                return;
+        }
+
         pulse.originTile = tileCoordinate;
         pulses.Add(pulse);
 
@@ -206,7 +217,7 @@ public class GroundTile : MonoBehaviour
     {
         if (Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1) != null && (pulse.continuous || pulse.source) && pulse.life != 0)
         {
-            Pulse nextPulse = new Pulse(pulse.direction);
+            Pulse nextPulse = new Pulse(pulse.direction, life: pulse.life);
             Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1).go.GetComponent<GroundTile>().SchedulePulse(nextPulse);
         }
     }

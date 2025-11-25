@@ -15,8 +15,14 @@ public class TowerUI : MonoBehaviour
 
     public void SetTargetTile(GroundTile tile)
     {
+        deleteButton.gameObject.SetActive(true);
         deleteButton.onClick.RemoveAllListeners();
         deleteButton.onClick.AddListener(() => tile.RemoveTower());
         deleteButton.onClick.AddListener(() => this.gameObject.SetActive(false));
+
+        if (tile.tower is SourceTower)
+        {
+            deleteButton.gameObject.SetActive(false);
+        }
     }
 }

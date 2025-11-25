@@ -106,9 +106,16 @@ public class SelectionHandler : MonoBehaviour
 
                     // Select new tile
                     currentSelectedTile = collidedTile;
+                    currentSelectedTile.Select();
+                }
+                else
+                {
+                    DeselectCurrent();
+                    TowerSelection.Instance.gameObject.SetActive(false);
+                    TowerUI.Instance.gameObject.SetActive(false);
                 }
                 
-                currentSelectedTile.Select();
+
             }
             else if (!Physics.Raycast(ray, out hit))
             {
@@ -266,53 +273,49 @@ public class SelectionHandler : MonoBehaviour
             GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
 
             // Calculate the distance from tower to mouse
-            int targetDistance = -1;
+            int targetDistance;
             List<Coordinate> ringTiles = new List<Coordinate>();
-            
-            if (currentSelectedTile != null && currentSelectedTile.tower != null)
-            {
-                LobberTower lobberTower = currentSelectedTile.tower as LobberTower;
-                if (lobberTower != null)
-                {
-                    // Get distance to mouse position
-                    float mouseDistance = Cubes.GetDistanceBetweenTwoCubes(currentSelectedTile.tileCoordinate.cube, collidedTile.tileCoordinate.cube);
-                    
-                    // Clamp to valid range
-                    targetDistance = Mathf.Clamp(Mathf.RoundToInt(mouseDistance), lobberTower.minLobDistance, lobberTower.maxLobDistance);
-                    
-                    // Get all tiles at this distance (the ring)
-                    ringTiles = lobberTower.GetLobRingAtDistance(targetDistance);
-                }
-            }
+            LobberTower lobberTower = currentSelectedTile.tower as LobberTower;
 
-            // Check if we need to update the visualization
-            bool needsUpdate = false;
+            // Get distance to mouse position
+            float mouseDistance = Cubes.GetDistanceBetweenTwoCubes(currentSelectedTile.tileCoordinate.cube, collidedTile.tileCoordinate.cube);
             
-            // Check if distance changed or if lowlighted tiles count doesn't match ring size
-            if (lowlightedTiles.Count != ringTiles.Count)
-            {
-                needsUpdate = true;
-            }
-            else
-            {
-                // Check if any tiles in the ring are different from current lowlighted tiles
-                foreach (Coordinate coord in ringTiles)
-                {
-                    GroundTile tile = coord.go.GetComponent<GroundTile>();
-                    if (!lowlightedTiles.Contains(tile))
-                    {
-                        needsUpdate = true;
-                        break;
-                    }
-                }
-            }
+            // Clamp to valid range
+            targetDistance = Mathf.Clamp(Mathf.RoundToInt(mouseDistance), lobberTower.minLobDistance, lobberTower.maxLobDistance);
+            
+            // Get all tiles at this distance (the ring)
+            ringTiles = GetLobRingAtDistance(targetDistance, currentSelectedTile);
 
-            if (needsUpdate)
+            if (currentHoveredTile != collidedTile)
             {
-                // Clear previous highlights
+                 // Remove highlight from previous tile and clear all lowlighted tiles
                 if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
                 {
                     currentHoveredTile.Deselect();
+                }
+                
+                SelectionUtility.DeselectListOfTiles(lowlightedTiles);
+                lowlightedTiles.Clear();
+
+                // Highlight new tile (only if it's not selected)
+                currentHoveredTile = collidedTile;
+                if (currentHoveredTile != currentSelectedTile)
+                {
+                    currentHoveredTile.Highlight();
+                }
+
+                // Find the tile closest to the mouse in the ring
+                GroundTile closestTile = null;
+                float closestDist = float.MaxValue;
+                
+                foreach (Coordinate coord in ringTiles)
+                { 
+                    float dist = Cubes.GetDistanceBetweenTwoCubes(coord.cube, collidedTile.tileCoordinate.cube);
+                    if (dist < closestDist)
+                    {
+                        closestDist = dist;
+                        closestTile = coord.go.GetComponent<GroundTile>();
+                    }
                 }
                 
                 foreach (GroundTile tile in lowlightedTiles)
@@ -332,25 +335,7 @@ public class SelectionHandler : MonoBehaviour
                     }
                 }
                 
-                // Find and highlight the tile closest to the mouse in the ring
-                GroundTile closestTile = null;
-                float closestDist = float.MaxValue;
                 
-                foreach (Coordinate coord in ringTiles)
-                {
-                    float dist = Cubes.GetDistanceBetweenTwoCubes(coord.cube, collidedTile.tileCoordinate.cube);
-                    if (dist < closestDist)
-                    {
-                        closestDist = dist;
-                        closestTile = coord.go.GetComponent<GroundTile>();
-                    }
-                }
-                
-                if (closestTile != null && closestTile != currentSelectedTile)
-                {
-                    currentHoveredTile = closestTile;
-                    currentHoveredTile.Highlight();
-                }
             }
         }
         else
@@ -366,6 +351,28 @@ public class SelectionHandler : MonoBehaviour
             }
             lowlightedTiles.Clear();
         }
+    }
+
+    // Get all tiles at a specific distance in all 6 directions (forms a ring)
+    public List<Coordinate> GetLobRingAtDistance(int distance, GroundTile centerTile)
+    {
+        List<Coordinate> ringTiles = new List<Coordinate>();
+        
+        if (centerTile == null || centerTile.tileCoordinate == null)
+            return ringTiles;
+
+
+        // Check each of the 6 hex directions at this distance
+        for (int dir = 0; dir < 6; dir++)
+        {
+            Coordinate coord = Coordinates.Instance.GetNeighbor(centerTile.tileCoordinate, dir, distance);
+            if (coord != null)
+            {
+                ringTiles.Add(coord);
+            }
+        }
+
+        return ringTiles;
     }
 
     void HandleLobberTowerClick()

@@ -11,8 +11,9 @@ public class Tower : MonoBehaviour
     //audio playback
     public AudioSource[] _audioSources;
     public AudioClip playbackClip;
-    private int sourceToggle;
+    internal int sourceToggle;
     public bool towerAlreadyActivatedThisBeat;
+    internal LibPdInstance pdInstance;
 
     //tower effects
     public GroundTile tile;
@@ -25,6 +26,10 @@ public class Tower : MonoBehaviour
         sourceToggle = 0;
         directions = new List<int>();
         towerAlreadyActivatedThisBeat = false;
+        if (GetComponent<LibPdInstance>() != null)
+        {
+            pdInstance = GetComponent<LibPdInstance>();
+        }
     }
 
     internal virtual void Update()

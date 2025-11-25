@@ -87,7 +87,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -214,7 +214,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -267,8 +267,9 @@ GameObject:
   - component: {fileID: 2962817409258140665}
   - component: {fileID: -9099161421716354733}
   - component: {fileID: 1563792546109287306}
+  - component: {fileID: 367364563412266315}
   m_Layer: 0
-  m_Name: ClapTower
+  m_Name: BounceTower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -368,7 +369,7 @@ AudioSource:
   m_GameObject: {fileID: 9057431189203469463}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 5615980910655735734, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
@@ -455,3 +456,57 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &367364563412266315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9057431189203469463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 653eaa228d164494e988c0c7cf77f78c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  patchName: tower-test
+  patchDir: /PureDataAssets/
+  patch: {fileID: 102900000, guid: 4cb3325ff92ffab4cb93e13ae0f8001c, type: 3}
+  pipePrintToConsole: 1
+  pureDataEvents:
+    Bang:
+      m_PersistentCalls:
+        m_Calls: []
+    Float:
+      m_PersistentCalls:
+        m_Calls: []
+    Symbol:
+      m_PersistentCalls:
+        m_Calls: []
+    List:
+      m_PersistentCalls:
+        m_Calls: []
+    Message:
+      m_PersistentCalls:
+        m_Calls: []
+  midiEvents:
+    MidiNoteOn:
+      m_PersistentCalls:
+        m_Calls: []
+    MidiControlChange:
+      m_PersistentCalls:
+        m_Calls: []
+    MidiProgramChange:
+      m_PersistentCalls:
+        m_Calls: []
+    MidiPitchBend:
+      m_PersistentCalls:
+        m_Calls: []
+    MidiAftertouch:
+      m_PersistentCalls:
+        m_Calls: []
+    MidiPolyAftertouch:
+      m_PersistentCalls:
+        m_Calls: []
+    MidiByte:
+      m_PersistentCalls:
+        m_Calls: []

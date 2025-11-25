@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using CubeCoordinates;
+using System.Collections.Generic;
 
 public class Pulse
 {
@@ -20,5 +21,12 @@ public class Pulse
         this.continuous = continuous;
         this.source = source;
         this.life = life;
+
+        PlayButtonController.OnTriggerStop += Kill;
+    }
+
+    void Kill()
+    {
+        life = 0;
     }
 }

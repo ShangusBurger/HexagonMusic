@@ -4,15 +4,7 @@ using CubeCoordinates;
 using UnityEngine;
 
 public class SinkTower : Tower
-{
-    private LibPdInstance pdInstance;
-    
-    internal override void Start()
-    {
-        base.Start();
-        pdInstance = GetComponent<LibPdInstance>();
-    }
-    
+{   
     internal override void Update()
     {
         base.Update();
@@ -30,8 +22,7 @@ public class SinkTower : Tower
     {
         goalTime = TempoHandler.nextBeatTime;
        
-        //base.PlayScheduledClip();
+        base.PlayScheduledClip();
         towerAlreadyActivatedThisBeat = true;
-        pdInstance.SendBang("bang");
     }
 }

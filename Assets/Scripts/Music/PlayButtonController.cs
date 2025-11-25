@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class PlayButtonController : MonoBehaviour
 {
     [SerializeField] private Button playButton;
+    [SerializeField] private Button stopButton;
     public static PlayButtonController Instance;
     
     // Event that Source Towers can subscribe to
@@ -26,7 +27,7 @@ public class PlayButtonController : MonoBehaviour
             Instance = this;
         }
         
-        playButton.onClick.AddListener(TriggerPlay);
+        stopButton.gameObject.SetActive(false);
     }
     
     public void TriggerPlay()
@@ -34,19 +35,15 @@ public class PlayButtonController : MonoBehaviour
         // Notify all Source Towers to trigger their pulses
         OnTriggerPlay?.Invoke();
         isPlaying = true;
-        playButton.GetComponentInChildren<Image>().color = Color.red;
-        playButton.GetComponentInChildren<TMP_Text>().text = "STOP";
-        playButton.onClick.RemoveListener(TriggerPlay);
-        playButton.onClick.AddListener(TriggerStop);
+        playButton.gameObject.SetActive(false);
+        stopButton.gameObject.SetActive(true);
     }
 
     public void TriggerStop()
     {
         OnTriggerStop?.Invoke();
         isPlaying = false;
-        playButton.GetComponentInChildren<Image>().color = Color.green;
-        playButton.GetComponentInChildren<TMP_Text>().text = "PLAY";
-        playButton.onClick.RemoveListener(TriggerStop);
-        playButton.onClick.AddListener(TriggerPlay);
+        stopButton.gameObject.SetActive(false);
+        playButton.gameObject.SetActive(true);
     }
 }

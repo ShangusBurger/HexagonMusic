@@ -56,28 +56,6 @@ public class LobberTower : Tower
         }
     }
 
-    // Get all tiles at a specific distance in all 6 directions (forms a ring)
-    public List<Coordinate> GetLobRingAtDistance(int distance)
-    {
-        List<Coordinate> ringTiles = new List<Coordinate>();
-        
-        if (tile == null || tile.tileCoordinate == null)
-            return ringTiles;
-
-
-        // Check each of the 6 hex directions at this distance
-        for (int dir = 0; dir < 6; dir++)
-        {
-            Coordinate coord = Coordinates.Instance.GetNeighbor(tile.tileCoordinate, dir, distance);
-            if (coord != null)
-            {
-                ringTiles.Add(coord);
-            }
-        }
-
-        return ringTiles;
-    }
-
     internal override void PlayScheduledClip()
     {
         goalTime = TempoHandler.nextBeatTime;
