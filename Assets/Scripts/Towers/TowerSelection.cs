@@ -36,5 +36,9 @@ public class TowerSelection : MonoBehaviour
         lobberButton.onClick.RemoveAllListeners();
         lobberButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Lobber));  
         lobberButton.onClick.AddListener(() => this.gameObject.SetActive(false));
+
+        sprayerButton.onClick.RemoveAllListeners();
+        sprayerButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Sprayer));  
+        sprayerButton.onClick.AddListener(() => this.gameObject.SetActive(false));
     }
 }

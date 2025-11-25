@@ -217,6 +217,10 @@ public class GroundTile : MonoBehaviour
     {
         if (Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1) != null && (pulse.continuous || pulse.source) && pulse.life != 0)
         {
+            if (pulse.life > 0)
+            {
+                pulse.life--;
+            }
             Pulse nextPulse = new Pulse(pulse.direction, life: pulse.life);
             Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1).go.GetComponent<GroundTile>().SchedulePulse(nextPulse);
         }
@@ -266,6 +270,10 @@ public class GroundTile : MonoBehaviour
                 tower = Instantiate(TileMapConstructor.Instance.lobberTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
                 SelectionHandler.currentMouseState = MouseState.SetLobberTower;
+                break;
+            case TowerType.Sprayer:
+                tower = Instantiate(TileMapConstructor.Instance.sprayerTowerPrefab, transform).GetComponent<Tower>();
+                tower.tile = this;
                 break;
         }
         

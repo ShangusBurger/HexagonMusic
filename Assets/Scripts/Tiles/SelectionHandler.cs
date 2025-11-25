@@ -111,8 +111,10 @@ public class SelectionHandler : MonoBehaviour
                 else
                 {
                     DeselectCurrent();
+                    
                     TowerSelection.Instance.gameObject.SetActive(false);
-                    TowerUI.Instance.gameObject.SetActive(false);
+                    if (TowerUI.Instance != null)
+                        TowerUI.Instance.gameObject.SetActive(false);
                 }
                 
 

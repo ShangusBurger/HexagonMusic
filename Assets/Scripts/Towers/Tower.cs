@@ -90,5 +90,6 @@ public enum TowerType
     Mono,
     Splitter,
     Sink,
-    Lobber
+    Lobber,
+    Sprayer
 }

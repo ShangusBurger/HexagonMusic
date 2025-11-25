@@ -353,9 +353,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goalTime: 0
-  _audioSources: []
-  playbackClip: {fileID: 8300000, guid: e77cc49654c1da548b88143ff9af3a56, type: 3}
+  _audioSources:
+  - {fileID: 3568778329882750925}
+  - {fileID: 1319045277087054885}
+  playbackClip: {fileID: 8300000, guid: 90bd825133590e4468f37a4e5565c0b9, type: 3}
   towerAlreadyActivatedThisBeat: 0
+  isMuted: 0
   tile: {fileID: 0}
   directions: 
 --- !u!82 &697923999967202072

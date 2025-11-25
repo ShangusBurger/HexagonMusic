@@ -354,8 +354,9 @@ MonoBehaviour:
   _audioSources:
   - {fileID: 3568778329882750925}
   - {fileID: 1319045277087054885}
-  playbackClip: {fileID: 8300000, guid: c450306a9133bf44f856016326b71018, type: 3}
+  playbackClip: {fileID: 8300000, guid: d8362c490eed21647b46c4ec606e1d48, type: 3}
   towerAlreadyActivatedThisBeat: 0
+  isMuted: 0
   tile: {fileID: 0}
   directions: 
   minLobDistance: 2
