@@ -29,23 +29,23 @@ public class PlayButtonController : MonoBehaviour
         playButton.onClick.AddListener(TriggerPlay);
     }
     
-    void TriggerPlay()
+    public void TriggerPlay()
     {
         // Notify all Source Towers to trigger their pulses
         OnTriggerPlay?.Invoke();
         isPlaying = true;
-        playButton.GetComponent<Image>().color = Color.red;
-        playButton.GetComponent<TMP_Text>().text = "STOP";
+        playButton.GetComponentInChildren<Image>().color = Color.red;
+        playButton.GetComponentInChildren<TMP_Text>().text = "STOP";
         playButton.onClick.RemoveListener(TriggerPlay);
         playButton.onClick.AddListener(TriggerStop);
     }
 
-    void TriggerStop()
+    public void TriggerStop()
     {
         OnTriggerStop?.Invoke();
         isPlaying = false;
-        playButton.GetComponent<Image>().color = Color.green;
-        playButton.GetComponent<TMP_Text>().text = "PLAY";
+        playButton.GetComponentInChildren<Image>().color = Color.green;
+        playButton.GetComponentInChildren<TMP_Text>().text = "PLAY";
         playButton.onClick.RemoveListener(TriggerStop);
         playButton.onClick.AddListener(TriggerPlay);
     }

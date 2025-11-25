@@ -8,8 +8,10 @@ public class LobberTower : Tower
     public int minLobDistance = 2;
     public int maxLobDistance = 6;
     public int lobDelay = 2;
+    public int lobDistance = -1;
+
+    public GameObject lobProjectilePrefab;
     
-    public GroundTile targetTile;
 
     internal override void Update()
     {
@@ -20,93 +22,60 @@ public class LobberTower : Tower
     {
         base.OnPulseReceived(incomingPulse);
 
-        // Lob the pulse to the target tile if one is set
-        if (targetTile != null && directions.Count > 0)
-        {
-            // Create a pulse that will continue in the lob direction
-            Pulse lobbedPulse = new Pulse(directions[0], continuous: true, source: false, delay: lobDelay);
-            targetTile.SchedulePulse(lobbedPulse);
-        }
-    }
-
-    // Helper method to check if a tile is within valid lob range AND in a hex direction
-    public bool IsValidLobTarget(Coordinate target)
-    {
-        if (target == null || tile == null || tile.tileCoordinate == null)
-            return false;
-
-        float distance = Cubes.GetDistanceBetweenTwoCubes(tile.tileCoordinate.cube, target.cube);
+        // Lob the pulse in the same direction it came from, at the set distance
+        Coordinate targetCoord = Coordinates.Instance.GetNeighbor(tile.tileCoordinate, incomingPulse.direction, lobDistance);
         
-        // Check if distance is valid
-        if (distance < minLobDistance || distance > maxLobDistance)
-            return false;
-
-        // Check if target is in one of the 6 hex directions
-        for (int dir = 0; dir < 6; dir++)
+        if (targetCoord != null && lobDistance > 0)
         {
-            Coordinate checkCoord = Coordinates.Instance.GetNeighbor(tile.tileCoordinate, dir, (int)distance);
-            if (checkCoord != null && checkCoord.cube == target.cube)
-            {
-                return true;
-            }
-        }
+            GroundTile targetGroundTile = targetCoord.go.GetComponent<GroundTile>();
+            // Create a pulse that will continue in the same direction
+            Pulse lobbedPulse = new Pulse(incomingPulse.direction, continuous: true, source: false, delay: lobDelay);
+            targetGroundTile.SchedulePulse(lobbedPulse);
 
-        return false;
+            // Spawn and launch the projectile
+            LaunchProjectile(targetGroundTile, lobbedPulse);
+        }
     }
 
-    // Get all valid tiles within lob range in hex directions
-    public List<Coordinate> GetValidLobTargets()
+     void LaunchProjectile(GroundTile targetTile, Pulse pulse)
     {
-        List<Coordinate> validTargets = new List<Coordinate>();
+        // Calculate flight duration based on lobDelay (in beats)
+        double flightDuration = TempoHandler.beatLength * lobDelay;
+        
+        // Get start and end positions
+        Vector3 startPos = transform.position;
+        Vector3 targetPos = targetTile.transform.position;
+        
+        // Instantiate projectile
+        GameObject projectile = Instantiate(lobProjectilePrefab, startPos, Quaternion.identity);
+        LobProjectile lobScript = projectile.GetComponent<LobProjectile>();
+        
+        if (lobScript != null)
+        {
+            lobScript.Initialize(startPos, targetPos, (float)flightDuration, targetTile, (float)(TempoHandler.nextBeatTime - AudioSettings.dspTime) + .1f);
+        }
+    }
+
+    // Get all tiles at a specific distance in all 6 directions (forms a ring)
+    public List<Coordinate> GetLobRingAtDistance(int distance)
+    {
+        List<Coordinate> ringTiles = new List<Coordinate>();
         
         if (tile == null || tile.tileCoordinate == null)
-            return validTargets;
+            return ringTiles;
 
-        // Check each of the 6 hex directions
+
+        // Check each of the 6 hex directions at this distance
         for (int dir = 0; dir < 6; dir++)
         {
-            // Check each distance from min to max
-            for (int dist = minLobDistance; dist <= maxLobDistance; dist++)
+            Coordinate coord = Coordinates.Instance.GetNeighbor(tile.tileCoordinate, dir, distance);
+            if (coord != null)
             {
-                Coordinate coord = Coordinates.Instance.GetNeighbor(tile.tileCoordinate, dir, dist);
-                if (coord != null)
-                {
-                    validTargets.Add(coord);
-                }
+                ringTiles.Add(coord);
             }
         }
 
-        return validTargets;
-    }
-
-    public void SetTargetTile(Coordinate target)
-    {
-        if (IsValidLobTarget(target))
-        {
-            targetTile = target.go.GetComponent<GroundTile>();
-            // Determine which direction the pulse should continue in
-            SetDirection(GetLobDirection(target));
-        }
-    }
-
-    // Determine which of the 6 hex directions the target is in
-    private int GetLobDirection(Coordinate target)
-    {
-        if (target == null || tile == null || tile.tileCoordinate == null)
-            return -1;
-
-        float distance = Cubes.GetDistanceBetweenTwoCubes(tile.tileCoordinate.cube, target.cube);
-
-        for (int dir = 0; dir < 6; dir++)
-        {
-            Coordinate checkCoord = Coordinates.Instance.GetNeighbor(tile.tileCoordinate, dir, (int)distance);
-            if (checkCoord != null && checkCoord.cube == target.cube)
-            {
-                return dir;
-            }
-        }
-
-        return -1;
+        return ringTiles;
     }
 
     internal override void PlayScheduledClip()

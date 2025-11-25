@@ -358,3 +358,8 @@ MonoBehaviour:
   towerAlreadyActivatedThisBeat: 0
   tile: {fileID: 0}
   directions: 
+  minLobDistance: 2
+  maxLobDistance: 6
+  lobDelay: 2
+  lobDistance: -1
+  lobProjectilePrefab: {fileID: 4616752181272996383, guid: 14b6b8774a35c2948820574024da5abd, type: 3}

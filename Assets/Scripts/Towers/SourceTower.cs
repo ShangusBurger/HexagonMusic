@@ -26,12 +26,12 @@ public class SourceTower : Tower
     {
         base.Update();
         //schedules next beat once the instrument has sounded
-        // if (AudioSettings.dspTime > goalTime)
-        // {
-        //     TriggerPulses();
-        //     goalTime += TempoHandler.barLength;
-        //     PlayScheduledClip();
-        // }
+        if (AudioSettings.dspTime > goalTime)
+        {
+            TriggerPulses();
+            goalTime += TempoHandler.barLength;
+            PlayScheduledClip();
+        }
     }
 
     void TriggerPulses()

@@ -47,16 +47,6 @@ public class TempoHandler : MonoBehaviour
         nextBeatTime = startDSPTime + beatLength;
     }
 
-    void Update()
-    {
-        HandleNextBeatAnimation();
-    }
-
-    void HandleNextBeatAnimation()
-    {
-        
-    }
-
     void OnAudioFilterRead(float[] data, int channels)
     {
         //If a beat has passed

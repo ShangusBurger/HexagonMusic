@@ -64,9 +64,7 @@ public class GroundTile : MonoBehaviour
             float t = Mathf.Clamp01(fadeTimer / fadeDuration);
             
             if (SelectionHandler.currentSelectedTile != this)
-            {
                 tileRenderer.material.color = Color.Lerp(fadeStartColor, fadeTargetColor, t);
-            }
 
             if (t >= 1f)
             {
@@ -131,7 +129,11 @@ public class GroundTile : MonoBehaviour
 
     private void StartFade(Color from, Color to)
     {
-        tileRenderer.material.color = from;
+        if (SelectionHandler.currentSelectedTile != this)
+        {
+            tileRenderer.material.color = from;
+        }
+        
         fadeStartColor = from;
         fadeTargetColor = to;
         fadeTimer = 0f;
@@ -242,10 +244,12 @@ public class GroundTile : MonoBehaviour
             case TowerType.Splitter:
                 tower = Instantiate(TileMapConstructor.Instance.splitterTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
+                SelectionHandler.DeselectCurrent();
                 break;
             case TowerType.Sink:
                 tower = Instantiate(TileMapConstructor.Instance.sinkTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
+                SelectionHandler.DeselectCurrent();
                 break;
             case TowerType.Lobber:
                 tower = Instantiate(TileMapConstructor.Instance.lobberTowerPrefab, transform).GetComponent<Tower>();
