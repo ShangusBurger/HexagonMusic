@@ -25,7 +25,7 @@ public class TowerSelection : MonoBehaviour
         monoButton.onClick.AddListener(() => this.gameObject.SetActive(false));
 
         sourceButton.onClick.RemoveAllListeners();
-        sourceButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Source));  
+        sourceButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Sink));  
         sourceButton.onClick.AddListener(() => this.gameObject.SetActive(false));
 
         splitterButton.onClick.RemoveAllListeners();

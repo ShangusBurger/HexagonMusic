@@ -1988,6 +1988,7 @@ MonoBehaviour:
   sourceTowerPrefab: {fileID: 9057431189203469463, guid: 7ac54c138f98e1145be8d1142bfe09a2, type: 3}
   monoTowerPrefab: {fileID: 9057431189203469463, guid: cfcbadbbbc395194ba2963e848d32a90, type: 3}
   splitterTowerPrefab: {fileID: 9057431189203469463, guid: ab237f8bd55218b42881bab03f76c9ac, type: 3}
+  sinkTowerPrefab: {fileID: 9057431189203469463, guid: a2545750cbd4a9d4ba94a780f643481e, type: 3}
   lobberTowerPrefab: {fileID: 9057431189203469463, guid: b9f5fd4942be5944989a24a0d0061b14, type: 3}
 --- !u!1 &1616201827
 GameObject:
@@ -2235,7 +2236,7 @@ MonoBehaviour:
   patchName: main~
   patchDir: /PureDataAssets/
   patch: {fileID: 102900000, guid: 361bd0098fb6ff14db9c7e7f81384976, type: 3}
-  pipePrintToConsole: 1
+  pipePrintToConsole: 0
   pureDataEvents:
     Bang:
       m_PersistentCalls:
@@ -2398,7 +2399,7 @@ GameObject:
   - component: {fileID: 2129288332}
   - component: {fileID: 2129288331}
   m_Layer: 5
-  m_Name: Source
+  m_Name: Sink
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

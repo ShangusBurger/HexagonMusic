@@ -75,5 +75,6 @@ public enum TowerType
     Source,
     Mono,
     Splitter,
+    Sink,
     Lobber
 }

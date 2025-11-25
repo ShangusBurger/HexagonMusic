@@ -151,12 +151,11 @@ public class GroundTile : MonoBehaviour
             if (!tower.towerAlreadyActivatedThisBeat)
             {
                 tower.PlayScheduledClip();
-
-                // Notify the tower that a pulse has been received
-                if (!pulse.source)
-                {
-                    tower.OnPulseReceived(pulse);
-                }
+            }
+            // Notify the tower that a pulse has been received
+            if (!pulse.source)
+            {
+                tower.OnPulseReceived(pulse);
             }
         }
     }
@@ -203,7 +202,7 @@ public class GroundTile : MonoBehaviour
 
     public void PropagatePulse(Pulse pulse)
     {
-        if (Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1) != null && (pulse.continuous || pulse.source))
+        if (Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1) != null && (pulse.continuous || pulse.source) && pulse.life != 0)
         {
             Pulse nextPulse = new Pulse(pulse.direction);
             Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1).go.GetComponent<GroundTile>().SchedulePulse(nextPulse);
@@ -242,6 +241,10 @@ public class GroundTile : MonoBehaviour
                 break;
             case TowerType.Splitter:
                 tower = Instantiate(TileMapConstructor.Instance.splitterTowerPrefab, transform).GetComponent<Tower>();
+                tower.tile = this;
+                break;
+            case TowerType.Sink:
+                tower = Instantiate(TileMapConstructor.Instance.sinkTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
                 break;
             case TowerType.Lobber:

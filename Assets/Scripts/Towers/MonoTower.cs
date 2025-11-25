@@ -5,11 +5,9 @@ using UnityEngine;
 
 public class MonoTower : Tower
 {
-    private LibPdInstance pdInstance;
     internal override void Start()
     {
         base.Start();
-        pdInstance = GetComponent<LibPdInstance>();
     }
     internal override void Update()
     {
@@ -32,8 +30,6 @@ public class MonoTower : Tower
     {
         goalTime = TempoHandler.nextBeatTime;
         base.PlayScheduledClip();
-
-        //pdInstance.SendBang("bang");
     }
 }
 

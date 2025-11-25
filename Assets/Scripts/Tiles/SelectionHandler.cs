@@ -33,7 +33,6 @@ public class SelectionHandler : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("Current Mouse State: " + currentMouseState);
         switch (currentMouseState)
         {
             case MouseState.Free:
@@ -112,6 +111,7 @@ public class SelectionHandler : MonoBehaviour
                     // Select new tile
                     currentSelectedTile = collidedTile;
                 }
+                
                 currentSelectedTile.Select();
             }
             else if (!Physics.Raycast(ray, out hit))
@@ -120,6 +120,7 @@ public class SelectionHandler : MonoBehaviour
                 if (TowerSelection.Instance.gameObject.activeSelf && currentSelectedTile != null)
                 {
                     TowerSelection.Instance.gameObject.SetActive(false);
+                    TowerUI.Instance.gameObject.SetActive(false);
                     currentSelectedTile.Deselect();
                 }
                 
@@ -130,6 +131,7 @@ public class SelectionHandler : MonoBehaviour
     // Opens the tower selection canvas at the tile's position. Buttons continue the UI.
     public static void OfferTowerPlacement(GroundTile tile)
     {
+        Instance.towerUICanvas.SetActive(false);
         Instance.towerSelectCanvas.SetActive(true);
         Instance.towerSelectCanvas.transform.position = new Vector3(tile.transform.position.x, Instance.towerSelectCanvas.transform.position.y, tile.transform.position.z);
         Instance.towerSelectCanvas.GetComponent<TowerSelection>().SetTargetTile(tile);
@@ -137,6 +139,7 @@ public class SelectionHandler : MonoBehaviour
 
     public static void OpenTowerUI(GroundTile tile)
     {
+        Instance.towerSelectCanvas.SetActive(false);
         Instance.towerUICanvas.SetActive(true);
         Instance.towerUICanvas.transform.position = new Vector3(tile.transform.position.x, Instance.towerSelectCanvas.transform.position.y, tile.transform.position.z);
         Instance.towerUICanvas.GetComponent<TowerUI>().SetTargetTile(tile);
