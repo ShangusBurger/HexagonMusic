@@ -10,6 +10,7 @@ public class TowerSelection : MonoBehaviour
     [SerializeField] private Button splitterButton;
     [SerializeField] private Button lobberButton;
     [SerializeField] private Button sprayerButton;
+    [SerializeField] private Button bufferButton;
     
 
     public static TowerSelection Instance;
@@ -40,5 +41,9 @@ public class TowerSelection : MonoBehaviour
         sprayerButton.onClick.RemoveAllListeners();
         sprayerButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Sprayer));  
         sprayerButton.onClick.AddListener(() => this.gameObject.SetActive(false));
+        
+        bufferButton.onClick.RemoveAllListeners();
+        bufferButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Buffer));  
+        bufferButton.onClick.AddListener(() => this.gameObject.SetActive(false));
     }
 }

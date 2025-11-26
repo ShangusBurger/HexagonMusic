@@ -22,12 +22,13 @@ public class GroundTile : MonoBehaviour
     public List<Pulse> pulses; //List of directions toward which the signal is flowing on the next pulse of the beat
     public List<Pulse> pulsesCached; //List of pulses to be processed on the next update
     public int beatsUntilPulse = -1;
+    public static event Action PulseExistsNotif;
 
 
     //Handling Updates
     private bool triggerBeatNextUpdate = false;
     public static event Action<Coordinate> OnTowerUpdated;
-    private double visualDelay = 0.0;
+    public double visualDelay = 0.0;
 
     // Fading variables
     [SerializeField] private float fadeDuration = 1f; // Duration of fade in seconds
@@ -58,6 +59,11 @@ public class GroundTile : MonoBehaviour
 
     void Update()
     {
+        if (pulsesCached.Count > 0 || pulses.Count > 0)
+        {
+            PulseExistsNotif?.Invoke();
+        }
+
         visualDelay -= (double) Time.deltaTime;
         // Handle color fading
         if (isFading)
@@ -76,8 +82,8 @@ public class GroundTile : MonoBehaviour
             }
         }
 
-        // if pulse happened last frame, propagate pulse to next tiles on next beat
-        if (pulsesCached.Count != 0 && visualDelay <= 0)
+        // if pulse happened last beat, propagate pulse to next tiles on next frame
+        if (pulsesCached.Count != 0 && visualDelay <= 0.0)
         {
             //for each pulse cached, either return it to the list with delay, or send it to next tile
             foreach (Pulse pulse in pulsesCached)
@@ -157,19 +163,21 @@ public class GroundTile : MonoBehaviour
         pulse.originTile = tileCoordinate;
         pulses.Add(pulse);
 
-        //play tower sound (and redirect pulse according to tower rules) if there is a tower on this tile
+        //play tower sound and notify existing tower of pulse
         if (tower != null && pulse.delay <= 0)
         {
             pulse.continuous = false;
-            if (!tower.towerAlreadyActivatedThisBeat)
-            {
-                tower.PlayScheduledClip();
-            }
             // Notify the tower that a pulse has been received
             if (!pulse.source)
             {
                 tower.OnPulseReceived(pulse);
             }
+
+            if (!tower.towerAlreadyActivatedThisBeat)
+            {
+                tower.PlayScheduledClip();
+            }
+            
         }
     }
 
@@ -196,7 +204,7 @@ public class GroundTile : MonoBehaviour
             OnTowerUpdated?.Invoke(TileMapConstructor.allTiles.GetCoordinateFromWorldPosition(transform.position));
             return;
         }
-
+        SelectionHandler.HideTowerUIs();
         SelectionHandler.OpenTowerUI(this);
     }
 
@@ -244,7 +252,7 @@ public class GroundTile : MonoBehaviour
     }
 
     public void AddTowerToTile(TowerType type)
-    {
+    {   
         switch (type)
         {
             case TowerType.Source:
@@ -275,8 +283,14 @@ public class GroundTile : MonoBehaviour
                 tower = Instantiate(TileMapConstructor.Instance.sprayerTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
                 break;
+            case TowerType.Buffer:
+                tower = Instantiate(TileMapConstructor.Instance.bufferTowerPrefab, transform).GetComponent<Tower>();
+                tower.tile = this;
+                break;
         }
-        
+
+        SelectionHandler.HideTowerUIs();
     }
 
+    
 }

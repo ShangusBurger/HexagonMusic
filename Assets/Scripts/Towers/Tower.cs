@@ -14,12 +14,16 @@ public class Tower : MonoBehaviour
     internal int sourceToggle;
     public bool towerAlreadyActivatedThisBeat;
     internal LibPdInstance pdInstance;
-    public bool isMuted = false;
+    internal bool isMuted = false;
 
     //tower effects
     public GroundTile tile;
+
     //used for directing pulses for mono/duo/lobber towers
     public List<int> directions;
+
+    //Tower UI reference
+    public TowerUI towerUI;
 
     internal virtual void Start()
     {
@@ -31,6 +35,9 @@ public class Tower : MonoBehaviour
         {
             pdInstance = GetComponent<LibPdInstance>();
         }
+
+        if (towerUI != null)
+            towerUI.SetTargetTower(this);
     }
 
     internal virtual void Update()
@@ -81,6 +88,21 @@ public class Tower : MonoBehaviour
     public void ToggleMute()
     {
         isMuted = !isMuted;
+
+        if (isMuted)
+        {
+            towerUI.muteButtonImage.sprite = towerUI.mutedSprite;
+        }
+        else
+        {
+            towerUI.muteButtonImage.sprite = towerUI.unmutedSprite;
+        }
+    }
+
+    public void DestroySelf()
+    {
+        towerUI.RemoveFromReference();
+        tile.RemoveTower();
     }
 }
 
@@ -91,5 +113,6 @@ public enum TowerType
     Splitter,
     Sink,
     Lobber,
-    Sprayer
+    Sprayer,
+    Buffer
 }

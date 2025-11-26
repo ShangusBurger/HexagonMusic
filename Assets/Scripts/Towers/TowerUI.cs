@@ -5,50 +5,30 @@ using UnityEngine.UI;
 
 public class TowerUI : MonoBehaviour
 {
-    [SerializeField] private Button deleteButton;
-    [SerializeField] private Button muteButton;
-    [SerializeField] private Image muteButtonImage;
-    public static TowerUI Instance;
+    public Image muteButtonImage;
 
-    [SerializeField] private Sprite mutedSprite;
-    [SerializeField] private Sprite unmutedSprite;
+    public Sprite mutedSprite;
+    public Sprite unmutedSprite;
 
-    [SerializeField] private GroundTile targetedTile;
+    private Tower tower;
 
     public void Start()
     {
-        Instance = this;
+        SelectionHandler.HideAllTowerUI += HideSelf;
     }
 
-    public void SetTargetTile(GroundTile tile)
+    public void SetTargetTower(Tower t)
     {
-        targetedTile = tile;
-        deleteButton.gameObject.SetActive(true);
-        deleteButton.onClick.RemoveAllListeners();
-        deleteButton.onClick.AddListener(() => tile.RemoveTower());
-        deleteButton.onClick.AddListener(() => this.gameObject.SetActive(false));
-
-        muteButton.onClick.RemoveAllListeners();
-        muteButton.onClick.AddListener(() => tile.tower.ToggleMute());
-        muteButton.onClick.AddListener(() => ToggleMuteIcon());
-
-        ToggleMuteIcon();
-
-        if (tile.tower is SourceTower)
-        {
-            deleteButton.gameObject.SetActive(false);
-        }
+        tower = t;
     }
 
-    public void ToggleMuteIcon()
+    public void RemoveFromReference()
     {
-        if (targetedTile.tower.isMuted)
-            {
-                muteButtonImage.sprite = mutedSprite;
-            }
-            else
-            {
-                muteButtonImage.sprite = unmutedSprite;
-            }
+        SelectionHandler.HideAllTowerUI -= HideSelf;
+    }
+
+    void HideSelf()
+    {
+        gameObject.SetActive(false);
     }
 }

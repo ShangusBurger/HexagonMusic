@@ -27,6 +27,7 @@ public class TileMapConstructor : MonoBehaviour
     public GameObject sinkTowerPrefab;
     public GameObject lobberTowerPrefab;
     public GameObject sprayerTowerPrefab;
+    public GameObject bufferTowerPrefab;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

@@ -19,8 +19,9 @@ public class PlayButtonController : MonoBehaviour
     [SerializeField] private Sprite stopImage;
 
     private bool isPlaying = false;
+    private bool pulseFoundThisBeat;
     
-    void Awake()
+    void Start()
     {
         if (Instance == null)
         {
@@ -28,6 +29,7 @@ public class PlayButtonController : MonoBehaviour
         }
         
         stopButton.gameObject.SetActive(false);
+        GroundTile.PulseExistsNotif += PulseFound;
     }
     
     public void TriggerPlay()
@@ -37,6 +39,8 @@ public class PlayButtonController : MonoBehaviour
         isPlaying = true;
         playButton.gameObject.SetActive(false);
         stopButton.gameObject.SetActive(true);
+
+        pulseFoundThisBeat = true;
     }
 
     public void TriggerStop()
@@ -46,4 +50,21 @@ public class PlayButtonController : MonoBehaviour
         stopButton.gameObject.SetActive(false);
         playButton.gameObject.SetActive(true);
     }
+
+    void Update()
+    {
+        if (!pulseFoundThisBeat)
+        {
+            TriggerStop();
+        }
+        pulseFoundThisBeat = false;
+    }
+
+    void PulseFound()
+    {
+        pulseFoundThisBeat = true;
+    }
+    
+
+
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using CubeCoordinates;
 using UnityEngine.UI;
+using UnityEditor.PackageManager;
 
 public class SelectionHandler : MonoBehaviour
 {
@@ -13,10 +14,13 @@ public class SelectionHandler : MonoBehaviour
     //Handling Tile Selection
     public static GroundTile currentHoveredTile = null;
     public static GroundTile currentSelectedTile = null;
-    [SerializeField] private GameObject towerSelectCanvas;
-    [SerializeField] private GameObject towerUICanvas;
     public static SelectionHandler Instance;
     List<GroundTile> lowlightedTiles = new List<GroundTile>();
+
+    public static event Action HideAllTowerUI;
+
+    //Overlays
+    [SerializeField] private GameObject towerSelectCanvas;
 
     void Awake()
     {
@@ -113,8 +117,7 @@ public class SelectionHandler : MonoBehaviour
                     DeselectCurrent();
                     
                     TowerSelection.Instance.gameObject.SetActive(false);
-                    if (TowerUI.Instance != null)
-                        TowerUI.Instance.gameObject.SetActive(false);
+                    HideAllTowerUI?.Invoke();
                 }
                 
 
@@ -125,7 +128,7 @@ public class SelectionHandler : MonoBehaviour
                 if (TowerSelection.Instance.gameObject.activeSelf && currentSelectedTile != null)
                 {
                     TowerSelection.Instance.gameObject.SetActive(false);
-                    TowerUI.Instance.gameObject.SetActive(false);
+                    HideAllTowerUI?.Invoke();
                     DeselectCurrent();
                 }
                 
@@ -133,10 +136,15 @@ public class SelectionHandler : MonoBehaviour
         }
     }
 
+    public static void HideTowerUIs()
+    {
+        HideAllTowerUI?.Invoke();
+    }
+
     // Opens the tower selection canvas at the tile's position. Buttons continue the UI.
     public static void OfferTowerPlacement(GroundTile tile)
     {
-        Instance.towerUICanvas.SetActive(false);
+        HideAllTowerUI?.Invoke();
         Instance.towerSelectCanvas.SetActive(true);
         Instance.towerSelectCanvas.transform.position = new Vector3(tile.transform.position.x, Instance.towerSelectCanvas.transform.position.y, tile.transform.position.z);
         Instance.towerSelectCanvas.GetComponent<TowerSelection>().SetTargetTile(tile);
@@ -145,9 +153,7 @@ public class SelectionHandler : MonoBehaviour
     public static void OpenTowerUI(GroundTile tile)
     {
         Instance.towerSelectCanvas.SetActive(false);
-        Instance.towerUICanvas.SetActive(true);
-        Instance.towerUICanvas.transform.position = new Vector3(tile.transform.position.x, Instance.towerSelectCanvas.transform.position.y, tile.transform.position.z);
-        Instance.towerUICanvas.GetComponent<TowerUI>().SetTargetTile(tile);
+        tile.tower.towerUI.gameObject.SetActive(true);
     }
 
     // Handles hovering when setting direction for Mono Tower
