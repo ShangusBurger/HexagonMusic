@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using CubeCoordinates;
 using UnityEngine;
 
 public class SourceTower : Tower
@@ -15,6 +11,8 @@ public class SourceTower : Tower
             PlayScheduledClip();
         }
         PlayButtonController.OnTriggerPlay += OnPlayButtonPressed;
+        ClearFieldController.OnClearField -= DestroySelf;
+        
     }
 
     void OnPlayButtonPressed()

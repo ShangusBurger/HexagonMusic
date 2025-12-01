@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using CubeCoordinates;
 using UnityEngine;
 
 public class Tower : MonoBehaviour
@@ -38,6 +36,8 @@ public class Tower : MonoBehaviour
 
         if (towerUI != null)
             towerUI.SetTargetTower(this);
+
+        ClearFieldController.OnClearField += DestroySelf;
     }
 
     internal virtual void Update()

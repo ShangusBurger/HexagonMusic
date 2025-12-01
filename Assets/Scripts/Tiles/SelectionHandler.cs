@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using CubeCoordinates;
-using UnityEngine.UI;
-using UnityEditor.PackageManager;
 
 public class SelectionHandler : MonoBehaviour
 {
