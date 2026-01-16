@@ -34,4 +34,10 @@ public class MonoTower : Tower
         // if (!isMuted)
         //     pdInstance.SendFloat("trigger", (float)(TempoHandler.nextBeatTime - AudioSettings.dspTime));
     }
+
+    public override void SetSelfUI()
+    {
+        towerUI.SetDropdown(SampleType.HiHat);
+        towerUI.OnSampleSelected(SampleType.HiHat);
+    }
 }

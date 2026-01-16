@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using CubeCoordinates;
+using UnityEngine.EventSystems;
 
 public class SelectionHandler : MonoBehaviour
 {
@@ -52,9 +53,25 @@ public class SelectionHandler : MonoBehaviour
         }
         
     }
+
+    bool IsPointerOverUI()
+    {
+        return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+    }
     
     void HandleMouseHover()
     {
+        // Skip hover handling if over UI
+        if (IsPointerOverUI())
+        {
+            if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
+            {
+                currentHoveredTile.Deselect();
+                currentHoveredTile = null;
+            }
+            return;
+        }
+
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = Camera.main.ScreenPointToRay(mousePos);
         
@@ -94,6 +111,8 @@ public class SelectionHandler : MonoBehaviour
     // Handles clicking on tiles to select them
     void HandleMouseClick()
     {
+        if (IsPointerOverUI()) return;
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             Vector3 mousePos = Mouse.current.position.ReadValue();
@@ -247,7 +266,6 @@ public class SelectionHandler : MonoBehaviour
                 {
                     int direction = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, collidedTile.tileCoordinate);
                     currentSelectedTile.tower.SetDirection(direction);
-
                 }
                 
                 // Clear all lowlighted tiles
@@ -260,7 +278,7 @@ public class SelectionHandler : MonoBehaviour
                     currentHoveredTile.Deselect();
                     currentHoveredTile = null;
                 }
-                
+                OpenTowerUI(currentSelectedTile);
                 DeselectCurrent();
                 
                 // Return to free mode
@@ -410,7 +428,7 @@ public class SelectionHandler : MonoBehaviour
                     currentHoveredTile.Deselect();
                     currentHoveredTile = null;
                 }
-                
+                OpenTowerUI(currentSelectedTile);
                 DeselectCurrent();
                 
                 // Return to free mode

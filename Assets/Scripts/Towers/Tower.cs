@@ -99,6 +99,11 @@ public class Tower : MonoBehaviour
         }
     }
 
+    public virtual void SetSelfUI()
+    {
+        return;
+    }
+
     public void DestroySelf()
     {
         towerUI.RemoveFromReference();

@@ -12,7 +12,6 @@ public class LobProjectile : MonoBehaviour
     private float gravity = 80f;
     
     private Vector3 velocity;
-    private bool isFlying = false;
 
     private float initDelay = 0f;
     

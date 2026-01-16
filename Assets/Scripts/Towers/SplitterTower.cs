@@ -35,4 +35,10 @@ public class SplitterTower : Tower
         goalTime = TempoHandler.nextBeatTime;
         base.PlayScheduledClip();
     }
+
+    public override void SetSelfUI()
+    {
+        towerUI.SetDropdown(SampleType.Snare);
+        towerUI.OnSampleSelected(SampleType.Snare);
+    }
 }

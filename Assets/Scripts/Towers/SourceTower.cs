@@ -52,9 +52,8 @@ public class SourceTower : Tower
 
     void TriggerPulses()
     {
-        tile.SchedulePulse(new Pulse(0, source: true));
-        tile.SchedulePulse(new Pulse(2, source: true));   
-        tile.SchedulePulse(new Pulse(4, source: true));
+        tile.SchedulePulse(new Pulse(2, source: true));
+        tile.SchedulePulse(new Pulse(5, source: true));   
     }
 
     
