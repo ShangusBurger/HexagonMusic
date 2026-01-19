@@ -68,4 +68,10 @@ public class BufferTower : Tower
         threshold = (int) value;
         bufferSizeText.text = value.ToString();
     }
+
+    public override void SetSelfUI()
+    {
+        towerUI.SetDropdown(SampleType.Tom);
+        towerUI.OnSampleSelected(SampleType.Tom);
+    }
 }

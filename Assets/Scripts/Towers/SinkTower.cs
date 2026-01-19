@@ -25,4 +25,10 @@ public class SinkTower : Tower
         base.PlayScheduledClip();
         towerAlreadyActivatedThisBeat = true;
     }
+
+    public override void SetSelfUI()
+    {
+        towerUI.SetDropdown(SampleType.Snap);
+        towerUI.OnSampleSelected(SampleType.Snap);
+    }
 }

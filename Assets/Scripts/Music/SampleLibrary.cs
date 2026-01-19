@@ -9,6 +9,7 @@ public enum SampleType
     Snare,
     HiHat,
     Tom,
+    Snap,
     Shaker
 }
 
@@ -81,6 +82,7 @@ public class SampleLibrary : MonoBehaviour
             case SampleType.HiHat: return "Hi-Hat";
             case SampleType.Tom: return "Tom";
             case SampleType.Shaker: return "Shaker";
+            case SampleType.Snap: return "Snap";
             default: return type.ToString();
         }
     }

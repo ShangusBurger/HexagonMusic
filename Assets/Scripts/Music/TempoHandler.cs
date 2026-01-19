@@ -42,8 +42,8 @@ public class TempoHandler : MonoBehaviour
         //sampleRate = AudioSettings.outputSampleRate;
         //nextTick = startDSPTime * sampleRate;
         //running = true;
-        beatLength = 60.0 / bpm * 4.0f / signatureLo;
-        barLength = beatLength * signatureHi;
+        beatLength = 60.0 / bpm * 4.0 / (double) signatureLo;
+        barLength = beatLength * (double) signatureHi;
         nextBeatTime = startDSPTime + beatLength;
     }
 

@@ -118,6 +118,7 @@ public class SelectionHandler : MonoBehaviour
             Vector3 mousePos = Mouse.current.position.ReadValue();
             Ray ray = Camera.main.ScreenPointToRay(mousePos);
 
+            // Raycast to ground tile
             if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.GetComponent<GroundTile>() != null)
             {
                 GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
@@ -214,6 +215,14 @@ public class SelectionHandler : MonoBehaviour
                             coordTile.Lowlight();
                         }
                     }
+
+                    //Rotate tower model to face direction
+
+                    if (currentSelectedTile.tower.visualModel != null)
+                    {
+                        Debug.Log(currentSelectedTile.tower.visualModel.transform.rotation.eulerAngles);
+                        currentSelectedTile.tower.visualModel.transform.eulerAngles = new Vector3(0f, ((float) -bestDirection + 2f) * 60f, 0f);
+                    }
                 }
             }
         }
@@ -278,7 +287,6 @@ public class SelectionHandler : MonoBehaviour
                     currentHoveredTile.Deselect();
                     currentHoveredTile = null;
                 }
-                OpenTowerUI(currentSelectedTile);
                 DeselectCurrent();
                 
                 // Return to free mode
@@ -428,7 +436,6 @@ public class SelectionHandler : MonoBehaviour
                     currentHoveredTile.Deselect();
                     currentHoveredTile = null;
                 }
-                OpenTowerUI(currentSelectedTile);
                 DeselectCurrent();
                 
                 // Return to free mode

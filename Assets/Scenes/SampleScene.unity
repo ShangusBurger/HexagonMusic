@@ -292,9 +292,11 @@ MonoBehaviour:
   - sampleType: 2
     clip: {fileID: 8300000, guid: e04fcbf2233fb07499d6968993af4151, type: 3}
   - sampleType: 3
-    clip: {fileID: 8300000, guid: 0c59c4153933f704ba1368bd3a6a3282, type: 3}
-  - sampleType: 4
+    clip: {fileID: 8300000, guid: d7ea5cfe6ad65244096ca892905a6e34, type: 3}
+  - sampleType: 5
     clip: {fileID: 8300000, guid: 4beceeb85def0de4b8c97c53898126ae, type: 3}
+  - sampleType: 4
+    clip: {fileID: 8300000, guid: ea612518e8746fe4f929733858cd888b, type: 3}
 --- !u!1 &193505840
 GameObject:
   m_ObjectHideFlags: 0
@@ -460,7 +462,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 434673971}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &271291966
 MonoBehaviour:
@@ -506,6 +508,49 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
+--- !u!1 &283820174
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 283820175}
+  - component: {fileID: 283820176}
+  m_Layer: 0
+  m_Name: ProgressHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &283820175
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283820174}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 434673971}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &283820176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283820174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcd4249ffea857646ac554d6d975cf96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &380244256
 GameObject:
   m_ObjectHideFlags: 0
@@ -772,6 +817,7 @@ Transform:
   m_Children:
   - {fileID: 1123584771}
   - {fileID: 1347486120}
+  - {fileID: 283820175}
   - {fileID: 271291965}
   m_Father: {fileID: 0}
   m_RootOrder: 2

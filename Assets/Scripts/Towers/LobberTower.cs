@@ -63,4 +63,10 @@ public class LobberTower : Tower
 
         //pdInstance.SendBang("bang");
     }
+
+    public override void SetSelfUI()
+    {
+        towerUI.SetDropdown(SampleType.Shaker);
+        towerUI.OnSampleSelected(SampleType.Shaker);
+    }
 }

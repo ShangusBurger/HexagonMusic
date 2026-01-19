@@ -29,7 +29,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7044555038288560308}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &3568778329882750925
 AudioSource:
@@ -306,7 +306,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7044555038288560308}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1319045277087054885
 AudioSource:
@@ -551,6 +551,87 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 37.82493, y: 36.399727, z: 2.5701275}
   m_Center: {x: 0.58835447, y: -0.11351706, z: -0.7850543}
+--- !u!1 &5935489743628309859
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1149857624602747154}
+  - component: {fileID: 5627354947037084721}
+  - component: {fileID: 8119578225589854614}
+  m_Layer: 0
+  m_Name: Model
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1149857624602747154
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5935489743628309859}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7044555038288560308}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &5627354947037084721
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5935489743628309859}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &8119578225589854614
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5935489743628309859}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 215efc2a3678a7b43b56a5aa25e4f275, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &6312321942818989590
 GameObject:
   m_ObjectHideFlags: 0
@@ -585,7 +666,7 @@ RectTransform:
   - {fileID: 1224456138027677601}
   - {fileID: 7947454908022374942}
   m_Father: {fileID: 7044555038288560308}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -665,11 +746,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d75d9ef110a3ce74792bf9186009c7ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deleteButton: {fileID: 4671291059228937467}
-  muteButton: {fileID: 8881296117733902169}
   muteButtonImage: {fileID: 9011519562634729313}
   mutedSprite: {fileID: 21300000, guid: 38dd44d822ae79c45a527b54b3c598b7, type: 3}
   unmutedSprite: {fileID: 21300000, guid: 9d3ba3cf45d28074e88dd7329eece274, type: 3}
+  sampleDropdown: {fileID: 0}
 --- !u!1 &7401223489541010344
 GameObject:
   m_ObjectHideFlags: 0
@@ -826,11 +906,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7044555038288560308}
-  - component: {fileID: 1391864280964726405}
-  - component: {fileID: 2962817409258140665}
   - component: {fileID: 4437610891886483323}
   - component: {fileID: 697923999967202072}
-  - component: {fileID: 5553551478017176142}
+  - component: {fileID: 6791081470668903936}
   m_Layer: 0
   m_Name: SinkTower
   m_TagString: Untagged
@@ -849,61 +927,13 @@ Transform:
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 1149857624602747154}
   - {fileID: 4532939763913327882}
   - {fileID: 1149807762272767434}
   - {fileID: 8258431439446626715}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &1391864280964726405
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9057431189203469463}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &2962817409258140665
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9057431189203469463}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 215efc2a3678a7b43b56a5aa25e4f275, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &4437610891886483323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1021,57 +1051,24 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &5553551478017176142
-MonoBehaviour:
+--- !u!95 &6791081470668903936
+Animator:
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9057431189203469463}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 653eaa228d164494e988c0c7cf77f78c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  patchName: tower-test
-  patchDir: /PureDataAssets/
-  patch: {fileID: 102900000, guid: 4cb3325ff92ffab4cb93e13ae0f8001c, type: 3}
-  pipePrintToConsole: 0
-  pureDataEvents:
-    Bang:
-      m_PersistentCalls:
-        m_Calls: []
-    Float:
-      m_PersistentCalls:
-        m_Calls: []
-    Symbol:
-      m_PersistentCalls:
-        m_Calls: []
-    List:
-      m_PersistentCalls:
-        m_Calls: []
-    Message:
-      m_PersistentCalls:
-        m_Calls: []
-  midiEvents:
-    MidiNoteOn:
-      m_PersistentCalls:
-        m_Calls: []
-    MidiControlChange:
-      m_PersistentCalls:
-        m_Calls: []
-    MidiProgramChange:
-      m_PersistentCalls:
-        m_Calls: []
-    MidiPitchBend:
-      m_PersistentCalls:
-        m_Calls: []
-    MidiAftertouch:
-      m_PersistentCalls:
-        m_Calls: []
-    MidiPolyAftertouch:
-      m_PersistentCalls:
-        m_Calls: []
-    MidiByte:
-      m_PersistentCalls:
-        m_Calls: []
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ae03c2d149c543347864458cccba593e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

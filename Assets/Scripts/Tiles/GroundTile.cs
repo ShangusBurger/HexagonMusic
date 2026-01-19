@@ -149,6 +149,14 @@ public class GroundTile : MonoBehaviour
         fadeTargetColor = to;
         fadeTimer = 0f;
         isFading = true;
+
+        if (tower != null)
+        {
+            if (tower.GetComponent<Animator>() != null)
+            {
+                tower.GetComponent<Animator>().SetTrigger("Pulse");
+            }
+        }
     }
 
     // used to create a new Pulse, either on this tile or to propagate to another tile

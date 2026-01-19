@@ -13,6 +13,7 @@ public class Tower : MonoBehaviour
     public bool towerAlreadyActivatedThisBeat;
     internal LibPdInstance pdInstance;
     internal bool isMuted = false;
+    internal GameObject visualModel;
 
     //tower effects
     public GroundTile tile;
@@ -29,7 +30,7 @@ public class Tower : MonoBehaviour
         sourceToggle = 0;
         directions = new List<int>();
         towerAlreadyActivatedThisBeat = false;
-        if (GetComponent<LibPdInstance>() != null)
+        visualModel = gameObject.GetComponentInChildren<MeshRenderer>().gameObject;
         {
             pdInstance = GetComponent<LibPdInstance>();
         }
