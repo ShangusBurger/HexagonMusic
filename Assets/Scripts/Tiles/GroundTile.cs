@@ -14,7 +14,12 @@ public class GroundTile : MonoBehaviour
     [SerializeField] private Color selectedMaterialColor;
     [SerializeField] private Color beatMaterialColor;
     private Renderer tileRenderer;
+
+    // original color, updated when goal is set to tile
     private Color originalColor;
+    
+    // default to white always
+    private Color defaultColor;
 
     //Tile Contents and Identity
     public Coordinate tileCoordinate;
@@ -23,6 +28,7 @@ public class GroundTile : MonoBehaviour
     public List<Pulse> pulsesCached; //List of pulses to be processed on the next update
     public int beatsUntilPulse = -1;
     public static event Action PulseExistsNotif;
+    bool isGoalTile = false;
 
 
     //Handling Updates
@@ -48,6 +54,7 @@ public class GroundTile : MonoBehaviour
         if (tileRenderer != null)
         {
             originalColor = tileRenderer.material.color;
+            defaultColor = originalColor;
         }
     }
 
@@ -191,7 +198,9 @@ public class GroundTile : MonoBehaviour
 
     public void Highlight()
     {
+
         tileRenderer.material.color = highlightMaterialColor;
+
     }
     public void Lowlight()
     {
@@ -298,6 +307,18 @@ public class GroundTile : MonoBehaviour
         }
 
         SelectionHandler.HideTowerUIs();
+    }
+    public void SetAsGoalTile(Color goalColor)
+    {
+        tileRenderer.material.color = goalColor;
+        originalColor = goalColor;
+        isGoalTile = true;
+    }
+
+    public void RemoveGoalTile()
+    {
+        isGoalTile = false;
+        originalColor = defaultColor;
     }
 
     
