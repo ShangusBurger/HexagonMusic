@@ -71,7 +71,7 @@ public class BufferTower : Tower
 
     public override void SetSelfUI()
     {
-        towerUI.SetDropdown(SampleType.Tom);
-        towerUI.OnSampleSelected(SampleType.Tom);
+        towerUI.SetDropdown("Tom");
+        towerUI.OnSampleSelected("Tom");
     }
 }

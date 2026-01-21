@@ -66,7 +66,7 @@ public class LobberTower : Tower
 
     public override void SetSelfUI()
     {
-        towerUI.SetDropdown(SampleType.Shaker);
-        towerUI.OnSampleSelected(SampleType.Shaker);
+        towerUI.SetDropdown("Shaker");
+        towerUI.OnSampleSelected("Shaker");
     }
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class EdgeCameraScroller : MonoBehaviour
 {
@@ -65,6 +66,9 @@ public class EdgeCameraScroller : MonoBehaviour
             float normalizedDistance = (mousePosition.y - (Screen.height - edgeThreshold)) / edgeThreshold;
             moveDirection.y = normalizedDistance;
         }
+
+        moveDirection.x += Input.GetAxisRaw("Horizontal") * 2f;
+        moveDirection.y += Input.GetAxisRaw("Vertical") * 2f;
         
         // Apply movement to target position
         Vector3 movement = new Vector3(moveDirection.x, 0, moveDirection.y) * moveSpeed * Time.deltaTime;
@@ -82,7 +86,7 @@ public class EdgeCameraScroller : MonoBehaviour
     {
         float scrollInput = Mouse.current.scroll.ReadValue().y;
 
-        if (scrollInput != 0f)
+        if (scrollInput != 0f && !EventSystem.current.IsPointerOverGameObject())
         {
             targetPosition.y -= scrollInput * zoomSpeed * Time.deltaTime;
             targetPosition.y = Mathf.Clamp(targetPosition.y, minY, maxY);

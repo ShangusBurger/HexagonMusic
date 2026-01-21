@@ -37,7 +37,7 @@ public class MonoTower : Tower
 
     public override void SetSelfUI()
     {
-        towerUI.SetDropdown(SampleType.HiHat);
-        towerUI.OnSampleSelected(SampleType.HiHat);
+        towerUI.SetDropdown("Hi-Hat");
+        towerUI.OnSampleSelected("Hi-Hat");
     }
 }

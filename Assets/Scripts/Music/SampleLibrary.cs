@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 // Enum for available sample types
 public enum SampleType
 {
-    BassDrum,
-    Snare,
-    HiHat,
-    Tom,
-    Snap,
-    Shaker
+    Percussion,
+    Chord
 }
 
 [Serializable]
@@ -18,15 +15,17 @@ public class AudioSampleEntry
 {
     public SampleType sampleType;
     public AudioClip clip;
+    public string name;
+    public AudioMixerGroup mixer;
 }
 
 public class SampleLibrary : MonoBehaviour
 {
     public static SampleLibrary Instance { get; private set; }
 
-    [SerializeField] private List<AudioSampleEntry> samples = new List<AudioSampleEntry>();
+    public List<AudioSampleEntry> samples = new List<AudioSampleEntry>();
 
-    private Dictionary<SampleType, AudioClip> sampleLookup;
+    public Dictionary<string, AudioSampleEntry> sampleLookup;
 
     void Awake()
     {
@@ -44,21 +43,21 @@ public class SampleLibrary : MonoBehaviour
 
     void BuildLookup()
     {
-        sampleLookup = new Dictionary<SampleType, AudioClip>();
+        sampleLookup = new Dictionary<string, AudioSampleEntry>();
         foreach (var entry in samples)
         {
-            if (!sampleLookup.ContainsKey(entry.sampleType))
+            if (!sampleLookup.ContainsKey(entry.name))
             {
-                sampleLookup.Add(entry.sampleType, entry.clip);
+                sampleLookup.Add(entry.name, entry);
             }
         }
     }
 
-    public AudioClip GetSample(SampleType type)
+    public AudioClip GetSample(string sampleName)
     {
-        if (sampleLookup != null && sampleLookup.TryGetValue(type, out AudioClip clip))
+        if (sampleLookup != null && sampleLookup.TryGetValue(sampleName, out AudioSampleEntry entry))
         {
-            return clip;
+            return entry.clip;
         }
         return null;
     }
@@ -66,25 +65,11 @@ public class SampleLibrary : MonoBehaviour
     public List<string> GetSampleNames()
     {
         List<string> names = new List<string>();
-        foreach (SampleType type in Enum.GetValues(typeof(SampleType)))
+        foreach (AudioSampleEntry entry in samples)
         {
-            names.Add(FormatSampleName(type));
+            names.Add(entry.name);
         }
         return names;
-    }
-
-    public static string FormatSampleName(SampleType type)
-    {
-        switch (type)
-        {
-            case SampleType.BassDrum: return "Bass Drum";
-            case SampleType.Snare: return "Snare";
-            case SampleType.HiHat: return "Hi-Hat";
-            case SampleType.Tom: return "Tom";
-            case SampleType.Shaker: return "Shaker";
-            case SampleType.Snap: return "Snap";
-            default: return type.ToString();
-        }
     }
 }
 

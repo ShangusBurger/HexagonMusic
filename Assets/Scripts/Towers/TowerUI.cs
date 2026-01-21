@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using UnityEditor.PackageManager.UI;
+using UnityEngine.Audio;
 
 
 public class TowerUI : MonoBehaviour
@@ -19,34 +21,36 @@ public class TowerUI : MonoBehaviour
     public void Start()
     {
         SelectionHandler.HideAllTowerUI += HideSelf;
-        InitializeDropdown();
     }
 
-    void InitializeDropdown()
+    public void InitializeDropdown()
     {
         if (sampleDropdown == null) return;
 
         sampleDropdown.ClearOptions();
 
-        // Add all sample type names to the dropdown
+        // Add all sample names to the dropdown
         List<string> options = new List<string>();
-        foreach (SampleType type in Enum.GetValues(typeof(SampleType)))
+        foreach (AudioSampleEntry entry in SampleLibrary.Instance.samples)
         {
-            options.Add(SampleLibrary.FormatSampleName(type));
+            options.Add(entry.name);
         }
         sampleDropdown.AddOptions(options);
 
         // Subscribe to dropdown value changed
         sampleDropdown.onValueChanged.AddListener(OnSampleSelected);
 
+        gameObject.SetActive(true);
         tower.SetSelfUI();
+        gameObject.SetActive(false);
     }
 
-    public void SetDropdown(SampleType currentType)
+    public void SetDropdown(string currentSample)
     {
         if (sampleDropdown == null) return;
 
-        int index = (int)currentType;
+        int index = sampleDropdown.options.FindIndex(option => option.text == currentSample);
+
         if (index >= 0 && index < sampleDropdown.options.Count)
         {
             sampleDropdown.value = index;
@@ -57,23 +61,34 @@ public class TowerUI : MonoBehaviour
     {
         if (tower == null || SampleLibrary.Instance == null) return;
 
-        SampleType selectedType = (SampleType)index;
-        AudioClip newClip = SampleLibrary.Instance.GetSample(selectedType);
+        AudioSampleEntry selectedSample = SampleLibrary.Instance.samples[index];
+        AudioClip newClip = selectedSample.clip;
 
         if (newClip != null)
         {
             tower.playbackClip = newClip;
+            foreach(AudioSource source in tower._audioSources)
+            {
+                source.outputAudioMixerGroup = selectedSample.mixer;
+            }
         }
     }
-    public void OnSampleSelected(SampleType type)
+    public void OnSampleSelected(string sampleName)
     {
         if (tower == null || SampleLibrary.Instance == null) return;
 
-        AudioClip newClip = SampleLibrary.Instance.GetSample(type);
+        AudioSampleEntry selectedSample = SampleLibrary.Instance.sampleLookup[sampleName];
+        AudioClip newClip = selectedSample.clip;
+
+        Debug.Log(selectedSample.name);
 
         if (newClip != null)
         {
             tower.playbackClip = newClip;
+            foreach(AudioSource source in tower._audioSources)
+            {
+                source.outputAudioMixerGroup = selectedSample.mixer;
+            }
         }
     }
 

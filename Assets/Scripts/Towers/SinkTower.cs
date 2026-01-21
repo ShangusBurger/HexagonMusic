@@ -28,7 +28,7 @@ public class SinkTower : Tower
 
     public override void SetSelfUI()
     {
-        towerUI.SetDropdown(SampleType.Snap);
-        towerUI.OnSampleSelected(SampleType.Snap);
+        towerUI.SetDropdown("Snap");
+        towerUI.OnSampleSelected("Snap");
     }
 }

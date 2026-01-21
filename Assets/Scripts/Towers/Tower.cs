@@ -36,7 +36,10 @@ public class Tower : MonoBehaviour
         }
 
         if (towerUI != null)
+        {
             towerUI.SetTargetTower(this);
+            towerUI.InitializeDropdown();
+        }
 
         ClearFieldController.OnClearField += DestroySelf;
     }

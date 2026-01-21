@@ -143,13 +143,12 @@ public class SelectionHandler : MonoBehaviour
             else if (!Physics.Raycast(ray, out hit))
             {
                 // Clicked outside any tile, hide tower selection canvas
-                if (TowerSelection.Instance.gameObject.activeSelf && currentSelectedTile != null)
-                {
-                    TowerSelection.Instance.gameObject.SetActive(false);
-                    HideAllTowerUI?.Invoke();
-                    DeselectCurrent();
-                }
-                
+                if (!TowerSelection.Instance.gameObject.activeSelf) return;
+                if (currentSelectedTile == null) return;
+
+                TowerSelection.Instance.gameObject.SetActive(false);
+                HideAllTowerUI?.Invoke();
+                DeselectCurrent();
             }
         }
     }
@@ -220,7 +219,6 @@ public class SelectionHandler : MonoBehaviour
 
                     if (currentSelectedTile.tower.visualModel != null)
                     {
-                        Debug.Log(currentSelectedTile.tower.visualModel.transform.rotation.eulerAngles);
                         currentSelectedTile.tower.visualModel.transform.eulerAngles = new Vector3(0f, ((float) -bestDirection + 2f) * 60f, 0f);
                     }
                 }

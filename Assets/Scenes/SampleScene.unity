@@ -287,16 +287,48 @@ MonoBehaviour:
   samples:
   - sampleType: 0
     clip: {fileID: 8300000, guid: 3c97b65c3d150324b8036643b6a56c57, type: 3}
-  - sampleType: 1
+    name: Kick Drum
+    mixer: {fileID: -2931629964961194630, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 0
     clip: {fileID: 8300000, guid: 60c8eec36202dd944a26bc7219bd6b5c, type: 3}
-  - sampleType: 2
+    name: Snare
+    mixer: {fileID: 3875966111989826692, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 0
     clip: {fileID: 8300000, guid: e04fcbf2233fb07499d6968993af4151, type: 3}
-  - sampleType: 3
+    name: Hi-Hat
+    mixer: {fileID: -7048343877426840841, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 0
     clip: {fileID: 8300000, guid: d7ea5cfe6ad65244096ca892905a6e34, type: 3}
-  - sampleType: 5
+    name: Tom
+    mixer: {fileID: -693862262144763839, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 0
     clip: {fileID: 8300000, guid: 4beceeb85def0de4b8c97c53898126ae, type: 3}
-  - sampleType: 4
+    name: Shaker
+    mixer: {fileID: -991724921223143142, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 0
     clip: {fileID: 8300000, guid: ea612518e8746fe4f929733858cd888b, type: 3}
+    name: Snap
+    mixer: {fileID: -991724921223143142, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 1
+    clip: {fileID: 8300000, guid: 2a9b1b52baab6d94b81de9f12a11f15f, type: 3}
+    name: Chord 1
+    mixer: {fileID: 101068108732231517, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 1
+    clip: {fileID: 8300000, guid: 3db602f4119fe474095d8984462b1c2c, type: 3}
+    name: Chord 2
+    mixer: {fileID: 101068108732231517, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 1
+    clip: {fileID: 8300000, guid: 20f474cd9b093284c8e90e2684008526, type: 3}
+    name: Chord 3
+    mixer: {fileID: 101068108732231517, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 1
+    clip: {fileID: 8300000, guid: cf4c9406f1443164e95909f7686a5b94, type: 3}
+    name: Chord 4
+    mixer: {fileID: 101068108732231517, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 1
+    clip: {fileID: 8300000, guid: 6ec6a4d3d3ff06d45b2ff96280a87b53, type: 3}
+    name: Chord 5
+    mixer: {fileID: 101068108732231517, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
 --- !u!1 &193505840
 GameObject:
   m_ObjectHideFlags: 0

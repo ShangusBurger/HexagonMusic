@@ -38,7 +38,7 @@ public class SplitterTower : Tower
 
     public override void SetSelfUI()
     {
-        towerUI.SetDropdown(SampleType.Snare);
-        towerUI.OnSampleSelected(SampleType.Snare);
+        towerUI.SetDropdown("Snare");
+        towerUI.OnSampleSelected("Snare");
     }
 }
