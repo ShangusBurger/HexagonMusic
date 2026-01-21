@@ -1,49 +1,59 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TowerSelection : MonoBehaviour
 {
-    [SerializeField] private Button monoButton;
-    [SerializeField] private Button sourceButton;
-    [SerializeField] private Button splitterButton;
-    [SerializeField] private Button lobberButton;
-    [SerializeField] private Button sprayerButton;
-    [SerializeField] private Button bufferButton;
-    
+    [System.Serializable]
+    public class TowerButtonMapping
+    {
+        public TowerType towerType;
+        public Button button;
+    }
+
+    [SerializeField] private List<TowerButtonMapping> towerButtons = new List<TowerButtonMapping>();
 
     public static TowerSelection Instance;
 
-    public void Start()
+    void Start()
     {
         Instance = this;
+        UnlockManager.OnTowerUnlocked += OnTowerUnlocked;
+        UnlockManager.OnUnlocksChanged += RefreshButtonVisibility;
+        RefreshButtonVisibility();
+        gameObject.SetActive(false);
+    }
+
+    void OnDestroy()
+    {
+        UnlockManager.OnTowerUnlocked -= OnTowerUnlocked;
+        UnlockManager.OnUnlocksChanged -= RefreshButtonVisibility;
+    }
+
+    void OnTowerUnlocked(TowerType tower)
+    {
+        foreach (var mapping in towerButtons)
+            if (mapping.towerType == tower && mapping.button != null)
+            { mapping.button.gameObject.SetActive(true); break; }
+    }
+
+    void RefreshButtonVisibility()
+    {
+        if (UnlockManager.Instance == null) return;
+        foreach (var mapping in towerButtons)
+            if (mapping.button != null)
+                mapping.button.gameObject.SetActive(UnlockManager.Instance.IsTowerUnlocked(mapping.towerType));
     }
 
     public void SetTargetTile(GroundTile tile)
     {
-        monoButton.onClick.RemoveAllListeners();
-        monoButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Mono));
-        monoButton.onClick.AddListener(() => this.gameObject.SetActive(false));
-
-        sourceButton.onClick.RemoveAllListeners();
-        sourceButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Sink));  
-        sourceButton.onClick.AddListener(() => this.gameObject.SetActive(false));
-
-        splitterButton.onClick.RemoveAllListeners();
-        splitterButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Splitter));  
-        splitterButton.onClick.AddListener(() => this.gameObject.SetActive(false));
-
-        lobberButton.onClick.RemoveAllListeners();
-        lobberButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Lobber));  
-        lobberButton.onClick.AddListener(() => this.gameObject.SetActive(false));
-
-        sprayerButton.onClick.RemoveAllListeners();
-        sprayerButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Sprayer));  
-        sprayerButton.onClick.AddListener(() => this.gameObject.SetActive(false));
-        
-        bufferButton.onClick.RemoveAllListeners();
-        bufferButton.onClick.AddListener(() => tile.AddTowerToTile(TowerType.Buffer));  
-        bufferButton.onClick.AddListener(() => this.gameObject.SetActive(false));
+        foreach (var mapping in towerButtons)
+        {
+            if (mapping.button == null) continue;
+            mapping.button.onClick.RemoveAllListeners();
+            TowerType type = mapping.towerType;
+            mapping.button.onClick.AddListener(() => tile.AddTowerToTile(type));
+            mapping.button.onClick.AddListener(() => gameObject.SetActive(false));
+        }
     }
 }

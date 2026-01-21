@@ -1,15 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-using UnityEditor.PackageManager.UI;
 using UnityEngine.Audio;
-
 
 public class TowerUI : MonoBehaviour
 {
     public Image muteButtonImage;
-
     public Sprite mutedSprite;
     public Sprite unmutedSprite;
 
@@ -17,97 +13,112 @@ public class TowerUI : MonoBehaviour
     [SerializeField] private TMPro.TMP_Dropdown sampleDropdown;
 
     private Tower tower;
+    private List<string> dropdownIndexToSampleName = new List<string>();
 
     public void Start()
     {
         SelectionHandler.HideAllTowerUI += HideSelf;
+        UnlockManager.OnSampleUnlocked += OnSampleUnlocked;
     }
+
+    void OnDestroy()
+    {
+        SelectionHandler.HideAllTowerUI -= HideSelf;
+        UnlockManager.OnSampleUnlocked -= OnSampleUnlocked;
+        if (sampleDropdown != null)
+            sampleDropdown.onValueChanged.RemoveListener(OnDropdownValueChanged);
+    }
+
+    void OnSampleUnlocked(string sampleName) => RefreshDropdownOptions();
 
     public void InitializeDropdown()
     {
         if (sampleDropdown == null) return;
+        sampleDropdown.onValueChanged.AddListener(OnDropdownValueChanged);
+        RefreshDropdownOptions();
+        gameObject.SetActive(true);
+        if (tower != null) tower.SetSelfUI();
+        gameObject.SetActive(false);
+    }
+
+    void RefreshDropdownOptions()
+    {
+        if (sampleDropdown == null || SampleLibrary.Instance == null) return;
+
+        string currentSelection = null;
+        if (dropdownIndexToSampleName.Count > 0 && sampleDropdown.value < dropdownIndexToSampleName.Count)
+            currentSelection = dropdownIndexToSampleName[sampleDropdown.value];
 
         sampleDropdown.ClearOptions();
+        dropdownIndexToSampleName.Clear();
 
-        // Add all sample names to the dropdown
         List<string> options = new List<string>();
         foreach (AudioSampleEntry entry in SampleLibrary.Instance.samples)
         {
-            options.Add(entry.name);
+            if (UnlockManager.Instance == null || UnlockManager.Instance.IsSampleUnlocked(entry.name))
+            {
+                options.Add(entry.name);
+                dropdownIndexToSampleName.Add(entry.name);
+            }
         }
+
         sampleDropdown.AddOptions(options);
 
-        // Subscribe to dropdown value changed
-        sampleDropdown.onValueChanged.AddListener(OnSampleSelected);
+        if (!string.IsNullOrEmpty(currentSelection))
+        {
+            int newIndex = dropdownIndexToSampleName.IndexOf(currentSelection);
+            if (newIndex >= 0) sampleDropdown.value = newIndex;
+        }
+    }
 
-        gameObject.SetActive(true);
-        tower.SetSelfUI();
-        gameObject.SetActive(false);
+    void OnDropdownValueChanged(int index)
+    {
+        if (tower == null || SampleLibrary.Instance == null) return;
+        if (index < 0 || index >= dropdownIndexToSampleName.Count) return;
+        OnSampleSelected(dropdownIndexToSampleName[index]);
     }
 
     public void SetDropdown(string currentSample)
     {
         if (sampleDropdown == null) return;
-
-        int index = sampleDropdown.options.FindIndex(option => option.text == currentSample);
-
+        int index = dropdownIndexToSampleName.IndexOf(currentSample);
         if (index >= 0 && index < sampleDropdown.options.Count)
-        {
             sampleDropdown.value = index;
-        }
+        else if (dropdownIndexToSampleName.Count > 0)
+            sampleDropdown.value = 0;
     }
 
-    void OnSampleSelected(int index)
-    {
-        if (tower == null || SampleLibrary.Instance == null) return;
-
-        AudioSampleEntry selectedSample = SampleLibrary.Instance.samples[index];
-        AudioClip newClip = selectedSample.clip;
-
-        if (newClip != null)
-        {
-            tower.playbackClip = newClip;
-            foreach(AudioSource source in tower._audioSources)
-            {
-                source.outputAudioMixerGroup = selectedSample.mixer;
-            }
-        }
-    }
     public void OnSampleSelected(string sampleName)
     {
         if (tower == null || SampleLibrary.Instance == null) return;
 
-        AudioSampleEntry selectedSample = SampleLibrary.Instance.sampleLookup[sampleName];
-        AudioClip newClip = selectedSample.clip;
-
-        Debug.Log(selectedSample.name);
-
-        if (newClip != null)
+        if (UnlockManager.Instance != null && !UnlockManager.Instance.IsSampleUnlocked(sampleName))
         {
-            tower.playbackClip = newClip;
-            foreach(AudioSource source in tower._audioSources)
-            {
-                source.outputAudioMixerGroup = selectedSample.mixer;
-            }
+            var unlocked = UnlockManager.Instance.GetUnlockedSamples();
+            if (unlocked.Count > 0) sampleName = unlocked[0];
+            else return;
+        }
+
+        if (!SampleLibrary.Instance.sampleLookup.TryGetValue(sampleName, out AudioSampleEntry entry))
+            return;
+
+        if (entry.clip != null)
+        {
+            tower.playbackClip = entry.clip;
+            foreach (AudioSource source in tower._audioSources)
+                source.outputAudioMixerGroup = entry.mixer;
         }
     }
 
-    public void SetTargetTower(Tower t)
-    {
-        tower = t;
-    }
+    public void SetTargetTower(Tower t) => tower = t;
 
     public void RemoveFromReference()
     {
         SelectionHandler.HideAllTowerUI -= HideSelf;
+        UnlockManager.OnSampleUnlocked -= OnSampleUnlocked;
         if (sampleDropdown != null)
-        {
-            sampleDropdown.onValueChanged.RemoveListener(OnSampleSelected);
-        }
+            sampleDropdown.onValueChanged.RemoveListener(OnDropdownValueChanged);
     }
 
-    void HideSelf()
-    {
-        gameObject.SetActive(false);
-    }
+    void HideSelf() => gameObject.SetActive(false);
 }

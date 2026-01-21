@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
+    public static List<Tower> allTowers;
+
     //tempo-related
     public double goalTime;
 
@@ -11,14 +13,13 @@ public class Tower : MonoBehaviour
     public AudioClip playbackClip;
     internal int sourceToggle;
     public bool towerAlreadyActivatedThisBeat;
-    internal LibPdInstance pdInstance;
     internal bool isMuted = false;
     internal GameObject visualModel;
 
     //tower effects
     public GroundTile tile;
 
-    //used for directing pulses for mono/duo/lobber towers
+    //used for directing pulses for mono/splitter/lobber/switcher towers
     public List<int> directions;
 
     //Tower UI reference
@@ -31,9 +32,6 @@ public class Tower : MonoBehaviour
         directions = new List<int>();
         towerAlreadyActivatedThisBeat = false;
         visualModel = gameObject.GetComponentInChildren<MeshRenderer>().gameObject;
-        {
-            pdInstance = GetComponent<LibPdInstance>();
-        }
 
         if (towerUI != null)
         {
@@ -42,6 +40,12 @@ public class Tower : MonoBehaviour
         }
 
         ClearFieldController.OnClearField += DestroySelf;
+
+        if (allTowers == null)
+        {
+            allTowers = new List<Tower>();
+        }
+        allTowers.Add(this);
     }
 
     internal virtual void Update()
@@ -112,6 +116,7 @@ public class Tower : MonoBehaviour
     {
         towerUI.RemoveFromReference();
         tile.RemoveTower();
+        allTowers.Remove(this);
     }
 }
 
@@ -123,5 +128,6 @@ public enum TowerType
     Sink,
     Lobber,
     Sprayer,
-    Buffer
+    Buffer,
+    Switcher
 }

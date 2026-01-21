@@ -16,10 +16,10 @@ public class GroundTile : MonoBehaviour
     private Renderer tileRenderer;
 
     // original color, updated when goal is set to tile
-    private Color originalColor;
+    [SerializeField] private Color originalColor;
     
     // default to white always
-    private Color defaultColor;
+    [SerializeField] private Color defaultColor;
 
     //Tile Contents and Identity
     public Coordinate tileCoordinate;
@@ -304,6 +304,10 @@ public class GroundTile : MonoBehaviour
                 tower = Instantiate(TileMapConstructor.Instance.bufferTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
                 break;
+            case TowerType.Switcher:
+                tower = Instantiate(TileMapConstructor.Instance.switcherTowerPrefab, transform).GetComponent<Tower>();
+                tower.tile = this;
+                break;
         }
 
         SelectionHandler.HideTowerUIs();
@@ -312,6 +316,7 @@ public class GroundTile : MonoBehaviour
     {
         tileRenderer.material.color = goalColor;
         originalColor = goalColor;
+        fadeTargetColor = goalColor;
         isGoalTile = true;
     }
 
@@ -319,7 +324,5 @@ public class GroundTile : MonoBehaviour
     {
         isGoalTile = false;
         originalColor = defaultColor;
-    }
-
-    
+    }  
 }
