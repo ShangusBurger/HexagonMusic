@@ -4,6 +4,7 @@ using UnityEngine;
 public class TileMapConstructor : MonoBehaviour
 {
     public static TileMapConstructor Instance;
+    public GameObject coordinatesGroup;
 
     // Prefab for the tile to be instantiated
     public GameObject tilePrefab;
@@ -59,7 +60,7 @@ public class TileMapConstructor : MonoBehaviour
         coordinates.CreateCoordinates(
             Cubes.GetNeighbors(Vector3.zero, gridRadius)
         );
-        coordinates.Build();
+        coordinatesGroup = coordinates.Build();
         foreach (Coordinate coord in coordinates.GetContainer().GetAllCoordinates())
         {
             coord.go.GetComponent<GroundTile>().tileCoordinate = coord;

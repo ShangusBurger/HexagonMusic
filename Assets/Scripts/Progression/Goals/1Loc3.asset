@@ -15,7 +15,7 @@ MonoBehaviour:
   displayText: Get Signal to the Green Tile
   rewards: []
   goalIcon: {fileID: 0}
-  targetHexCoords: {x: 2, y: -5}
+  targetHexCoords: {x: 6, y: 3}
   targetColor:
     serializedVersion: 2
     rgba: 4292408781

@@ -9,13 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c891d6e7b12dc554185d4e087d8bd48f, type: 3}
-  m_Name: 1Loc1
+  m_Script: {fileID: 11500000, guid: 058f654df7e989549888a8baf9462f33, type: 3}
+  m_Name: BufferUnlock
   m_EditorClassIdentifier: 
-  displayText: Get Signal to the Green Tile
-  rewards: []
-  goalIcon: {fileID: 0}
-  targetHexCoords: {x: 2, y: 3}
-  targetColor:
-    serializedVersion: 2
-    rgba: 4292408781
+  displayName: Buffer Tower
+  description: 
+  icon: {fileID: 0}
+  towerType: 6

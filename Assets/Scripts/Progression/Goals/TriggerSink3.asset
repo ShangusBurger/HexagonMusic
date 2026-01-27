@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 959cb428c8935084787cf1efebf90d3c, type: 3}
-  m_Name: UseThreeSamples
+  m_Script: {fileID: 11500000, guid: 3b95d532f9e07144ebf4d9ca874df63a, type: 3}
+  m_Name: TriggerSink3
   m_EditorClassIdentifier: 
-  displayText: Use Three Different Sounds on Towers
+  displayText: Hit a Sinker Tower with 3 Signals at the Same Time
   rewards:
-  - {fileID: 11400000, guid: 798328925a64f084db06f8112dea1fdd, type: 2}
-  - {fileID: 11400000, guid: 569a56d9107fba8448217fbb24ec34f1, type: 2}
+  - {fileID: 11400000, guid: 9c71391aeb84d0049b967a58aba61ebf, type: 2}
   goalIcon: {fileID: 0}
-  numberOfSamplesNeeded: 3
+  targetTowerType: 3
+  targetNumber: 3

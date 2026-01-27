@@ -12,16 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85e5553fe3bc2354180f5356abc1233d, type: 3}
   m_Name: 3Loc
   m_EditorClassIdentifier: 
-  displayText: Get Signal to All of the Orange Tiles
-  rewards: []
+  displayText: Get Signal to All of the Purple Tiles
+  rewards:
+  - {fileID: 11400000, guid: b7929141105475b4c9774d070a22cad3, type: 2}
+  - {fileID: 11400000, guid: 7bd76eaebdb0d5e45be702c23112b1a3, type: 2}
   goalIcon: {fileID: 0}
   targetHexCoords:
-  - {x: -4, y: 4}
-  - {x: 2, y: 5}
-  - {x: 5, y: -6}
+  - {x: 5, y: 1}
+  - {x: 3, y: 5}
+  - {x: -5, y: 2}
   targetColor:
     serializedVersion: 2
-    rgba: 4287611647
+    rgba: 4294609081
   completedColor:
     serializedVersion: 2
     rgba: 4293132198

@@ -184,42 +184,38 @@ public class SelectionHandler : MonoBehaviour
         {
             GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
 
-            //Only update if we're hovering over a different tile
-            if (collidedTile != currentHoveredTile)
+            // Remove highlight from previous tile and clear all lowlighted tiles
+            if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
             {
-                // Remove highlight from previous tile and clear all lowlighted tiles
-                if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
-                {
-                    currentHoveredTile.Deselect();
-                }
+                currentHoveredTile.Deselect();
+            }
+            
+            SelectionUtility.DeselectListOfTiles(lowlightedTiles);
+            lowlightedTiles.Clear();
+
+            // Highlight new tile (only if it's not selected)
+            currentHoveredTile = collidedTile;
+            if (currentHoveredTile != currentSelectedTile)
+            {
+                currentHoveredTile.Highlight();
+                int bestDirection = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, currentHoveredTile.tileCoordinate);
+                Coordinate targetCoord = GetFurthestCoordinateInDirection(currentSelectedTile.tileCoordinate, bestDirection);
+                List<Coordinate> coordsBetween = Coordinates.Instance.GetLine(currentSelectedTile.tileCoordinate, targetCoord);
                 
-                SelectionUtility.DeselectListOfTiles(lowlightedTiles);
-                lowlightedTiles.Clear();
-
-                // Highlight new tile (only if it's not selected)
-                currentHoveredTile = collidedTile;
-                if (currentHoveredTile != currentSelectedTile)
+                foreach (Coordinate coord in coordsBetween)
                 {
-                    currentHoveredTile.Highlight();
-                    int bestDirection = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, currentHoveredTile.tileCoordinate);
-                    Coordinate targetCoord = GetFurthestCoordinateInDirection(currentSelectedTile.tileCoordinate, bestDirection);
-                    List<Coordinate> coordsBetween = Coordinates.Instance.GetLine(currentSelectedTile.tileCoordinate, targetCoord);
-                    
-                    foreach (Coordinate coord in coordsBetween)
+                    GroundTile coordTile = coord.go.GetComponent<GroundTile>();
+                    if (coordTile != currentSelectedTile && coordTile != null)
                     {
-                        GroundTile coordTile = coord.go.GetComponent<GroundTile>();
-                        if (coordTile != currentSelectedTile && coordTile != null)
-                        {
-                            lowlightedTiles.Add(coordTile);
-                            coordTile.Lowlight();
-                        }
+                        lowlightedTiles.Add(coordTile);
+                        coordTile.Lowlight();
                     }
+                }
 
-                    //Rotate tower model to face direction
-                    if (currentSelectedTile.tower.visualModel != null)
-                    {
-                        currentSelectedTile.tower.visualModel.transform.eulerAngles = new Vector3(0f, ((float) -bestDirection + 2f) * 60f, 0f);
-                    }
+                //Rotate tower model to face direction
+                if (currentSelectedTile.tower.visualModel != null)
+                {
+                    currentSelectedTile.tower.visualModel.transform.eulerAngles = new Vector3(0f, ((float) bestDirection + 2f) * 60f + -30f, 0f);
                 }
             }
         }

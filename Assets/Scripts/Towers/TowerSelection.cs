@@ -9,7 +9,7 @@ public class TowerSelection : MonoBehaviour
     {
         public TowerType towerType;
         public Button button;
-        public GameObject lockedPlaceholder;
+        [HideInInspector] public GameObject lockedPlaceholder;
     }
 
     [SerializeField] private List<TowerButtonMapping> towerButtons = new List<TowerButtonMapping>();

@@ -92,8 +92,14 @@ namespace CubeCoordinates
         private void CalculateDimensions()
         {
             _radius = _radius * _scale;
-            _spacingX = _radius * 2 * 0.75f;
-            _spacingZ = ((Mathf.Sqrt(3) / 2.0f) * (_radius * 2) / 2);
+
+            // Pointy-top: width = sqrt(3) * radius, height = 2 * radius
+            _spacingX = _radius * Mathf.Sqrt(3);
+            _spacingZ = _radius * 1.5f;
+
+            //Flat-top
+            //_spacingX = _radius * 2 * 0.75f;
+            //_spacingZ = ((Mathf.Sqrt(3) / 2.0f) * (_radius * 2) / 2);
         }
 
         /// <summary>
@@ -159,20 +165,18 @@ namespace CubeCoordinates
         /// <summary>
         /// Instantiates the GameObject specified in SetCoordinateType for all Coordinate instances in the "all" Container
         /// </summary>
-        public void Build()
+        public GameObject Build()
         {
-            if (_coordinateType == Coordinate.Type.None) return;
+            if (_coordinateType == Coordinate.Type.None) return null;
 
             List<Coordinate> coordinates = GetContainer().GetAllCoordinates();
             foreach (Coordinate coordinate in coordinates)
             {
                 string label =
                     "Coordinate [" +
-                    coordinate.cube.x +
+                    Cubes.ConvertCubeToAxial(coordinate.cube).x +
                     "," +
-                    coordinate.cube.y +
-                    "," +
-                    coordinate.cube.z +
+                    Cubes.ConvertCubeToAxial(coordinate.cube).y +
                     "]";
                 GameObject go =
                     (GameObject)
@@ -184,6 +188,8 @@ namespace CubeCoordinates
                 go.SetActive(true);
                 coordinate.SetGameObject(go);
             }
+
+            return _coordinateGroup;
         }
 
         /// <summary>

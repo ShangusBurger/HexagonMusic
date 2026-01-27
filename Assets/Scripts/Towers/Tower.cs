@@ -18,6 +18,7 @@ public class Tower : MonoBehaviour
 
     //tower effects
     public GroundTile tile;
+    public TowerType ownType;
 
     //used for directing pulses for mono/splitter/lobber/switcher towers
     public List<int> directions;
@@ -110,6 +111,15 @@ public class Tower : MonoBehaviour
     public virtual void SetSelfUI()
     {
         return;
+    }
+
+    public virtual void AnimatePulse(int direction)
+    {
+        if (GetComponent<Animator>() != null)
+        {
+            Animator anim = GetComponent<Animator>();
+            anim.SetTrigger("Pulse");
+        }
     }
 
     public void DestroySelf()

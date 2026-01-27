@@ -136,7 +136,7 @@ public class GroundTile : MonoBehaviour
                     continue;
                 }
                 
-                StartFade(beatMaterialColor, originalColor);
+                StartFade(beatMaterialColor, originalColor, pulse.direction);
                 
                 //whether or not the pulse actually continues to another tile is handled in PropagatePulse()
                 PropagatePulse(pulse);
@@ -152,7 +152,7 @@ public class GroundTile : MonoBehaviour
         }
     }
 
-    private void StartFade(Color from, Color to)
+    private void StartFade(Color from, Color to, int direction)
     {
         if (SelectionHandler.currentSelectedTile != this && SelectionHandler.currentHoveredTile != this)
         {
@@ -166,10 +166,7 @@ public class GroundTile : MonoBehaviour
 
         if (tower != null)
         {
-            if (tower.GetComponent<Animator>() != null)
-            {
-                tower.GetComponent<Animator>().SetTrigger("Pulse");
-            }
+            tower.AnimatePulse(direction);
         }
     }
 
@@ -277,6 +274,7 @@ public class GroundTile : MonoBehaviour
             Deselect();
             SelectionHandler.currentSelectedTile = null;
         }
+        OnTowerChangeMade?.Invoke();
     }
 
     public void AddTowerToTile()
@@ -326,6 +324,7 @@ public class GroundTile : MonoBehaviour
                 tower.tile = this;
                 break;
         }
+        tower.ownType = type;
 
         OnTowerChangeMade?.Invoke();
         SelectionHandler.HideTowerUIs();

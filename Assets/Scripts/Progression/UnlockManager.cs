@@ -61,7 +61,6 @@ public class UnlockManager : MonoBehaviour
     {
         if (unlockedSamples.Add(sampleName))
         {
-            Debug.Log($"Unlocked sample: {sampleName}");
             OnSampleUnlocked?.Invoke(sampleName);
             OnUnlocksChanged?.Invoke();
         }
@@ -74,7 +73,6 @@ public class UnlockManager : MonoBehaviour
     {
         if (unlockedFeatures.Add(featureId))
         {
-            Debug.Log($"Unlocked feature: {featureId}");
             OnFeatureUnlocked?.Invoke(featureId);
             OnUnlocksChanged?.Invoke();
         }

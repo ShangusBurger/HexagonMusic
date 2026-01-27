@@ -563,7 +563,11 @@ MonoBehaviour:
   - sampleType: 0
     clip: {fileID: 8300000, guid: ea612518e8746fe4f929733858cd888b, type: 3}
     name: Snap
-    mixer: {fileID: -991724921223143142, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+    mixer: {fileID: -9210262741089195114, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
+  - sampleType: 0
+    clip: {fileID: 8300000, guid: 3ad17703755265e46a253deccc5a552c, type: 3}
+    name: Clap
+    mixer: {fileID: -19224211820334757, guid: 38fc442fa239d6a44a9672c84b01b4d4, type: 2}
   - sampleType: 1
     clip: {fileID: 8300000, guid: 2a9b1b52baab6d94b81de9f12a11f15f, type: 3}
     name: Chord 1
@@ -968,7 +972,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 03319d12f9d15df41a517c2b00051163, type: 2}
   - {fileID: 11400000, guid: f673767e768786d4393519e9b0ae653c, type: 2}
   - {fileID: 11400000, guid: af3ee34824ca92e4889a1c16bd0c8dff, type: 2}
-  - {fileID: 11400000, guid: af3ee34824ca92e4889a1c16bd0c8dff, type: 2}
+  - {fileID: 11400000, guid: 4adad647ea45d6f47b03377a274c520d, type: 2}
 --- !u!1 &380244256
 GameObject:
   m_ObjectHideFlags: 0
@@ -3865,13 +3869,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1563593927}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!114 &1563593929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3884,6 +3888,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bff9d56dce36e646a0619f0571c1d38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  coordinatesGroup: {fileID: 0}
   tilePrefab: {fileID: 9057431189203469463, guid: 12b5abf9d5ed3f64fa8d216a442389ab, type: 3}
   defaultGridSizeRect: {x: 0, y: 0}
   defaultGridRadius: 12

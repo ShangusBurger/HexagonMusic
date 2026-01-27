@@ -10,21 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85e5553fe3bc2354180f5356abc1233d, type: 3}
-  m_Name: 5Loc
+  m_Name: 4Loc
   m_EditorClassIdentifier: 
-  displayText: Get Signal to All of the Orange Tiles
+  displayText: Get Signal to All of the Purple Tiles
   rewards:
   - {fileID: 11400000, guid: 3bb2ceff227ca5241a606618dd203520, type: 2}
   goalIcon: {fileID: 0}
   targetHexCoords:
-  - {x: -1, y: 2}
-  - {x: 2, y: 1}
-  - {x: 3, y: -1}
-  - {x: -3, y: 3}
-  - {x: 4, y: -4}
+  - {x: -5, y: 1}
+  - {x: -4, y: 2}
+  - {x: 4, y: 1}
+  - {x: 5, y: 2}
   targetColor:
     serializedVersion: 2
-    rgba: 4287611647
+    rgba: 4294938579
   completedColor:
     serializedVersion: 2
     rgba: 4293132198

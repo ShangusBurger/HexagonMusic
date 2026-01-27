@@ -14,11 +14,24 @@ public class TowerUI : MonoBehaviour
 
     private Tower tower;
     private List<string> dropdownIndexToSampleName = new List<string>();
+    private bool isInitialized = false;
 
-    public void Start()
+    // Awake is called even when GameObject is inactive - ensures subscription happens
+    void Awake()
+    {
+        UnlockManager.OnSampleUnlocked += OnSampleUnlocked;
+    }
+
+    void Start()
     {
         SelectionHandler.HideAllTowerUI += HideSelf;
-        UnlockManager.OnSampleUnlocked += OnSampleUnlocked;
+    }
+
+    // Refresh dropdown whenever UI becomes visible to catch any missed updates
+    void OnEnable()
+    {
+        if (isInitialized)
+            RefreshDropdownOptions();
     }
 
     void OnDestroy()
@@ -36,6 +49,7 @@ public class TowerUI : MonoBehaviour
         if (sampleDropdown == null) return;
         sampleDropdown.onValueChanged.AddListener(OnDropdownValueChanged);
         RefreshDropdownOptions();
+        isInitialized = true;
         gameObject.SetActive(true);
         if (tower != null) tower.SetSelfUI();
         gameObject.SetActive(false);

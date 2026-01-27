@@ -45,7 +45,6 @@ public class MultiLocationUntimedGoal : Goal
                 isComplete = false;
         }
         
-        Debug.Log(isComplete);
         if (isComplete)
             DeconstructGoal();
 

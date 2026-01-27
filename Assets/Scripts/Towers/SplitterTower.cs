@@ -41,4 +41,14 @@ public class SplitterTower : Tower
         towerUI.SetDropdown("Snare");
         towerUI.OnSampleSelected("Snare");
     }
+
+    public override void AnimatePulse(int direction)
+    {
+        if (GetComponent<Animator>() != null)
+        {
+            Animator anim = GetComponent<Animator>();
+            anim.SetInteger("direction", direction % 2);
+            anim.SetTrigger("Pulse");
+        }
+    }
 }

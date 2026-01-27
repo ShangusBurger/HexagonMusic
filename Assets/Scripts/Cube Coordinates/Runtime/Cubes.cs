@@ -316,12 +316,20 @@ namespace CubeCoordinates
         /// <returns>Vector3 world transform position</returns>
         public static Vector3 ConvertCubeToWorldPosition(Vector3 cube)
         {
-            return new Vector3(cube.x * Coordinates.Instance.spacingX,
-                0.0f,
-                -(
-                (cube.x * Coordinates.Instance.spacingZ) +
-                (cube.z * Coordinates.Instance.spacingZ * 2.0f)
-                ));
+            // Pointy-top layout
+            float x = Coordinates.Instance.spacingX * (cube.x + cube.z / 2.0f);
+            float z = Coordinates.Instance.spacingZ * cube.z;
+            return new Vector3(x, 0.0f, z);
+
+        //Falt-top
+        return new Vector3(cube.x * Coordinates.Instance.spacingX,
+            0.0f,
+            -(
+            (cube.x * Coordinates.Instance.spacingZ) +
+            (cube.z * Coordinates.Instance.spacingZ * 2.0f)
+            ));
+
+                
         }
 
         /// <summary>
@@ -346,7 +354,16 @@ namespace CubeCoordinates
         /// <returns>Vector3 cube coordinate</returns>
         public static Vector3 ConvertWorldPositionToCube(Vector3 position)
         {
-            return ConvertAxialToCube(ConvertWorldPositionToAxial(position));
+            // Pointy-top: convert back from world position
+            float q = (position.x * (Mathf.Sqrt(3) / 3.0f) - position.z / 3.0f) / Coordinates.Instance.radius;
+            float r = (position.z * (2.0f / 3.0f)) / Coordinates.Instance.radius;
+            return RoundCube(ConvertAxialToCube(new Vector2(q, r)));
+
+            // Flat-top: convert back from world position
+            q = (position.x * (2.0f / 3.0f)) / Coordinates.Instance.radius;
+            r = (-position.x / 3.0f + (Mathf.Sqrt(3) / 3.0f) * position.z) / Coordinates.Instance.radius;
+            return RoundCube(ConvertAxialToCube(new Vector2(q, r)));
+
         }
 
         /// <summary>

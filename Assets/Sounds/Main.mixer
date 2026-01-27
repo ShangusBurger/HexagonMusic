@@ -1,5 +1,38 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!243 &-9210262741089195114
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Snap
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 7cca0d2550447704aadda4311b80300c
+  m_Children: []
+  m_Volume: 35dc2ca321716e4459c738a8e623aff2
+  m_Pitch: 0cc110c853af45f4b90d57c838ca3d25
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: -8136428480895408827}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!244 &-8136428480895408827
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: bffe5830c86fa794e9f247266161e67d
+  m_EffectName: Attenuation
+  m_MixLevel: 9bd9d7b47abd4484f8bc128f70d022c2
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!244 &-8045377989781809681
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -108,13 +141,27 @@ AudioMixerEffectController:
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
+--- !u!244 &-2215993154345022879
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 47716b452acc8ff4b835f637d4958389
+  m_EffectName: Attenuation
+  m_MixLevel: ca119ad9ecb68c24cb5d04498281d72e
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!243 &-991724921223143142
 AudioMixerGroupController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Aux
+  m_Name: Shaker
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: 16093f141eaeff243ac9264c8e51d0b0
   m_Children: []
@@ -146,6 +193,25 @@ AudioMixerGroupController:
   m_Mute: 0
   m_Solo: 0
   m_BypassEffects: 0
+--- !u!243 &-19224211820334757
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Clap
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: f6d80f828af8d894e92aec837e747fb3
+  m_Children: []
+  m_Volume: 38ae3908a20dca74ba31be90c2976004
+  m_Pitch: c0edee913f3d0644183ed042a0b44b20
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: -2215993154345022879}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
 --- !u!241 &24100000
 AudioMixerController:
   m_ObjectHideFlags: 0
@@ -173,6 +239,8 @@ AudioMixerController:
     - f37886db32096f04198dd47763d530c0
     - 16093f141eaeff243ac9264c8e51d0b0
     - 166de8772a0079845a0379c77f7a3c96
+    - 7cca0d2550447704aadda4311b80300c
+    - f6d80f828af8d894e92aec837e747fb3
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500006}
@@ -223,12 +291,14 @@ AudioMixerSnapshotController:
   m_FloatValues:
     9651aac28ddaf024eb23af6fbe894c30: -2953
     5aa0ef238213917458969ed3f1dad1cc: 2.78
+    35dc2ca321716e4459c738a8e623aff2: -9.332112
     9ae44114babc533479ff3e43848d4b62: -6148
     064db1d75e3665e4d98c664dedd06f25: -1.5191216
+    38ae3908a20dca74ba31be90c2976004: -7.436929
     a9683d48cda6f7248b30366d94f552c2: 0
     b5892199dc9b0f14e820d6c00650d595: 0.216
     ebe2d3b923ad9634e9878ad3c9ce6e56: -5082
-    79187eb9b21c6764e88173b6a3e3dde6: -11.400904
+    79187eb9b21c6764e88173b6a3e3dde6: -11.944499
     ce98482addfacd640a32f03d4dbb7d1b: 0
     b6de2fcaf9faa804b8b420a2fdd34672: 0.0396
     462e65fb985eeff4ebd172d7a01e0676: -0.16685188
@@ -283,6 +353,8 @@ AudioMixerGroupController:
   - {fileID: 3875966111989826692}
   - {fileID: -7048343877426840841}
   - {fileID: -991724921223143142}
+  - {fileID: -9210262741089195114}
+  - {fileID: -19224211820334757}
   m_Volume: a9683d48cda6f7248b30366d94f552c2
   m_Pitch: 1754c832017449d488eb7a114d7a2dda
   m_Send: 00000000000000000000000000000000
@@ -313,7 +385,7 @@ AudioMixerGroupController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Snare-Clap
+  m_Name: Snare
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: 435e5f0d4dcde104999f17603d4bf9cd
   m_Children: []
