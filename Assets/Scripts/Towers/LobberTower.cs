@@ -6,7 +6,7 @@ using UnityEngine;
 public class LobberTower : Tower
 {
     public int minLobDistance = 2;
-    public int maxLobDistance = 6;
+    public int maxLobDistance = 8;
     public int lobDelay = 2;
     public int lobDistance = -1;
 
@@ -23,13 +23,13 @@ public class LobberTower : Tower
         base.OnPulseReceived(incomingPulse);
 
         // Lob the pulse in the same direction it came from, at the set distance
-        Coordinate targetCoord = Coordinates.Instance.GetNeighbor(tile.tileCoordinate, incomingPulse.direction, lobDistance);
+        Coordinate targetCoord = Coordinates.Instance.GetNeighbor(tile.tileCoordinate, (incomingPulse.direction + 3) % 6, lobDistance);
         
         if (targetCoord != null && lobDistance > 0)
         {
             GroundTile targetGroundTile = targetCoord.go.GetComponent<GroundTile>();
             // Create a pulse that will continue in the same direction
-            Pulse lobbedPulse = new Pulse(incomingPulse.direction, continuous: true, source: false, delay: lobDelay);
+            Pulse lobbedPulse = new Pulse((incomingPulse.direction + 3) % 6, continuous: true, source: false, delay: lobDelay);
             targetGroundTile.SchedulePulse(lobbedPulse);
 
             // Spawn and launch the projectile

@@ -29,7 +29,6 @@ public class UnlockManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
             InitializeUnlocks();
         }
         else

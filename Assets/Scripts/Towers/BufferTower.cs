@@ -9,6 +9,7 @@ public class BufferTower : Tower
     public int threshold = 8;
     public int currentAccumulated;
     public bool resetBufferNextUpdate = false;
+    public bool goalCompleteFlag = false;
 
     [SerializeField] private TMP_Text bufferSizeText;
 
@@ -43,6 +44,7 @@ public class BufferTower : Tower
             Pulse newPulse = new Pulse(incomingPulse.direction, source: true);
             tile.SchedulePulse(newPulse);
             resetBufferNextUpdate = true;
+            goalCompleteFlag = true;
         }
     }
 

@@ -314,14 +314,17 @@ public class GroundTile : MonoBehaviour
             case TowerType.Sprayer:
                 tower = Instantiate(TileMapConstructor.Instance.sprayerTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
+                SelectionHandler.DeselectCurrent();
                 break;
             case TowerType.Buffer:
                 tower = Instantiate(TileMapConstructor.Instance.bufferTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
+                SelectionHandler.DeselectCurrent();
                 break;
             case TowerType.Switcher:
                 tower = Instantiate(TileMapConstructor.Instance.switcherTowerPrefab, transform).GetComponent<Tower>();
                 tower.tile = this;
+                SelectionHandler.DeselectCurrent();
                 break;
         }
         tower.ownType = type;

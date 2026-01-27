@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c77beb92eb95734cb4b280f237a23e0, type: 3}
+  m_Name: Trigger2Buffer
+  m_EditorClassIdentifier: 
+  displayText: Trigger Two Different Buffer Towers on the Same Beat, Using Different
+    Buffer Sizes
+  rewards:
+  - {fileID: 11400000, guid: ceff1ceeba8c42649b62c3d1482bc12c, type: 2}
+  - {fileID: 11400000, guid: d3ecfc9c331ad1246b65666a4d5ac167, type: 2}
+  - {fileID: 11400000, guid: b605d1ee6ac39004e84304cf85875d58, type: 2}
+  - {fileID: 11400000, guid: 827a8b19c7c3a3242bd2ad537840491f, type: 2}
+  goalIcon: {fileID: 0}
+  targetNumber: 2
+  bufferSizes: 
