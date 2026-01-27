@@ -114,7 +114,7 @@ public class Tower : MonoBehaviour
 
     public void DestroySelf()
     {
-        towerUI.RemoveFromReference();
+        towerUI.RemoveFromReference(); // This broke
         tile.RemoveTower();
         allTowers.Remove(this);
     }

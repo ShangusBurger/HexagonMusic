@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85e5553fe3bc2354180f5356abc1233d, type: 3}
+  m_Name: 3Loc
+  m_EditorClassIdentifier: 
+  displayText: Get Signal to All of the Orange Tiles
+  rewards: []
+  goalIcon: {fileID: 0}
+  targetHexCoords:
+  - {x: -4, y: 4}
+  - {x: 2, y: 5}
+  - {x: 5, y: -6}
+  targetColor:
+    serializedVersion: 2
+    rgba: 4287611647
+  completedColor:
+    serializedVersion: 2
+    rgba: 4293132198

@@ -30,6 +30,8 @@ public class ProgressHandler : MonoBehaviour
             CacheNextUnlock();
         }
         else Destroy(gameObject);
+
+        GroundTile.OnTowerChangeMade += ResetCurrentGoal;
     }
 
     void Update()
@@ -41,11 +43,15 @@ public class ProgressHandler : MonoBehaviour
             CompleteCurrentGoal();
 
         if (Input.GetKeyDown(KeyCode.P))
-        {
-            currentGoal.DeconstructGoal();
-            ProgressHandler.Instance.SkipCurrentGoal();
-        }
+            SkipCurrentGoal();
     }
+
+    void ResetCurrentGoal()
+    {
+        if (currentGoal != null)
+            currentGoal.SetupGoal();
+    }
+
 
     void SetCurrentGoal(Goal goal)
     {

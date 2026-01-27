@@ -18,7 +18,7 @@ public class PlayButtonController : MonoBehaviour
     [SerializeField] private Sprite playImage;
     [SerializeField] private Sprite stopImage;
 
-    //private bool isPlaying = false;
+    private bool isPlaying = false;
     private bool pulseFoundThisBeat;
     
     void Start()
@@ -36,7 +36,7 @@ public class PlayButtonController : MonoBehaviour
     {
         // Notify all Source Towers to trigger their pulses
         OnTriggerPlay?.Invoke();
-        //isPlaying = true;
+        isPlaying = true;
         playButton.gameObject.SetActive(false);
         stopButton.gameObject.SetActive(true);
 
@@ -46,7 +46,7 @@ public class PlayButtonController : MonoBehaviour
     public void TriggerStop()
     {
         OnTriggerStop?.Invoke();
-        //isPlaying = false;
+        isPlaying = false;
         stopButton.gameObject.SetActive(false);
         playButton.gameObject.SetActive(true);
     }
@@ -58,6 +58,16 @@ public class PlayButtonController : MonoBehaviour
             TriggerStop();
         }
         pulseFoundThisBeat = false;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (isPlaying)
+            {
+                TriggerStop();
+            }
+            else TriggerPlay();
+            
+        }
     }
 
     void PulseFound()

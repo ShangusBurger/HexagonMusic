@@ -9,12 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 959cb428c8935084787cf1efebf90d3c, type: 3}
-  m_Name: UseThreeSamples
+  m_Script: {fileID: 11500000, guid: c891d6e7b12dc554185d4e087d8bd48f, type: 3}
+  m_Name: 1Loc4-Splitter
   m_EditorClassIdentifier: 
-  displayText: Use 3 Different Sounds on Towers
+  displayText: Get Signal to the Green Tile
   rewards:
-  - {fileID: 11400000, guid: 798328925a64f084db06f8112dea1fdd, type: 2}
-  - {fileID: 11400000, guid: 569a56d9107fba8448217fbb24ec34f1, type: 2}
+  - {fileID: 11400000, guid: e04f8f08bebd26d4f864349c8e505e20, type: 2}
   goalIcon: {fileID: 0}
-  numberOfSamplesNeeded: 3
+  targetHexCoords: {x: 0, y: 0}
+  targetColor:
+    serializedVersion: 2
+    rgba: 4292408781

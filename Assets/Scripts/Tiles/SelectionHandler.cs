@@ -216,7 +216,6 @@ public class SelectionHandler : MonoBehaviour
                     }
 
                     //Rotate tower model to face direction
-
                     if (currentSelectedTile.tower.visualModel != null)
                     {
                         currentSelectedTile.tower.visualModel.transform.eulerAngles = new Vector3(0f, ((float) -bestDirection + 2f) * 60f, 0f);

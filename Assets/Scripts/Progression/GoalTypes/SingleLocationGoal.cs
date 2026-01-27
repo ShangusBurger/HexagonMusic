@@ -9,10 +9,13 @@ public class SingleLocationGoal : Goal
     public Vector2 targetHexCoords;
     GroundTile targetTile;
 
+    //Coloration
+    public Color32 targetColor;
+
     public override void SetupGoal()
     {
         targetTile = Coordinates.Instance.GetContainer().GetCoordinate(Cubes.ConvertAxialToCube(targetHexCoords)).go.GetComponent<GroundTile>();
-        targetTile.SetAsGoalTile(new Color32(159, 250, 157, 255));
+        targetTile.SetAsGoalTile(targetColor);
     }
 
     public override void DeconstructGoal()

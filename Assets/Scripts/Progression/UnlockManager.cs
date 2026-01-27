@@ -49,7 +49,6 @@ public class UnlockManager : MonoBehaviour
     {
         if (unlockedTowers.Add(tower))
         {
-            Debug.Log($"Unlocked tower: {tower}");
             OnTowerUnlocked?.Invoke(tower);
             OnUnlocksChanged?.Invoke();
         }

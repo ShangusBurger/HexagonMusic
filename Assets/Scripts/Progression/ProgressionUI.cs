@@ -30,8 +30,6 @@ public class ProgressionUI : MonoBehaviour
     [Header("Progress Bar Colors")]
     [SerializeField] private Image progressFillImage;
     [SerializeField] private Color normalColor = Color.yellow;
-    [SerializeField] private Color almostThereColor = Color.green;
-    [SerializeField] private float almostThereThreshold = 0.75f;
 
     void Awake()
     {
@@ -105,9 +103,6 @@ public class ProgressionUI : MonoBehaviour
 
         float progress = info.GetProgressNormalized();
         if (progressSlider != null) progressSlider.value = progress;
-
-        if (progressFillImage != null)
-            progressFillImage.color = progress >= almostThereThreshold ? almostThereColor : normalColor;
 
         if (unlockIconSilhouette != null && info.unlockable.icon != null)
             unlockIconSilhouette.sprite = info.unlockable.icon;

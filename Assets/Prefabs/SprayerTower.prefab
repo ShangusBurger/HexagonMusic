@@ -394,7 +394,7 @@ MonoBehaviour:
   towerAlreadyActivatedThisBeat: 0
   tile: {fileID: 0}
   directions: 
-  towerUI: {fileID: 0}
+  towerUI: {fileID: 6750710343877653929}
 --- !u!95 &2503174043734868605
 Animator:
   serializedVersion: 5
@@ -542,3 +542,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3915099634048144075, guid: a68bb2fea923de54781b07526865476e, type: 3}
   m_PrefabInstance: {fileID: 3196662007732512300}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6750710343877653929 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8211052105046414213, guid: a68bb2fea923de54781b07526865476e, type: 3}
+  m_PrefabInstance: {fileID: 3196662007732512300}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d75d9ef110a3ce74792bf9186009c7ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

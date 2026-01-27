@@ -130,8 +130,14 @@ MonoBehaviour:
   lowlightMaterialColor: {r: 1, g: 0.7028302, b: 0.7283019, a: 1}
   selectedMaterialColor: {r: 0.20167309, g: 0.4808039, b: 0.6226415, a: 1}
   beatMaterialColor: {r: 1, g: 0.6213613, b: 0, a: 0.8235294}
+  goalCompleteColor: {r: 0.740566, g: 1, b: 0.7468937, a: 1}
+  originalColor: {r: 0, g: 0, b: 0, a: 0}
+  defaultColor: {r: 0, g: 0, b: 0, a: 0}
   tower: {fileID: 0}
   beatsUntilPulse: -1
+  isGoalTile: 0
+  goalTriggered: 0
+  visualDelay: 0
   fadeDuration: 1
 --- !u!135 &5413712515568741557
 SphereCollider:

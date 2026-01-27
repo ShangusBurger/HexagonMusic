@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c891d6e7b12dc554185d4e087d8bd48f, type: 3}
-  m_Name: Loc4
+  m_Name: 1Loc1
   m_EditorClassIdentifier: 
   displayText: Get Signal to the Green Tile
-  rewards:
-  - {fileID: 11400000, guid: 514d90c2941becc438df7502fb7d60de, type: 2}
+  rewards: []
   goalIcon: {fileID: 0}
-  targetHexCoords: {x: 0, y: 0}
+  targetHexCoords: {x: 3, y: 3}
+  targetColor:
+    serializedVersion: 2
+    rgba: 4292408781

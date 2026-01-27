@@ -9,11 +9,13 @@ public class TowerSelection : MonoBehaviour
     {
         public TowerType towerType;
         public Button button;
+        public GameObject lockedPlaceholder;
     }
 
     [SerializeField] private List<TowerButtonMapping> towerButtons = new List<TowerButtonMapping>();
 
     public static TowerSelection Instance;
+    [SerializeField] private GameObject prefabLockedButton;
 
     void Start()
     {
@@ -39,10 +41,22 @@ public class TowerSelection : MonoBehaviour
 
     void RefreshButtonVisibility()
     {
-        if (UnlockManager.Instance == null) return;
         foreach (var mapping in towerButtons)
-            if (mapping.button != null)
-                mapping.button.gameObject.SetActive(UnlockManager.Instance.IsTowerUnlocked(mapping.towerType));
+        {
+            if (mapping.lockedPlaceholder == null)
+                mapping.lockedPlaceholder = Instantiate(prefabLockedButton, mapping.button.transform.position, new Quaternion(0f, 0f, 0f, 0f), transform);
+            
+            if (UnlockManager.Instance.IsTowerUnlocked(mapping.towerType))
+            {
+                mapping.button.gameObject.SetActive(true);
+                Destroy(mapping.lockedPlaceholder);
+                mapping.lockedPlaceholder = null;
+            }
+            else
+            {
+                mapping.button.gameObject.SetActive(false);
+            }
+        }
     }
 
     public void SetTargetTile(GroundTile tile)

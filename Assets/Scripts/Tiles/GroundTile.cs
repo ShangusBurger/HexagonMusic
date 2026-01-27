@@ -13,6 +13,7 @@ public class GroundTile : MonoBehaviour
     [SerializeField] private Color lowlightMaterialColor;
     [SerializeField] private Color selectedMaterialColor;
     [SerializeField] private Color beatMaterialColor;
+    [SerializeField] private Color goalCompleteColor;
     private Renderer tileRenderer;
 
     // original color, updated when goal is set to tile
@@ -28,13 +29,15 @@ public class GroundTile : MonoBehaviour
     public List<Pulse> pulsesCached; //List of pulses to be processed on the next update
     public int beatsUntilPulse = -1;
     public static event Action PulseExistsNotif;
-    bool isGoalTile = false;
+    public bool isGoalTile = false;
+    public bool goalTriggered = false;
 
 
     //Handling Updates
     private bool triggerBeatNextUpdate = false;
     public static event Action<Coordinate> OnTowerUpdated;
     public double visualDelay = 0.0;
+    public static event Action OnTowerChangeMade;
 
     // Fading variables
     [SerializeField] private float fadeDuration = 1f; // Duration of fade in seconds
@@ -69,7 +72,21 @@ public class GroundTile : MonoBehaviour
         if (pulsesCached.Count > 0 || pulses.Count > 0)
         {
             PulseExistsNotif?.Invoke();
+            if (isGoalTile)
+            {
+                foreach (Pulse p in pulses)
+                {
+                    if (!p.source)
+                    {
+                        goalTriggered = true;
+                        tileRenderer.material.color = goalCompleteColor;
+                        originalColor = goalCompleteColor;
+                    }
+                }
+            }
         }
+
+        
 
         visualDelay -= (double) Time.deltaTime;
         // Handle color fading
@@ -131,17 +148,7 @@ public class GroundTile : MonoBehaviour
         if (triggerBeatNextUpdate)
         {
             triggerBeatNextUpdate = false;
-            visualDelay = TempoHandler.beatLength * 3/4;
-
-            //if active pulse on tile, add to cache to be sent onward next update
-            if (pulses.Count > 0)
-            {  
-                foreach (Pulse p in pulses)
-                {
-                    pulsesCached.Add(p);
-                }
-                pulses.Clear();
-            }
+            
         }
     }
 
@@ -235,7 +242,17 @@ public class GroundTile : MonoBehaviour
 
     public void BeatRecieved()
     {
-        triggerBeatNextUpdate = true;
+        visualDelay = TempoHandler.beatLength * 3/4;
+
+            //if active pulse on tile, add to cache to be sent onward next update
+            if (pulses.Count > 0)
+            {  
+                foreach (Pulse p in pulses)
+                {
+                    pulsesCached.Add(p);
+                }
+                pulses.Clear();
+            }
     }
 
     public void PropagatePulse(Pulse pulse)
@@ -310,6 +327,7 @@ public class GroundTile : MonoBehaviour
                 break;
         }
 
+        OnTowerChangeMade?.Invoke();
         SelectionHandler.HideTowerUIs();
     }
     public void SetAsGoalTile(Color goalColor)
@@ -318,11 +336,15 @@ public class GroundTile : MonoBehaviour
         originalColor = goalColor;
         fadeTargetColor = goalColor;
         isGoalTile = true;
+        goalTriggered = false;
     }
 
     public void RemoveGoalTile()
     {
-        isGoalTile = false;
         originalColor = defaultColor;
+        fadeTargetColor = defaultColor;
+        tileRenderer.material.color = defaultColor;
+        isGoalTile = false;
+        goalTriggered = false;
     }  
 }
