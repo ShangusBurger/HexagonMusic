@@ -322,12 +322,12 @@ namespace CubeCoordinates
             return new Vector3(x, 0.0f, z);
 
         //Falt-top
-        return new Vector3(cube.x * Coordinates.Instance.spacingX,
-            0.0f,
-            -(
-            (cube.x * Coordinates.Instance.spacingZ) +
-            (cube.z * Coordinates.Instance.spacingZ * 2.0f)
-            ));
+        // return new Vector3(cube.x * Coordinates.Instance.spacingX,
+        //     0.0f,
+        //     -(
+        //     (cube.x * Coordinates.Instance.spacingZ) +
+        //     (cube.z * Coordinates.Instance.spacingZ * 2.0f)
+        //     ));
 
                 
         }
@@ -360,9 +360,9 @@ namespace CubeCoordinates
             return RoundCube(ConvertAxialToCube(new Vector2(q, r)));
 
             // Flat-top: convert back from world position
-            q = (position.x * (2.0f / 3.0f)) / Coordinates.Instance.radius;
-            r = (-position.x / 3.0f + (Mathf.Sqrt(3) / 3.0f) * position.z) / Coordinates.Instance.radius;
-            return RoundCube(ConvertAxialToCube(new Vector2(q, r)));
+            // q = (position.x * (2.0f / 3.0f)) / Coordinates.Instance.radius;
+            // r = (-position.x / 3.0f + (Mathf.Sqrt(3) / 3.0f) * position.z) / Coordinates.Instance.radius;
+            // return RoundCube(ConvertAxialToCube(new Vector2(q, r)));
 
         }
 

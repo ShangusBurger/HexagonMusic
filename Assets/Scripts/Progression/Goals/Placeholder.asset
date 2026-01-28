@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 959cb428c8935084787cf1efebf90d3c, type: 3}
   m_Name: Placeholder
   m_EditorClassIdentifier: 
-  displayText: Lob a Signal Ball over 5 Towers
+  displayText: Make some music!
   rewards:
   - {fileID: 11400000, guid: bff6099c35f2f2844a85971c5c873c26, type: 2}
   - {fileID: 11400000, guid: 4af9190f56683544e960c2587767d203, type: 2}

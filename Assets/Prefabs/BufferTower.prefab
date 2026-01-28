@@ -140,7 +140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 8
+  m_text: 4
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -687,8 +687,8 @@ RectTransform:
   m_Father: {fileID: 5194043228554948453}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.42857143, y: 0}
-  m_AnchorMax: {x: 0.42857143, y: 1}
+  m_AnchorMin: {x: 0.33333334, y: 0}
+  m_AnchorMax: {x: 0.33333334, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -933,9 +933,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 7007633941657036795}
   m_Direction: 0
   m_MinValue: 2
-  m_MaxValue: 16
+  m_MaxValue: 8
   m_WholeNumbers: 1
-  m_Value: 8
+  m_Value: 4
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -1020,11 +1020,13 @@ MonoBehaviour:
   playbackClip: {fileID: 8300000, guid: 4beceeb85def0de4b8c97c53898126ae, type: 3}
   towerAlreadyActivatedThisBeat: 0
   tile: {fileID: 0}
+  ownType: 0
   directions: 
   towerUI: {fileID: 3160380747599560476}
-  threshold: 8
+  threshold: 4
   currentAccumulated: 0
   resetBufferNextUpdate: 0
+  goalCompleteFlag: 0
   bufferSizeText: {fileID: 6490986259722211521}
   bufferIndicatorTransform: {fileID: 8108081961733992499}
 --- !u!95 &6160876709520350363
@@ -1081,7 +1083,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.42857143, y: 1}
+  m_AnchorMax: {x: 0.33333334, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1236,7 +1238,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8622037298956320071, guid: a68bb2fea923de54781b07526865476e, type: 3}
       propertyPath: m_Name
-      value: TowerUICanvas (1)
+      value: TowerUICanvas
       objectReference: {fileID: 0}
     - target: {fileID: 8622037298956320071, guid: a68bb2fea923de54781b07526865476e, type: 3}
       propertyPath: m_IsActive
