@@ -12,7 +12,6 @@ public class SplitterTower : Tower
 
     internal override void OnPulseReceived(Pulse incomingPulse)
     {
-
         base.OnPulseReceived(incomingPulse);
         directions.Clear();
         directions.Add((incomingPulse.direction + 1) % 6);
@@ -21,6 +20,7 @@ public class SplitterTower : Tower
         // Create a new pulse in the redirect direction
         if (directions.Count > 0)
         {
+            Debug.Log("activated splitter");
             Pulse redirectedPulse;
             foreach (int direction in directions)
             {

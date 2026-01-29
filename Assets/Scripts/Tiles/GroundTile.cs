@@ -175,7 +175,7 @@ public class GroundTile : MonoBehaviour
     {
         foreach (Pulse p in pulses)
         {
-            if (p.direction == pulse.direction && p.delay == pulse.delay && !pulse.source)
+            if (p.direction == pulse.direction && p.delay == pulse.delay && !pulse.source && !p.source)
                 return;
         }
 
