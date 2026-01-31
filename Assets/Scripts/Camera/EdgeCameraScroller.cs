@@ -24,6 +24,7 @@ public class EdgeCameraScroller : MonoBehaviour
     
     void Start()
     {
+        Application.targetFrameRate = 60;
         targetPosition = transform.position;
     }
     
