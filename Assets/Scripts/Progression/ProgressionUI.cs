@@ -8,16 +8,31 @@ public class ProgressionUI : MonoBehaviour
 {
     public static ProgressionUI Instance;
 
-    [Header("Current Goal Display")]
-    [SerializeField] private GameObject goalPanel;
-    [SerializeField] private TMP_Text goalText;
+    [System.Serializable]
+    public class TrackUIElements
+    {
+        [Header("Track Assignment")]
+        public string trackId;
 
-    [Header("Next Unlock Display")]
-    [SerializeField] private GameObject nextUnlockPanel;
-    [SerializeField] private TMP_Text progressText;
-    [SerializeField] private Slider progressSlider;
-    [SerializeField] private Image unlockIconSilhouette;
+        [Header("Current Goal Display")]
+        public GameObject goalPanel;
+        public TMP_Text goalText;
+        public Image trackColorIndicator;
 
+        [Header("Progress Display (used for goal progress OR unlock progress)")]
+        public GameObject progressPanel;
+        public TMP_Text progressText;
+        public Slider progressSlider;
+        public Image progressIcon;  // Shows goal icon or unlock silhouette
+
+        [Header("Track Complete Display")]
+        public GameObject trackCompletePanel;
+    }
+
+    [Header("Track UI Elements")]
+    [SerializeField] private List<TrackUIElements> trackUIs = new List<TrackUIElements>();
+
+    [Header("Shared UI Elements")]
     [Header("Unlock Notification")]
     [SerializeField] private GameObject unlockNotificationPanel;
     [SerializeField] private TMP_Text unlockNotificationText;
@@ -27,14 +42,16 @@ public class ProgressionUI : MonoBehaviour
     [Header("All Complete Display")]
     [SerializeField] private GameObject allCompletePanel;
 
-    [Header("Progress Bar Colors")]
-    [SerializeField] private Image progressFillImage;
-    [SerializeField] private Color normalColor = Color.yellow;
+    private Dictionary<string, TrackUIElements> trackUIMap = new Dictionary<string, TrackUIElements>();
 
     void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
+        foreach (var ui in trackUIs)
+            if (!string.IsNullOrEmpty(ui.trackId))
+                trackUIMap[ui.trackId] = ui;
     }
 
     void Start()
@@ -42,12 +59,29 @@ public class ProgressionUI : MonoBehaviour
         ProgressHandler.OnNewGoalStarted += OnNewGoalStarted;
         ProgressHandler.OnNextUnlockProgressChanged += OnNextUnlockProgressChanged;
         ProgressHandler.OnRewardsGranted += OnRewardsGranted;
-        ProgressHandler.OnProgressChanged += RefreshUI;
+        ProgressHandler.OnTrackProgressChanged += OnTrackProgressChanged;
+        ProgressHandler.OnTrackCompleted += OnTrackCompleted;
+        ProgressHandler.OnAnyProgressChanged += RefreshAllUI;
 
         if (unlockNotificationPanel != null) unlockNotificationPanel.SetActive(false);
         if (allCompletePanel != null) allCompletePanel.SetActive(false);
 
-        RefreshUI();
+        RefreshAllUI();
+    }
+
+    void Update()
+    {
+        // Continuously update goal progress for tracks that show it
+        if (ProgressHandler.Instance == null) return;
+
+        foreach (var kvp in trackUIMap)
+        {
+            var state = ProgressHandler.Instance.GetTrackState(kvp.Key);
+            if (state != null && state.track.showGoalProgress && state.currentGoal != null)
+            {
+                UpdateGoalProgressDisplay(kvp.Value, state.currentGoal);
+            }
+        }
     }
 
     void OnDestroy()
@@ -55,62 +89,136 @@ public class ProgressionUI : MonoBehaviour
         ProgressHandler.OnNewGoalStarted -= OnNewGoalStarted;
         ProgressHandler.OnNextUnlockProgressChanged -= OnNextUnlockProgressChanged;
         ProgressHandler.OnRewardsGranted -= OnRewardsGranted;
-        ProgressHandler.OnProgressChanged -= RefreshUI;
+        ProgressHandler.OnTrackProgressChanged -= OnTrackProgressChanged;
+        ProgressHandler.OnTrackCompleted -= OnTrackCompleted;
+        ProgressHandler.OnAnyProgressChanged -= RefreshAllUI;
     }
 
-    void OnNewGoalStarted(Goal goal) => UpdateGoalDisplay(goal);
-    void OnNextUnlockProgressChanged(NextUnlockInfo info) => UpdateNextUnlockDisplay(info);
-
-    void OnRewardsGranted(List<Unlockable> rewards)
+    void OnNewGoalStarted(string trackId, Goal goal)
     {
-        if (rewards.Count > 0) ShowUnlockNotification(rewards[0]);
+        if (trackUIMap.TryGetValue(trackId, out var ui))
+            UpdateGoalDisplay(ui, goal);
     }
 
-    void RefreshUI()
+    void OnNextUnlockProgressChanged(string trackId, NextUnlockInfo info)
+    {
+        if (trackUIMap.TryGetValue(trackId, out var ui))
+            RefreshTrackUI(trackId, ui);
+    }
+
+    void OnRewardsGranted(string trackId, List<Unlockable> rewards)
+    {
+        if (rewards.Count > 0)
+            ShowUnlockNotification(rewards[0], trackId);
+    }
+
+    void OnTrackProgressChanged(string trackId)
+    {
+        if (trackUIMap.TryGetValue(trackId, out var ui))
+            RefreshTrackUI(trackId, ui);
+    }
+
+    void OnTrackCompleted(string trackId)
+    {
+        if (trackUIMap.TryGetValue(trackId, out var ui))
+        {
+            if (ui.trackCompletePanel != null) ui.trackCompletePanel.SetActive(true);
+            if (ui.progressPanel != null) ui.progressPanel.SetActive(false);
+        }
+
+        CheckAllTracksComplete();
+    }
+
+    void RefreshAllUI()
     {
         if (ProgressHandler.Instance == null) return;
 
-        UpdateGoalDisplay(ProgressHandler.Instance.GetCurrentGoal());
-        UpdateNextUnlockDisplay(ProgressHandler.Instance.GetNextUnlock());
+        foreach (var kvp in trackUIMap)
+            RefreshTrackUI(kvp.Key, kvp.Value);
 
-        if (ProgressHandler.Instance.IsAllComplete())
+        CheckAllTracksComplete();
+    }
+
+    void RefreshTrackUI(string trackId, TrackUIElements ui)
+    {
+        var state = ProgressHandler.Instance.GetTrackState(trackId);
+        if (state == null) return;
+
+        UpdateGoalDisplay(ui, state.currentGoal);
+
+        if (ui.trackColorIndicator != null)
+            ui.trackColorIndicator.color = state.track.trackColor;
+
+        if (state.IsComplete)
         {
-            if (allCompletePanel != null) allCompletePanel.SetActive(true);
-            if (nextUnlockPanel != null) nextUnlockPanel.SetActive(false);
+            if (ui.trackCompletePanel != null) ui.trackCompletePanel.SetActive(true);
+            if (ui.progressPanel != null) ui.progressPanel.SetActive(false);
+        }
+        else if (state.track.showGoalProgress)
+        {
+            UpdateGoalProgressDisplay(ui, state.currentGoal);
+        }
+        else
+        {
+            UpdateUnlockProgressDisplay(ui, state.cachedNextUnlock);
         }
     }
 
-    void UpdateGoalDisplay(Goal goal)
+    void UpdateGoalDisplay(TrackUIElements ui, Goal goal)
     {
         if (goal != null)
         {
-            if (goalPanel != null) goalPanel.SetActive(true);
-            if (goalText != null) goalText.text = goal.displayText;
+            if (ui.goalPanel != null) ui.goalPanel.SetActive(true);
+            if (ui.goalText != null) ui.goalText.text = goal.displayText;
         }
-        else if (goalPanel != null) goalPanel.SetActive(false);
+        else if (ui.goalPanel != null) ui.goalPanel.SetActive(false);
     }
 
-    void UpdateNextUnlockDisplay(NextUnlockInfo info)
+    void UpdateGoalProgressDisplay(TrackUIElements ui, Goal goal)
     {
-        if (info == null || info.unlockable == null)
+        if (goal == null)
         {
-            if (nextUnlockPanel != null) nextUnlockPanel.SetActive(false);
+            if (ui.progressPanel != null) ui.progressPanel.SetActive(false);
             return;
         }
 
-        if (nextUnlockPanel != null) nextUnlockPanel.SetActive(true);
-        if (progressText != null) progressText.text = info.GetProgressText();
+        if (ui.progressPanel != null) ui.progressPanel.SetActive(true);
+        
+        string progressText = goal.GetProgressText();
+        if (ui.progressText != null)
+            ui.progressText.text = string.IsNullOrEmpty(progressText) ? "" : progressText;
 
-        float progress = info.GetProgressNormalized();
-        if (progressSlider != null) progressSlider.value = progress;
+        if (ui.progressSlider != null)
+            ui.progressSlider.value = goal.GetProgressNormalized();
 
-        if (unlockIconSilhouette != null && info.unlockable.icon != null)
-            unlockIconSilhouette.sprite = info.unlockable.icon;
+        if (ui.progressIcon != null && goal.goalIcon != null)
+            ui.progressIcon.sprite = goal.goalIcon;
     }
 
-    void ShowUnlockNotification(Unlockable unlockable)
+    void UpdateUnlockProgressDisplay(TrackUIElements ui, NextUnlockInfo info)
+    {
+        if (info == null || info.unlockable == null)
+        {
+            if (ui.progressPanel != null) ui.progressPanel.SetActive(false);
+            return;
+        }
+
+        if (ui.progressPanel != null) ui.progressPanel.SetActive(true);
+        if (ui.progressText != null) ui.progressText.text = info.GetProgressText();
+
+        if (ui.progressSlider != null)
+            ui.progressSlider.value = info.GetProgressNormalized();
+
+        if (ui.progressIcon != null && info.unlockable.icon != null)
+            ui.progressIcon.sprite = info.unlockable.icon;
+    }
+
+    void ShowUnlockNotification(Unlockable unlockable, string trackId)
     {
         if (unlockNotificationPanel == null) return;
+
+        var state = ProgressHandler.Instance?.GetTrackState(trackId);
+        string trackName = state?.track.displayName ?? "";
 
         if (unlockNotificationText != null)
             unlockNotificationText.text = $"{unlockable.displayName} Unlocked!";
@@ -120,6 +228,14 @@ public class ProgressionUI : MonoBehaviour
 
         unlockNotificationPanel.SetActive(true);
         StartCoroutine(HideNotificationAfterDelay());
+    }
+
+    void CheckAllTracksComplete()
+    {
+        if (ProgressHandler.Instance != null && ProgressHandler.Instance.AreAllTracksComplete())
+        {
+            if (allCompletePanel != null) allCompletePanel.SetActive(true);
+        }
     }
 
     IEnumerator HideNotificationAfterDelay()

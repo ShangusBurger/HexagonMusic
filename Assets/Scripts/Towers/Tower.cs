@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,6 +27,8 @@ public class Tower : MonoBehaviour
     //Tower UI reference
     public TowerUI towerUI;
 
+    public static Action OnInteractionMade; // Event for when the tower is placed
+
     internal virtual void Start()
     {
         goalTime = TempoHandler.startDSPTime + TempoHandler.barLength;
@@ -47,6 +50,7 @@ public class Tower : MonoBehaviour
             allTowers = new List<Tower>();
         }
         allTowers.Add(this);
+        InteractionMade(); // Notify that a tower has been placed
     }
 
     internal virtual void Update()
@@ -124,9 +128,16 @@ public class Tower : MonoBehaviour
 
     public void DestroySelf()
     {
+        InteractionMade();
         towerUI.RemoveFromReference(); // This broke
         tile.RemoveTower();
         allTowers.Remove(this);
+    }
+
+    //Called when a tower is manually placed or deleted, for tracking interaction goal
+    public static void InteractionMade()
+    {
+        OnInteractionMade?.Invoke();
     }
 }
 

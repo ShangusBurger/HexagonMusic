@@ -3,6 +3,7 @@ public class NextUnlockInfo
 {
     public Unlockable unlockable;
     public Goal sourceGoal;
+    public string trackId;  // NEW: identifies which track this belongs to
     public int goalIndex;
     public int goalsRemaining;
     public int goalsCompleted;

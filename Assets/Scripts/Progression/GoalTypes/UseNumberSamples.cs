@@ -1,40 +1,39 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using CubeCoordinates;
 
 [CreateAssetMenu(fileName = "NewGoal", menuName = "Goals/UseNumberSamples")]
 public class UseNumberSamples : Goal
 {
     public int numberOfSamplesNeeded;
 
-    public override void SetupGoal()
-    {
-        
-    }
+    public override void SetupGoal() { }
 
-    public override void DeconstructGoal()
+    public override void DeconstructGoal() { }
+
+    private int GetUniqueSampleCount()
     {
-       
+        HashSet<AudioClip> samplesUsed = new HashSet<AudioClip>();
+        foreach (Tower t in Tower.allTowers)
+        {
+            if (t.playbackClip != null)
+                samplesUsed.Add(t.playbackClip);
+        }
+        return samplesUsed.Count;
     }
 
     public override bool IsComplete()
     {
-        List<AudioClip> samplesUsed = new List<AudioClip>();
+        return GetUniqueSampleCount() >= numberOfSamplesNeeded;
+    }
 
-        foreach (Tower t in Tower.allTowers)
-        {
-            if (!samplesUsed.Contains(t.playbackClip))
-            {
-                samplesUsed.Add(t.playbackClip);
-            }
-        }
+    public override float GetProgressNormalized()
+    {
+        if (numberOfSamplesNeeded <= 0) return 1f;
+        return Mathf.Clamp01((float)GetUniqueSampleCount() / numberOfSamplesNeeded);
+    }
 
-        if (samplesUsed.Count >= numberOfSamplesNeeded)
-        {
-            return true;
-        }
-
-        return false;
+    public override string GetProgressText()
+    {
+        return $"{GetUniqueSampleCount()}/{numberOfSamplesNeeded}";
     }
 }

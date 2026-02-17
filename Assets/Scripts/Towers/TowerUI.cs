@@ -36,6 +36,7 @@ public class TowerUI : MonoBehaviour
 
     void OnDestroy()
     {
+        Tower.InteractionMade(); // Notify goals that an interaction has been made when this UI is destroyed (tower placed or removed)
         SelectionHandler.HideAllTowerUI -= HideSelf;
         UnlockManager.OnSampleUnlocked -= OnSampleUnlocked;
         if (sampleDropdown != null)

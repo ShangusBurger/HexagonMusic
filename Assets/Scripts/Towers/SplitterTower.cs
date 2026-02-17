@@ -20,7 +20,6 @@ public class SplitterTower : Tower
         // Create a new pulse in the redirect direction
         if (directions.Count > 0)
         {
-            Debug.Log("activated splitter");
             Pulse redirectedPulse;
             foreach (int direction in directions)
             {

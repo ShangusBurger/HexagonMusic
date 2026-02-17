@@ -422,9 +422,37 @@ PrefabInstance:
     m_TransformParent: {fileID: 7044555038288560308}
     m_Modifications:
     - target: {fileID: 2634814377310614810, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2634814377310614810, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2634814377310614810, guid: a68bb2fea923de54781b07526865476e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: -9099161421716354733}
+    - target: {fileID: 2634814377310614810, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 9057431189203469463}
+    - target: {fileID: 2634814377310614810, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2634814377310614810, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2634814377310614810, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 2634814377310614810, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 3915099634048144075, guid: a68bb2fea923de54781b07526865476e, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
