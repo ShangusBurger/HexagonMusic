@@ -19,20 +19,35 @@ public class MultiLocationUntimedGoal : Goal
         targetTiles = new List<GroundTile>();
         foreach (Vector2 coord in targetHexCoords)
         {
-            GroundTile targetTile = Coordinates.Instance.GetContainer().GetCoordinate(Cubes.ConvertAxialToCube(coord)).go.GetComponent<GroundTile>();
+            GroundTile targetTile = Coordinates.Instance.GetContainer()
+                .GetCoordinate(Cubes.ConvertAxialToCube(coord)).go.GetComponent<GroundTile>();
             targetTiles.Add(targetTile);
             targetTile.SetAsGoalTile(targetColor);
             targetTile.goalTriggered = false;
         }
+        
+        // Subscribe to tower changes for reset behavior
+        GroundTile.OnTowerChangeMade += ResetTriggeredTiles;
     }
 
     public override void DeconstructGoal()
     {
+        // Unsubscribe from tower changes
+        GroundTile.OnTowerChangeMade -= ResetTriggeredTiles;
+        
         foreach (GroundTile tile in targetTiles)
         {
             tile.RemoveGoalTile();
         }
-        
+    }
+
+    private void ResetTriggeredTiles()
+    {
+        foreach (GroundTile tile in targetTiles)
+        {
+            tile.goalTriggered = false;
+            tile.SetAsGoalTile(targetColor); // Reset visual state if needed
+        }
     }
 
     public override bool IsComplete()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using CubeCoordinates;
 
-[CreateAssetMenu(fileName = "NewGoal", menuName = "Goals/TriggerMultiTower")]
+[CreateAssetMenu(fileName = "NewGoal", menuName = "Goals/TriggerMultiBuffer")]
 public class TriggerMultiBufferGoal : Goal
 {
     public int targetNumber;

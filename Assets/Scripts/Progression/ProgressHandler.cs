@@ -30,12 +30,11 @@ public class ProgressHandler : MonoBehaviour
         }
         else Destroy(gameObject);
 
-        GroundTile.OnTowerChangeMade += ResetAllCurrentGoals;
     }
 
     void OnDestroy()
     {
-        GroundTile.OnTowerChangeMade -= ResetAllCurrentGoals;
+
     }
 
     void InitializeTracks()
@@ -66,13 +65,6 @@ public class ProgressHandler : MonoBehaviour
         // Debug: Skip goals with P key (track 0) and O key (track 1)
         if (Input.GetKeyDown(KeyCode.P)) SkipCurrentGoal(0);
         if (Input.GetKeyDown(KeyCode.O)) SkipCurrentGoal(1);
-    }
-
-    void ResetAllCurrentGoals()
-    {
-        foreach (var state in trackStates.Values)
-            if (state.currentGoal != null)
-                state.currentGoal.SetupGoal();
     }
 
     void SetCurrentGoal(TrackProgressState state, Goal goal)

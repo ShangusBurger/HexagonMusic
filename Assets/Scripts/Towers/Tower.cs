@@ -132,6 +132,7 @@ public class Tower : MonoBehaviour
         towerUI.RemoveFromReference(); // This broke
         tile.RemoveTower();
         allTowers.Remove(this);
+        ClearFieldController.OnClearField -= DestroySelf;
     }
 
     //Called when a tower is manually placed or deleted, for tracking interaction goal
