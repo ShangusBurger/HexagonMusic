@@ -332,13 +332,17 @@ public class GroundTile : MonoBehaviour
         OnTowerChangeMade?.Invoke();
         SelectionHandler.HideTowerUIs();
     }
-    public void SetAsGoalTile(Color goalColor)
+    public void SetAsGoalTile(Color goalColor, bool isUntimed)
     {
         tileRenderer.material.color = goalColor;
         originalColor = goalColor;
         fadeTargetColor = goalColor;
-        isGoalTile = true;
         goalTriggered = false;
+        
+        if (isUntimed)
+        {
+            isGoalTile = true;
+        }
     }
 
     public void RemoveGoalTile()

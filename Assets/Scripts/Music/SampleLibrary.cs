@@ -7,7 +7,8 @@ using UnityEngine.Audio;
 public enum SampleType
 {
     Percussion,
-    Chord
+    Chord,
+    Bass
 }
 
 [Serializable]

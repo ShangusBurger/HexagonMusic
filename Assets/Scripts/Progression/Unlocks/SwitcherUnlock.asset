@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 058f654df7e989549888a8baf9462f33, type: 3}
   m_Name: SwitcherUnlock
   m_EditorClassIdentifier: 
-  displayName: Switcher Tower And New Sounds
+  displayName: Switcher Tower
   description: 
   icon: {fileID: 0}
   towerType: 7

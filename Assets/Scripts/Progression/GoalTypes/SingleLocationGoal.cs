@@ -15,7 +15,7 @@ public class SingleLocationGoal : Goal
     public override void SetupGoal()
     {
         targetTile = Coordinates.Instance.GetContainer().GetCoordinate(Cubes.ConvertAxialToCube(targetHexCoords)).go.GetComponent<GroundTile>();
-        targetTile.SetAsGoalTile(targetColor);
+        targetTile.SetAsGoalTile(targetColor, false);
     }
 
     public override void DeconstructGoal()

@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Trigger2Sink
   m_EditorClassIdentifier: 
   displayText: Trigger Two Different Sinker Towers on the Same Beat
-  rewards: []
+  rewards:
+  - {fileID: 11400000, guid: b605d1ee6ac39004e84304cf85875d58, type: 2}
   goalIcon: {fileID: 0}
   targetNumber: 2
   targetType: 3

@@ -13,9 +13,6 @@ MonoBehaviour:
   m_Name: LobberPlaceholder
   m_EditorClassIdentifier: 
   displayText: Lob signal over 5 towers
-  rewards:
-  - {fileID: 11400000, guid: bff6099c35f2f2844a85971c5c873c26, type: 2}
-  - {fileID: 11400000, guid: 4af9190f56683544e960c2587767d203, type: 2}
-  - {fileID: 11400000, guid: 62967c1a62bbd32408e6b15f475794d2, type: 2}
+  rewards: []
   goalIcon: {fileID: 0}
   numberOfSamplesNeeded: 20

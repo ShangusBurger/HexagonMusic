@@ -22,7 +22,7 @@ public class MultiLocationUntimedGoal : Goal
             GroundTile targetTile = Coordinates.Instance.GetContainer()
                 .GetCoordinate(Cubes.ConvertAxialToCube(coord)).go.GetComponent<GroundTile>();
             targetTiles.Add(targetTile);
-            targetTile.SetAsGoalTile(targetColor);
+            targetTile.SetAsGoalTile(targetColor, true);
             targetTile.goalTriggered = false;
         }
         
@@ -46,7 +46,7 @@ public class MultiLocationUntimedGoal : Goal
         foreach (GroundTile tile in targetTiles)
         {
             tile.goalTriggered = false;
-            tile.SetAsGoalTile(targetColor); // Reset visual state if needed
+            tile.SetAsGoalTile(targetColor, true); // Reset visual state if needed
         }
     }
 

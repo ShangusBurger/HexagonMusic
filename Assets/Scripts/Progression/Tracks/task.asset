@@ -18,6 +18,8 @@ MonoBehaviour:
   trackColor: {r: 0.7075472, g: 0.27100396, b: 0.67087275, a: 1}
   goals:
   - {fileID: 11400000, guid: b7d026c2976b5f34e92d7a80eb6ad959, type: 2}
+  - {fileID: 11400000, guid: 288d5a5e715de104ab1557e41c5b1723, type: 2}
   - {fileID: 11400000, guid: 1fa6f2501c2a5e64197f21c2f99d9aca, type: 2}
+  - {fileID: 11400000, guid: ce5c9a8638bab7648b0867307eab9f79, type: 2}
   showGoalProgress: 1
   completionMessage: Track Complete!

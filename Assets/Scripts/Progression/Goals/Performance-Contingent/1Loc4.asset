@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayText: Get Signal to the Green Tile
   rewards:
-  - {fileID: 11400000, guid: e04f8f08bebd26d4f864349c8e505e20, type: 2}
+  - {fileID: 11400000, guid: 7bd76eaebdb0d5e45be702c23112b1a3, type: 2}
   goalIcon: {fileID: 0}
   targetHexCoords: {x: 0, y: 0}
   targetColor:

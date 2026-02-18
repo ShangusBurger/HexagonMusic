@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,8 @@ public class TowerUI : MonoBehaviour
     private Tower tower;
     private List<string> dropdownIndexToSampleName = new List<string>();
     private bool isInitialized = false;
+
+    public static Action OnSampleInteractionMade; // Event for when the sound sample is changed
 
     // Awake is called even when GameObject is inactive - ensures subscription happens
     void Awake()
@@ -90,6 +93,7 @@ public class TowerUI : MonoBehaviour
         if (tower == null || SampleLibrary.Instance == null) return;
         if (index < 0 || index >= dropdownIndexToSampleName.Count) return;
         OnSampleSelected(dropdownIndexToSampleName[index]);
+        OnSampleInteractionMade?.Invoke(); // Notify that a sample interaction has occurred
     }
 
     public void SetDropdown(string currentSample)

@@ -259,7 +259,7 @@ public class SelectionHandler : MonoBehaviour
             Vector3 mousePos = Mouse.current.position.ReadValue();
             Ray ray = Camera.main.ScreenPointToRay(mousePos);
 
-            if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.GetComponent<GroundTile>() != null)
+            if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.GetComponent<GroundTile>() != null && !IsPointerOverUI())
             {
                 GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
                 
@@ -402,7 +402,7 @@ public class SelectionHandler : MonoBehaviour
 
     void HandleLobberTowerClick()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        if (Mouse.current.leftButton.wasPressedThisFrame && !IsPointerOverUI())
         {
             // Set the lob distance based on the ring that's currently displayed
             if (currentSelectedTile != null && currentSelectedTile.tower != null && lowlightedTiles.Count > 0)

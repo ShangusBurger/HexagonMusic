@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayText: Get Signal to All of the Purple Tiles
   rewards:
-  - {fileID: 11400000, guid: 3bb2ceff227ca5241a606618dd203520, type: 2}
+  - {fileID: 11400000, guid: 6eb1403c78866b747be2addd002c81fe, type: 2}
   goalIcon: {fileID: 0}
   targetHexCoords:
   - {x: -5, y: 1}
@@ -23,7 +23,7 @@ MonoBehaviour:
   - {x: 5, y: 2}
   targetColor:
     serializedVersion: 2
-    rgba: 4294938579
+    rgba: 4294609081
   completedColor:
     serializedVersion: 2
     rgba: 4293132198
