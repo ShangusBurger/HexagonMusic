@@ -56,7 +56,8 @@ public class SourceTower : Tower
         tile.SchedulePulse(new Pulse(3, source: true));   
     }
 
-    
-
-  
+    public void OnTempoChanged(float newBPM)
+    {
+        TempoHandler.ChangeBPM((double)newBPM);
+    }
 }

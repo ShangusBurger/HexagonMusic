@@ -15,7 +15,6 @@ MonoBehaviour:
   displayText: Trigger 3 Different Buffer Towers on the Same Beat, Using Different
     Buffer Sizes
   rewards:
-  - {fileID: 11400000, guid: 3afc4a5094a372a449321cdeb59020f4, type: 2}
   - {fileID: 11400000, guid: 4af9190f56683544e960c2587767d203, type: 2}
   goalIcon: {fileID: 0}
   targetNumber: 3

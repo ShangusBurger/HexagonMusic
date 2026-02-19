@@ -86,8 +86,6 @@ public class GroundTile : MonoBehaviour
             }
         }
 
-        
-
         visualDelay -= (double) Time.deltaTime;
         // Handle color fading
         if (isFading)
@@ -239,7 +237,7 @@ public class GroundTile : MonoBehaviour
 
     public void BeatRecieved()
     {
-        visualDelay = TempoHandler.beatLength * 3/4;
+        visualDelay = TempoHandler.beatLength * 1/2;
 
             //if active pulse on tile, add to cache to be sent onward next update
             if (pulses.Count > 0)

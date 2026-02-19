@@ -67,4 +67,11 @@ public class TempoHandler : MonoBehaviour
             }
         }
     }
+
+    public static void ChangeBPM(double newBPM)
+    {
+        bpm = newBPM;
+        beatLength = 60.0 / bpm * 4.0 / (double)signatureLo;
+        barLength = beatLength * (double)signatureHi;
+    }
 }

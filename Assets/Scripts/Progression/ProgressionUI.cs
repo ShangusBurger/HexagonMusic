@@ -25,22 +25,14 @@ public class ProgressionUI : MonoBehaviour
         public Slider progressSlider;
         public Image progressIcon;  // Shows goal icon or unlock silhouette
 
-        [Header("Track Complete Display")]
-        public GameObject trackCompletePanel;
+        public GameObject unlockNotificationPanel;
+        public TMP_Text unlockNotificationText;
+        public Image unlockNotificationIcon;
+        public float notificationDuration = 3f;
     }
 
     [Header("Track UI Elements")]
     [SerializeField] private List<TrackUIElements> trackUIs = new List<TrackUIElements>();
-
-    [Header("Shared UI Elements")]
-    [Header("Unlock Notification")]
-    [SerializeField] private GameObject unlockNotificationPanel;
-    [SerializeField] private TMP_Text unlockNotificationText;
-    [SerializeField] private Image unlockNotificationIcon;
-    [SerializeField] private float notificationDuration = 3f;
-
-    [Header("All Complete Display")]
-    [SerializeField] private GameObject allCompletePanel;
 
     private Dictionary<string, TrackUIElements> trackUIMap = new Dictionary<string, TrackUIElements>();
 
@@ -62,9 +54,6 @@ public class ProgressionUI : MonoBehaviour
         ProgressHandler.OnTrackProgressChanged += OnTrackProgressChanged;
         ProgressHandler.OnTrackCompleted += OnTrackCompleted;
         ProgressHandler.OnAnyProgressChanged += RefreshAllUI;
-
-        if (unlockNotificationPanel != null) unlockNotificationPanel.SetActive(false);
-        if (allCompletePanel != null) allCompletePanel.SetActive(false);
 
         RefreshAllUI();
     }
@@ -122,11 +111,8 @@ public class ProgressionUI : MonoBehaviour
     {
         if (trackUIMap.TryGetValue(trackId, out var ui))
         {
-            if (ui.trackCompletePanel != null) ui.trackCompletePanel.SetActive(true);
             if (ui.progressPanel != null) ui.progressPanel.SetActive(false);
         }
-
-        CheckAllTracksComplete();
     }
 
     void RefreshAllUI()
@@ -136,7 +122,6 @@ public class ProgressionUI : MonoBehaviour
         foreach (var kvp in trackUIMap)
             RefreshTrackUI(kvp.Key, kvp.Value);
 
-        CheckAllTracksComplete();
     }
 
     void RefreshTrackUI(string trackId, TrackUIElements ui)
@@ -151,7 +136,6 @@ public class ProgressionUI : MonoBehaviour
 
         if (state.IsComplete)
         {
-            if (ui.trackCompletePanel != null) ui.trackCompletePanel.SetActive(true);
             if (ui.progressPanel != null) ui.progressPanel.SetActive(false);
         }
         else if (state.track.showGoalProgress)
@@ -181,7 +165,6 @@ public class ProgressionUI : MonoBehaviour
         if (goal == null || !goal.showProgressUI)
         {
             if (ui.progressPanel != null) ui.progressPanel.SetActive(false);
-            Debug.Log("We're Here!");
             return;
         }
         
@@ -216,32 +199,24 @@ public class ProgressionUI : MonoBehaviour
 
     void ShowUnlockNotification(Unlockable unlockable, string trackId)
     {
-        if (unlockNotificationPanel == null) return;
+        if (trackUIMap[trackId].unlockNotificationPanel == null) return;
 
         var state = ProgressHandler.Instance?.GetTrackState(trackId);
         string trackName = state?.track.displayName ?? "";
 
-        if (unlockNotificationText != null)
-            unlockNotificationText.text = $"{unlockable.displayName} Unlocked!";
+        if (trackUIMap[trackId].unlockNotificationText != null)
+            trackUIMap[trackId].unlockNotificationText.text = $"{unlockable.displayName} Unlocked!";
 
-        if (unlockNotificationIcon != null && unlockable.icon != null)
-            unlockNotificationIcon.sprite = unlockable.icon;
+        if (trackUIMap[trackId].unlockNotificationIcon != null && unlockable.icon != null)
+            trackUIMap[trackId].unlockNotificationIcon.sprite = unlockable.icon;
 
-        unlockNotificationPanel.SetActive(true);
-        StartCoroutine(HideNotificationAfterDelay());
+        trackUIMap[trackId].unlockNotificationPanel.SetActive(true);
+        StartCoroutine(HideNotificationAfterDelay(trackId));
     }
 
-    void CheckAllTracksComplete()
+    IEnumerator HideNotificationAfterDelay(string trackId)
     {
-        if (ProgressHandler.Instance != null && ProgressHandler.Instance.AreAllTracksComplete())
-        {
-            if (allCompletePanel != null) allCompletePanel.SetActive(true);
-        }
-    }
-
-    IEnumerator HideNotificationAfterDelay()
-    {
-        yield return new WaitForSeconds(notificationDuration);
-        if (unlockNotificationPanel != null) unlockNotificationPanel.SetActive(false);
+        yield return new WaitForSeconds(trackUIMap[trackId].notificationDuration);
+        if (trackUIMap[trackId].unlockNotificationPanel != null) trackUIMap[trackId].unlockNotificationPanel.SetActive(false);
     }
 }
