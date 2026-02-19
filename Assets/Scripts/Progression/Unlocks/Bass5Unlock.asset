@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cba6bb1e8e9c1434dad954a9b3d10a62, type: 3}
   m_Name: Bass5Unlock
   m_EditorClassIdentifier: 
-  displayName: Bass 5 - New Sound
+  displayName: Bass 5 Sound
   description: 
   icon: {fileID: 0}
   sampleName: Bass 5

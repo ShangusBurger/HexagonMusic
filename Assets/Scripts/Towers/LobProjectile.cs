@@ -5,6 +5,9 @@ using CubeCoordinates;
 
 public class LobProjectile : MonoBehaviour
 {
+    // Static list of all active projectiles in flight (used by LobOverTowerGoal)
+    public static List<LobProjectile> ActiveProjectiles = new List<LobProjectile>();
+
     private Vector3 startPosition;
     private Vector3 targetPosition;
     private float flightDuration;
@@ -15,8 +18,10 @@ public class LobProjectile : MonoBehaviour
 
     private float initDelay = 0f;
     
-    // Reference to the target tile and pulse info
+    // Reference to the origin and target tiles
+    public GroundTile OriginTile { get; set; }
     private GroundTile targetTile;
+    public GroundTile TargetTile => targetTile;
     
     public void Initialize(Vector3 start, Vector3 target, float duration, GroundTile destination, float del)
     {
@@ -30,6 +35,9 @@ public class LobProjectile : MonoBehaviour
         
         // Calculate initial velocity to reach target with gravity
         CalculateTrajectory();
+
+        // Register as active projectile
+        ActiveProjectiles.Add(this);
     }
     
     void CalculateTrajectory()
@@ -64,6 +72,7 @@ public class LobProjectile : MonoBehaviour
         {
             // Land at target
             transform.position = targetPosition;
+            ActiveProjectiles.Remove(this);
             Destroy(gameObject);
             return;
         }
@@ -73,5 +82,11 @@ public class LobProjectile : MonoBehaviour
         float verticalMovement = (velocity.y - (gravity * elapsedTime)) * Time.deltaTime;
         
         transform.position += horizontalMovement + new Vector3(0f, verticalMovement, 0f);
+    }
+
+    void OnDestroy()
+    {
+        // Safety net: ensure we're removed from the list even if destroyed externally
+        ActiveProjectiles.Remove(this);
     }
 }

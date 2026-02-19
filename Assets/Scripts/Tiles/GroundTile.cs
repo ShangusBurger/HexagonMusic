@@ -67,7 +67,7 @@ public class GroundTile : MonoBehaviour
         TempoHandler.TriggerBeat += BeatRecieved;
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (pulsesCached.Count > 0 || pulses.Count > 0)
         {

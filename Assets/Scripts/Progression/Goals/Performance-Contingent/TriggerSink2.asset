@@ -9,10 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 959cb428c8935084787cf1efebf90d3c, type: 3}
-  m_Name: LobberPlaceholder
+  m_Script: {fileID: 11500000, guid: 3b95d532f9e07144ebf4d9ca874df63a, type: 3}
+  m_Name: TriggerSink2
   m_EditorClassIdentifier: 
-  displayText: Lob signal over 5 towers
-  rewards: []
+  displayText: Hit One Sinker Tower with 2 Signals at the Same Time
+  rewards:
+  - {fileID: 11400000, guid: b7929141105475b4c9774d070a22cad3, type: 2}
   goalIcon: {fileID: 0}
-  numberOfSamplesNeeded: 20
+  targetTowerType: 3
+  targetNumber: 2

@@ -215,4 +215,8 @@ public class ProgressHandler : MonoBehaviour
         }
         
     }
+
+    public void HideTrackMeter(string trackId)
+    {
+    }
 }

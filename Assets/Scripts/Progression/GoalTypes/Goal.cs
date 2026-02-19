@@ -13,6 +13,12 @@ public class Goal : ScriptableObject
     [Header("Display")]
     public Sprite goalIcon;
 
+    /// <summary>
+    /// Whether the progress UI (slider, text, icon) should be shown for this goal.
+    /// Override to false in subclasses to hide the progress panel.
+    /// </summary>
+    public virtual bool showProgressUI => true;
+
     public virtual void SetupGoal() { }
     public virtual void DeconstructGoal() { }
     public virtual bool IsComplete() => false;

@@ -53,6 +53,7 @@ public class LobberTower : Tower
         if (lobScript != null)
         {
             lobScript.Initialize(startPos, targetPos, (float)flightDuration, targetTile, (float)(TempoHandler.nextBeatTime - AudioSettings.dspTime) + .1f);
+            lobScript.OriginTile = tile; // Pass origin tile for goal tracking
         }
     }
 

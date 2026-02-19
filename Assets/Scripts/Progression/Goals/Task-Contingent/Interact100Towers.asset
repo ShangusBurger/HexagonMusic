@@ -9,10 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cba6bb1e8e9c1434dad954a9b3d10a62, type: 3}
-  m_Name: SnapUnlock
+  m_Script: {fileID: 11500000, guid: 82e476d5886ddef449ceb754763da2d5, type: 3}
+  m_Name: Interact100Towers
   m_EditorClassIdentifier: 
-  displayName: Snap Sound
-  description: 
-  icon: {fileID: 0}
-  sampleName: Snap
+  displayText: Place or Delete 200 Towers
+  rewards:
+  - {fileID: 11400000, guid: bff6099c35f2f2844a85971c5c873c26, type: 2}
+  goalIcon: {fileID: 0}
+  requiredInteractionCount: 200

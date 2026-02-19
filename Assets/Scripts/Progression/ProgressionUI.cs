@@ -176,13 +176,14 @@ public class ProgressionUI : MonoBehaviour
 
     void UpdateGoalProgressDisplay(TrackUIElements ui, Goal goal)
     {
-        if (goal == null)
+        if (ui.progressPanel != null) ui.progressPanel.SetActive(true);
+
+        if (goal == null || !goal.showProgressUI)
         {
             if (ui.progressPanel != null) ui.progressPanel.SetActive(false);
+            Debug.Log("We're Here!");
             return;
         }
-
-        if (ui.progressPanel != null) ui.progressPanel.SetActive(true);
         
         string progressText = goal.GetProgressText();
         if (ui.progressText != null)

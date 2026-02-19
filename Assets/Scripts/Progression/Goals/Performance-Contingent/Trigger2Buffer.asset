@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c77beb92eb95734cb4b280f237a23e0, type: 3}
   m_Name: Trigger2Buffer
   m_EditorClassIdentifier: 
-  displayText: Trigger Two Different Buffer Towers on the Same Beat, Using Different
+  displayText: Trigger 2 Different Buffer Towers on the Same Beat, Using Different
     Buffer Sizes
-  rewards: []
+  rewards:
+  - {fileID: 11400000, guid: 827a8b19c7c3a3242bd2ad537840491f, type: 2}
   goalIcon: {fileID: 0}
   targetNumber: 2
   bufferSizes: 

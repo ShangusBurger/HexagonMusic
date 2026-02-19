@@ -16,6 +16,7 @@ public class TowerUI : MonoBehaviour
     private Tower tower;
     private List<string> dropdownIndexToSampleName = new List<string>();
     private bool isInitialized = false;
+    private bool _suppressDropdownCallback = false;
 
     public static Action OnSampleInteractionMade; // Event for when the sound sample is changed
 
@@ -34,7 +35,11 @@ public class TowerUI : MonoBehaviour
     void OnEnable()
     {
         if (isInitialized)
+        {
+            _suppressDropdownCallback = true;
             RefreshDropdownOptions();
+            _suppressDropdownCallback = false;
+        }
     }
 
     void OnDestroy()
@@ -45,17 +50,25 @@ public class TowerUI : MonoBehaviour
             sampleDropdown.onValueChanged.RemoveListener(OnDropdownValueChanged);
     }
 
-    void OnSampleUnlocked(string sampleName) => RefreshDropdownOptions();
+    void OnSampleUnlocked(string sampleName)
+    {
+        _suppressDropdownCallback = true;
+        RefreshDropdownOptions();
+        _suppressDropdownCallback = false;
+    }
 
     public void InitializeDropdown()
     {
         if (sampleDropdown == null) return;
         sampleDropdown.onValueChanged.AddListener(OnDropdownValueChanged);
+
+        _suppressDropdownCallback = true;
         RefreshDropdownOptions();
         isInitialized = true;
         gameObject.SetActive(true);
         if (tower != null) tower.SetSelfUI();
         gameObject.SetActive(false);
+        _suppressDropdownCallback = false;
     }
 
     void RefreshDropdownOptions()
@@ -90,20 +103,25 @@ public class TowerUI : MonoBehaviour
 
     void OnDropdownValueChanged(int index)
     {
+        if (_suppressDropdownCallback) return;
+
         if (tower == null || SampleLibrary.Instance == null) return;
         if (index < 0 || index >= dropdownIndexToSampleName.Count) return;
         OnSampleSelected(dropdownIndexToSampleName[index]);
-        OnSampleInteractionMade?.Invoke(); // Notify that a sample interaction has occurred
+        OnSampleInteractionMade?.Invoke();
     }
 
     public void SetDropdown(string currentSample)
     {
         if (sampleDropdown == null) return;
+
+        _suppressDropdownCallback = true;
         int index = dropdownIndexToSampleName.IndexOf(currentSample);
         if (index >= 0 && index < sampleDropdown.options.Count)
             sampleDropdown.value = index;
         else if (dropdownIndexToSampleName.Count > 0)
             sampleDropdown.value = 0;
+        _suppressDropdownCallback = false;
     }
 
     public void OnSampleSelected(string sampleName)

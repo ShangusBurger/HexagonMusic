@@ -18,6 +18,6 @@ public class TrackProgressState
         lastUnlockGoalIndex = -1;
     }
 
-    public bool IsComplete => currentLevel >= track.goals.Count;
+    public bool IsComplete => currentLevel >= track.goals.Count - 1;
     public int TotalGoalCount => track.goals.Count;
 }
