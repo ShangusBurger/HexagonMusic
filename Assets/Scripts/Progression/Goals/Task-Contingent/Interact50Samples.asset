@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82e476d5886ddef449ceb754763da2d5, type: 3}
-  m_Name: Interact100Towers
+  m_Script: {fileID: 11500000, guid: 917844d384a79c54a8788c4dd37b5a87, type: 3}
+  m_Name: Interact50Samples
   m_EditorClassIdentifier: 
-  displayText: Place or Delete 100 Towers
+  displayText: Change a Tower's Sound 50 Times
   rewards:
-  - {fileID: 11400000, guid: e9e010f47017627409000353f7dd3ff3, type: 2}
+  - {fileID: 11400000, guid: bff6099c35f2f2844a85971c5c873c26, type: 2}
   goalIcon: {fileID: 0}
-  requiredInteractionCount: 100
+  requiredInteractionCount: 30

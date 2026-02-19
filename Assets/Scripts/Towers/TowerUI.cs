@@ -13,17 +13,23 @@ public class TowerUI : MonoBehaviour
     [Header("Sample Selection")]
     [SerializeField] private TMPro.TMP_Dropdown sampleDropdown;
 
+    [Header("Tempo Slider (Source Tower Only)")]
+    [SerializeField] private GameObject tempoSliderContainer;
+
     private Tower tower;
     private List<string> dropdownIndexToSampleName = new List<string>();
     private bool isInitialized = false;
     private bool _suppressDropdownCallback = false;
 
-    public static Action OnSampleInteractionMade; // Event for when the sound sample is changed
+    private const string TEMPO_FEATURE_ID = "TempoSlider";
+
+    public static Action OnSampleInteractionMade;
 
     // Awake is called even when GameObject is inactive - ensures subscription happens
     void Awake()
     {
         UnlockManager.OnSampleUnlocked += OnSampleUnlocked;
+        UnlockManager.OnFeatureUnlocked += OnFeatureUnlocked;
     }
 
     void Start()
@@ -40,12 +46,14 @@ public class TowerUI : MonoBehaviour
             RefreshDropdownOptions();
             _suppressDropdownCallback = false;
         }
+        RefreshTempoSliderVisibility();
     }
 
     void OnDestroy()
     {
         SelectionHandler.HideAllTowerUI -= HideSelf;
         UnlockManager.OnSampleUnlocked -= OnSampleUnlocked;
+        UnlockManager.OnFeatureUnlocked -= OnFeatureUnlocked;
         if (sampleDropdown != null)
             sampleDropdown.onValueChanged.RemoveListener(OnDropdownValueChanged);
     }
@@ -55,6 +63,22 @@ public class TowerUI : MonoBehaviour
         _suppressDropdownCallback = true;
         RefreshDropdownOptions();
         _suppressDropdownCallback = false;
+    }
+
+    void OnFeatureUnlocked(string featureId)
+    {
+        if (featureId == TEMPO_FEATURE_ID)
+            RefreshTempoSliderVisibility();
+    }
+
+    void RefreshTempoSliderVisibility()
+    {
+        if (tempoSliderContainer == null) return;
+
+        bool unlocked = UnlockManager.Instance != null
+            && UnlockManager.Instance.IsFeatureUnlocked(TEMPO_FEATURE_ID);
+
+        tempoSliderContainer.SetActive(unlocked);
     }
 
     public void InitializeDropdown()
@@ -152,6 +176,7 @@ public class TowerUI : MonoBehaviour
     {
         SelectionHandler.HideAllTowerUI -= HideSelf;
         UnlockManager.OnSampleUnlocked -= OnSampleUnlocked;
+        UnlockManager.OnFeatureUnlocked -= OnFeatureUnlocked;
         if (sampleDropdown != null)
             sampleDropdown.onValueChanged.RemoveListener(OnDropdownValueChanged);
     }

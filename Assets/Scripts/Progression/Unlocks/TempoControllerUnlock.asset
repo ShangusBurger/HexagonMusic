@@ -9,11 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82e476d5886ddef449ceb754763da2d5, type: 3}
-  m_Name: Interact100Towers
+  m_Script: {fileID: 11500000, guid: 5f547bbb7ba3ae541835f968a9c2ab43, type: 3}
+  m_Name: TempoControllerUnlock
   m_EditorClassIdentifier: 
-  displayText: Place or Delete 100 Towers
-  rewards:
-  - {fileID: 11400000, guid: e9e010f47017627409000353f7dd3ff3, type: 2}
-  goalIcon: {fileID: 0}
-  requiredInteractionCount: 100
+  displayName: Tempo Controller
+  description: 
+  icon: {fileID: 0}
+  featureId: TempoSlider

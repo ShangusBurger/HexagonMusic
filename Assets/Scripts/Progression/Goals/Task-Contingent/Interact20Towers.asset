@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayText: Place or Delete 20 Towers
   rewards:
-  - {fileID: 11400000, guid: e04f8f08bebd26d4f864349c8e505e20, type: 2}
+  - {fileID: 11400000, guid: 3bb2ceff227ca5241a606618dd203520, type: 2}
   goalIcon: {fileID: 0}
   requiredInteractionCount: 20
