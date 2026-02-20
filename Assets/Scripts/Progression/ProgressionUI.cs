@@ -211,9 +211,13 @@ public class ProgressionUI : MonoBehaviour
             trackUIMap[trackId].unlockNotificationIcon.sprite = unlockable.icon;
 
         trackUIMap[trackId].unlockNotificationPanel.SetActive(true);
-        StartCoroutine(HideNotificationAfterDelay(trackId));
     }
 
+    public void HideNotification(string trackId)
+    {
+        if (trackUIMap[trackId].unlockNotificationPanel != null)
+            trackUIMap[trackId].unlockNotificationPanel.SetActive(false);
+    }
     IEnumerator HideNotificationAfterDelay(string trackId)
     {
         yield return new WaitForSeconds(trackUIMap[trackId].notificationDuration);
