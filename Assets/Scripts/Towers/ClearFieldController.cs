@@ -16,6 +16,10 @@ public class ClearFieldController : MonoBehaviour
         // Hide any open UI
         SelectionHandler.HideTowerUIs();
         SelectionHandler.DeselectCurrent();
-        SelectionHandler.currentMouseState = MouseState.Free;
+        SelectionHandler.currentMouseState = MouseState.HandTool;
+
+        // Also reset toolbar to hand tool
+        if (ToolbarUI.Instance != null)
+            ToolbarUI.Instance.SelectHandTool();
     }
 }

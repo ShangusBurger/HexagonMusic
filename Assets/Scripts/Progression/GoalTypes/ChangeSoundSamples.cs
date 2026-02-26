@@ -7,9 +7,12 @@ public class ChangeSoundSamples : Goal
     public int requiredInteractionCount = 5;
     private int currentInteractionCount = 0;
 
+    private void Start() {
+        currentInteractionCount = 0;
+    }
+
     public override void SetupGoal()
     {
-        currentInteractionCount = 0;
         TowerUI.OnSampleInteractionMade += IncrementSampleCount;
     }
 

@@ -216,15 +216,8 @@ public class GroundTile : MonoBehaviour
         {
             tileRenderer.material.color = selectedMaterialColor;
         }
-
-        if (tower == null)
-        {
-            SelectionHandler.OfferTowerPlacement(this);
-            OnTowerUpdated?.Invoke(TileMapConstructor.allTiles.GetCoordinateFromWorldPosition(transform.position));
-            return;
-        }
-        SelectionHandler.HideTowerUIs();
-        SelectionHandler.OpenTowerUI(this);
+        // REMOVED: OfferTowerPlacement / OpenTowerUI calls
+        // SelectionHandler now handles all interaction routing.
     }
 
     public void Deselect()
@@ -275,61 +268,54 @@ public class GroundTile : MonoBehaviour
         OnTowerChangeMade?.Invoke();
     }
 
+    // ── AddTowerToTile(TowerType) — instantiation only ────────────────
+    // No longer sets SelectionHandler.currentMouseState or calls
+    // DeselectCurrent. SelectionHandler manages state transitions.
+    public void AddTowerToTile(TowerType type)
+    {
+        switch (type)
+        {
+            case TowerType.Source:
+                tower = Instantiate(TileMapConstructor.Instance.sourceTowerPrefab, transform).GetComponent<Tower>();
+                break;
+            case TowerType.Mono:
+                tower = Instantiate(TileMapConstructor.Instance.monoTowerPrefab, transform).GetComponent<Tower>();
+                break;
+            case TowerType.Splitter:
+                tower = Instantiate(TileMapConstructor.Instance.splitterTowerPrefab, transform).GetComponent<Tower>();
+                break;
+            case TowerType.Sink:
+                tower = Instantiate(TileMapConstructor.Instance.sinkTowerPrefab, transform).GetComponent<Tower>();
+                break;
+            case TowerType.Lobber:
+                tower = Instantiate(TileMapConstructor.Instance.lobberTowerPrefab, transform).GetComponent<Tower>();
+                break;
+            case TowerType.Sprayer:
+                tower = Instantiate(TileMapConstructor.Instance.sprayerTowerPrefab, transform).GetComponent<Tower>();
+                break;
+            case TowerType.Buffer:
+                tower = Instantiate(TileMapConstructor.Instance.bufferTowerPrefab, transform).GetComponent<Tower>();
+                break;
+            case TowerType.Switcher:
+                tower = Instantiate(TileMapConstructor.Instance.switcherTowerPrefab, transform).GetComponent<Tower>();
+                break;
+            case TowerType.Passer:
+                tower = Instantiate(TileMapConstructor.Instance.passerTowerPrefab, transform).GetComponent<Tower>();
+                break;
+        }
+
+        tower.tile = this;
+        tower.ownType = type;
+        OnTowerChangeMade?.Invoke();
+    }
+
+    // ── AddTowerToTile() (no-arg overload) — unchanged ────────────────
     public void AddTowerToTile()
     {
         tower = Instantiate(TileMapConstructor.Instance.sourceTowerPrefab, transform).GetComponent<Tower>();
         tower.tile = this;
     }
 
-    public void AddTowerToTile(TowerType type)
-    {   
-        switch (type)
-        {
-            case TowerType.Source:
-                tower = Instantiate(TileMapConstructor.Instance.sourceTowerPrefab, transform).GetComponent<Tower>();
-                tower.tile = this;
-                break;
-            case TowerType.Mono:
-                tower = Instantiate(TileMapConstructor.Instance.monoTowerPrefab, transform).GetComponent<Tower>();
-                tower.tile = this;
-                SelectionHandler.currentMouseState = MouseState.SetMonoTower;
-                break;
-            case TowerType.Splitter:
-                tower = Instantiate(TileMapConstructor.Instance.splitterTowerPrefab, transform).GetComponent<Tower>();
-                tower.tile = this;
-                SelectionHandler.DeselectCurrent();
-                break;
-            case TowerType.Sink:
-                tower = Instantiate(TileMapConstructor.Instance.sinkTowerPrefab, transform).GetComponent<Tower>();
-                tower.tile = this;
-                SelectionHandler.DeselectCurrent();
-                break;
-            case TowerType.Lobber:
-                tower = Instantiate(TileMapConstructor.Instance.lobberTowerPrefab, transform).GetComponent<Tower>();
-                tower.tile = this;
-                SelectionHandler.currentMouseState = MouseState.SetLobberTower;
-                break;
-            case TowerType.Sprayer:
-                tower = Instantiate(TileMapConstructor.Instance.sprayerTowerPrefab, transform).GetComponent<Tower>();
-                tower.tile = this;
-                SelectionHandler.DeselectCurrent();
-                break;
-            case TowerType.Buffer:
-                tower = Instantiate(TileMapConstructor.Instance.bufferTowerPrefab, transform).GetComponent<Tower>();
-                tower.tile = this;
-                SelectionHandler.DeselectCurrent();
-                break;
-            case TowerType.Switcher:
-                tower = Instantiate(TileMapConstructor.Instance.switcherTowerPrefab, transform).GetComponent<Tower>();
-                tower.tile = this;
-                SelectionHandler.DeselectCurrent();
-                break;
-        }
-        tower.ownType = type;
-
-        OnTowerChangeMade?.Invoke();
-        SelectionHandler.HideTowerUIs();
-    }
     public void SetAsGoalTile(Color goalColor, bool isUntimed)
     {
         tileRenderer.material.color = goalColor;
@@ -351,4 +337,10 @@ public class GroundTile : MonoBehaviour
         isGoalTile = false;
         goalTriggered = false;
     }  
+
+    // ── NEW: Allow external scripts to notify of tower changes ────────
+    public static void NotifyTowerChangeMade()
+    {
+        OnTowerChangeMade?.Invoke();
+    }
 }

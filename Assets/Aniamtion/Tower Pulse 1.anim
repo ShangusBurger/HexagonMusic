@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Tower Pulse
+  m_Name: Tower Pulse 1
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0
@@ -21,7 +21,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 1.3, y: 2, z: 1.3}
+        value: {x: 1.3, y: 1.8, z: 1.3}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -30,7 +30,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 0.016666668
-        value: {x: 1.2669891, y: 1.3, z: 1.269641}
+        value: {x: 1.2669891, y: 2, z: 1.269641}
         inSlope: {x: -3.415444, y: -3.1867085, z: -3.145752}
         outSlope: {x: -3.415444, y: -3.1867085, z: -3.145752}
         tangentMode: 0
@@ -39,9 +39,9 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.22041394, z: 0.33333334}
       - serializedVersion: 3
         time: 0.05
-        value: {x: 1.1666586, y: 1.203839, z: 1.1759644}
-        inSlope: {x: -0.42097327, y: -2.5922108, z: -0.48558554}
-        outSlope: {x: -0.42097327, y: -2.5922108, z: -0.48558554}
+        value: {x: 1.1666586, y: 1.8943101, z: 1.1759644}
+        inSlope: {x: -0.42097327, y: -3.1501675, z: -0.48558554}
+        outSlope: {x: -0.42097327, y: -3.1501675, z: -0.48558554}
         tangentMode: 0
         weightedMode: 0
         inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
@@ -139,7 +139,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 2
+        value: 1.8
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -148,7 +148,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.016666668
-        value: 1.3
+        value: 2
         inSlope: -3.1867085
         outSlope: -3.1867085
         tangentMode: 0

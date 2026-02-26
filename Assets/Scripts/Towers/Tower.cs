@@ -33,9 +33,13 @@ public class Tower : MonoBehaviour
     {
         goalTime = TempoHandler.startDSPTime + TempoHandler.barLength;
         sourceToggle = 0;
-        directions = new List<int>();
         towerAlreadyActivatedThisBeat = false;
         visualModel = gameObject.GetComponentInChildren<MeshRenderer>().gameObject;
+
+        // Only create a new list if directions hasn't already been set externally
+        // (e.g. by MoveTower restoring saved state before Start runs)
+        if (directions == null || directions.Count == 0)
+            directions = new List<int>();
 
         if (towerUI != null)
         {
@@ -151,5 +155,6 @@ public enum TowerType
     Lobber,
     Sprayer,
     Buffer,
-    Switcher
+    Switcher,
+    Passer
 }

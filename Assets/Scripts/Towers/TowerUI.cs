@@ -46,7 +46,6 @@ public class TowerUI : MonoBehaviour
             RefreshDropdownOptions();
             _suppressDropdownCallback = false;
         }
-        RefreshTempoSliderVisibility();
     }
 
     void OnDestroy()
@@ -67,18 +66,7 @@ public class TowerUI : MonoBehaviour
 
     void OnFeatureUnlocked(string featureId)
     {
-        if (featureId == TEMPO_FEATURE_ID)
-            RefreshTempoSliderVisibility();
-    }
 
-    void RefreshTempoSliderVisibility()
-    {
-        if (tempoSliderContainer == null) return;
-
-        bool unlocked = UnlockManager.Instance != null
-            && UnlockManager.Instance.IsFeatureUnlocked(TEMPO_FEATURE_ID);
-
-        tempoSliderContainer.SetActive(unlocked);
     }
 
     public void InitializeDropdown()

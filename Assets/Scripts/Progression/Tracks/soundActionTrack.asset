@@ -10,19 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 557af49c33c1ef94ebd771b7a8913256, type: 3}
-  m_Name: task
+  m_Name: soundActionTrack
   m_EditorClassIdentifier: 
-  trackId: task
-  displayName: task-contingent
+  trackId: soundAction
+  displayName: task-contingent - change sounds
   trackIcon: {fileID: 0}
   trackColor: {r: 0.7075472, g: 0.27100396, b: 0.67087275, a: 1}
   goals:
   - {fileID: 11400000, guid: 288d5a5e715de104ab1557e41c5b1723, type: 2}
-  - {fileID: 11400000, guid: b7d026c2976b5f34e92d7a80eb6ad959, type: 2}
   - {fileID: 11400000, guid: ce5c9a8638bab7648b0867307eab9f79, type: 2}
-  - {fileID: 11400000, guid: 1fa6f2501c2a5e64197f21c2f99d9aca, type: 2}
   - {fileID: 11400000, guid: 232ffdffa894eec4d8eef3e4a81a1d52, type: 2}
-  - {fileID: 11400000, guid: 8c05bc1537ff5004ca9225699aacdcc7, type: 2}
-  - {fileID: 11400000, guid: 725254e2d2bf97247b1d3993977fcd7a, type: 2}
   showGoalProgress: 1
   completionMessage: 
