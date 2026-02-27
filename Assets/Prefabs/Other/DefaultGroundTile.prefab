@@ -129,7 +129,8 @@ MonoBehaviour:
   highlightMaterialColor: {r: 1, g: 0.45098042, b: 0.49803925, a: 1}
   lowlightMaterialColor: {r: 1, g: 0.7028302, b: 0.7283019, a: 1}
   selectedMaterialColor: {r: 0.20167309, g: 0.4808039, b: 0.6226415, a: 1}
-  beatMaterialColor: {r: 1, g: 0.6213613, b: 0, a: 0.8235294}
+  activeBeatMaterialColor: {r: 1, g: 0.56652045, b: 0, a: 1}
+  beatMaterialColor: {r: 1, g: 0.7668646, b: 0.5896226, a: 1}
   goalCompleteColor: {r: 0.740566, g: 1, b: 0.7468937, a: 1}
   originalColor: {r: 0, g: 0, b: 0, a: 0}
   defaultColor: {r: 0, g: 0, b: 0, a: 0}

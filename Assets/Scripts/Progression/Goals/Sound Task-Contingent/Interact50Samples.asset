@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayText: Change a Tower's Sound 50 Times
   rewards:
-  - {fileID: 11400000, guid: bff6099c35f2f2844a85971c5c873c26, type: 2}
+  - {fileID: 11400000, guid: 9c71391aeb84d0049b967a58aba61ebf, type: 2}
   goalIcon: {fileID: 0}
   requiredInteractionCount: 50

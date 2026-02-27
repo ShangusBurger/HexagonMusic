@@ -538,7 +538,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trackUIs:
-  - trackId: performance
+  - trackId: soundAction
     goalPanel: {fileID: 271946529}
     goalText: {fileID: 657463014}
     trackColorIndicator: {fileID: 0}
@@ -553,6 +553,18 @@ MonoBehaviour:
   - trackId: task
     goalPanel: {fileID: 271769949}
     goalText: {fileID: 663941676}
+    trackColorIndicator: {fileID: 0}
+    progressPanel: {fileID: 0}
+    progressText: {fileID: 0}
+    progressSlider: {fileID: 0}
+    progressIcon: {fileID: 0}
+    unlockNotificationPanel: {fileID: 850357707}
+    unlockNotificationText: {fileID: 577051883}
+    unlockNotificationIcon: {fileID: 2090447189}
+    notificationDuration: 3
+  - trackId: performance
+    goalPanel: {fileID: 0}
+    goalText: {fileID: 0}
     trackColorIndicator: {fileID: 0}
     progressPanel: {fileID: 0}
     progressText: {fileID: 0}
@@ -2649,6 +2661,7 @@ MonoBehaviour:
   tracks:
   - {fileID: 11400000, guid: 2ed5fe5d36868b442bd5bf87b2066dc6, type: 2}
   - {fileID: 11400000, guid: 0fa1a45fed789704f936b0a343386052, type: 2}
+  - {fileID: 11400000, guid: ef5b93b9da7e7bb42a8e64aa661a7b84, type: 2}
 --- !u!1 &306256664
 GameObject:
   m_ObjectHideFlags: 0

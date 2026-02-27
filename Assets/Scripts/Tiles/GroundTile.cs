@@ -12,6 +12,7 @@ public class GroundTile : MonoBehaviour
     [SerializeField] private Color highlightMaterialColor;
     [SerializeField] private Color lowlightMaterialColor;
     [SerializeField] private Color selectedMaterialColor;
+    [SerializeField] private Color activeBeatMaterialColor;
     [SerializeField] private Color beatMaterialColor;
     [SerializeField] private Color goalCompleteColor;
     private Renderer tileRenderer;
@@ -43,6 +44,7 @@ public class GroundTile : MonoBehaviour
     [SerializeField] private float fadeDuration = 1f; // Duration of fade in seconds
     private bool isFading = false;
     private float fadeTimer = 0f;
+    private float fadeDelay = 0f;
     private Color fadeStartColor;
     private Color fadeTargetColor;
 
@@ -90,17 +92,24 @@ public class GroundTile : MonoBehaviour
         // Handle color fading
         if (isFading)
         {
-            fadeTimer += Time.deltaTime;
-            float t = Mathf.Clamp01(fadeTimer / fadeDuration);
-            
-            if (SelectionHandler.currentSelectedTile != this && SelectionHandler.currentHoveredTile != this)
+            if (fadeDelay <= 0)
             {
-                tileRenderer.material.color = Color.Lerp(fadeStartColor, fadeTargetColor, t);
-            }
+                fadeTimer += Time.deltaTime;
+                float t = Mathf.Clamp01(fadeTimer / fadeDuration);
+                
+                if (SelectionHandler.currentSelectedTile != this && SelectionHandler.currentHoveredTile != this)
+                {
+                    tileRenderer.material.color = Color.Lerp(fadeStartColor, fadeTargetColor, t);
+                }
 
-            if (t >= 1f)
+                if (t >= 1f)
+                {
+                    isFading = false;
+                }
+            }
+            else
             {
-                isFading = false;
+                fadeDelay -= Time.deltaTime;
             }
         }
 
@@ -154,13 +163,14 @@ public class GroundTile : MonoBehaviour
     {
         if (SelectionHandler.currentSelectedTile != this && SelectionHandler.currentHoveredTile != this)
         {
-            tileRenderer.material.color = from;
+            tileRenderer.material.color = activeBeatMaterialColor;
         }
         
         fadeStartColor = from;
         fadeTargetColor = to;
         fadeTimer = 0f;
         isFading = true;
+        fadeDelay = (float) TempoHandler.beatLength;
 
         if (tower != null)
         {
