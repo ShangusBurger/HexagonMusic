@@ -5,40 +5,33 @@ public class PlaceOrDeleteTowers : Goal
 {
     [Header("Goal Settings")]
     public int requiredInteractionCount = 5;
-    private int currentInteractionCount = 0;
 
     public override void SetupGoal()
     {
-        currentInteractionCount = 0;
-        Tower.OnInteractionMade += IncrementTowerCount;
+        // No subscription needed — we read directly from lifetime stats
+        displayText = "Place, Delete, or Move " + requiredInteractionCount + " Towers to Unlock";
     }
 
     public override void DeconstructGoal()
     {
-        Tower.OnInteractionMade -= IncrementTowerCount;
+        // Nothing to unsubscribe
     }
 
     public override bool IsComplete()
     {
-        return currentInteractionCount >= requiredInteractionCount
-;
+        if (PlayerStats.Instance == null) return false;
+        return PlayerStats.Instance.TotalTowerInteractions >= requiredInteractionCount;
     }
 
     public override float GetProgressNormalized()
     {
-        if (requiredInteractionCount <= 0) return 1f;
-        return Mathf.Clamp01((float)currentInteractionCount / requiredInteractionCount);
+        if (PlayerStats.Instance == null || requiredInteractionCount <= 0) return 0f;
+        return Mathf.Clamp01((float)PlayerStats.Instance.TotalTowerInteractions / requiredInteractionCount);
     }
 
     public override string GetProgressText()
     {
-        return $"{currentInteractionCount}/{requiredInteractionCount}";
-    }
-
-    // This method is called whenever a tower is placed or removed
-    private void IncrementTowerCount()
-    {
-        currentInteractionCount += 1;
-        ProgressHandler.UpdateTrackUI(); // Notify the ProgressHandler to update the UI for this track
+        int current = PlayerStats.Instance != null ? PlayerStats.Instance.TotalTowerInteractions : 0;
+        return $"{current}/{requiredInteractionCount}";
     }
 }

@@ -127,7 +127,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GroundTile
   highlightMaterialColor: {r: 1, g: 0.45098042, b: 0.49803925, a: 1}
-  lowlightMaterialColor: {r: 1, g: 0.7028302, b: 0.7283019, a: 1}
+  lowlightMaterialColor: {r: 1, g: 0.86415094, b: 0.8766634, a: 1}
+  infoLowlightMaterialColor: {r: 0.78867924, g: 1, b: 0.98381007, a: 1}
   selectedMaterialColor: {r: 0.20167309, g: 0.4808039, b: 0.6226415, a: 1}
   activeBeatMaterialColor: {r: 1, g: 0.56652045, b: 0, a: 1}
   beatMaterialColor: {r: 1, g: 0.7668646, b: 0.5896226, a: 1}

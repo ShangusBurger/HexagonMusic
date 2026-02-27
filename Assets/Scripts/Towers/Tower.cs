@@ -36,8 +36,6 @@ public class Tower : MonoBehaviour
         towerAlreadyActivatedThisBeat = false;
         visualModel = gameObject.GetComponentInChildren<MeshRenderer>().gameObject;
 
-        // Only create a new list if directions hasn't already been set externally
-        // (e.g. by MoveTower restoring saved state before Start runs)
         if (directions == null || directions.Count == 0)
             directions = new List<int>();
 
@@ -50,11 +48,13 @@ public class Tower : MonoBehaviour
         ClearFieldController.OnClearField += DestroySelf;
 
         if (allTowers == null)
-        {
             allTowers = new List<Tower>();
-        }
+
         allTowers.Add(this);
-        InteractionMade(); // Notify that a tower has been placed
+
+        // Source towers shouldn't count as player interactions
+        if (ownType != TowerType.Source)
+            InteractionMade();
     }
 
     internal virtual void Update()

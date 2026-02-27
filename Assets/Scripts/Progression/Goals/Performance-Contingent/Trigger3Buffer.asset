@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayText: Trigger 3 Different Buffer Towers on the Same Beat, Using Different
     Buffer Sizes
-  rewards:
-  - {fileID: 11400000, guid: 4af9190f56683544e960c2587767d203, type: 2}
+  rewards: []
   goalIcon: {fileID: 0}
+  gatingTowerType: -1
   targetNumber: 3
   bufferSizes: 

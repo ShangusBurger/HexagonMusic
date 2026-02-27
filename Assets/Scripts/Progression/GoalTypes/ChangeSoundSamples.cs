@@ -13,29 +13,31 @@ public class ChangeSoundSamples : Goal
 
     public override void SetupGoal()
     {
-        TowerUI.OnSampleInteractionMade += IncrementSampleCount;
+        // No subscription needed — we read directly from lifetime stats
+        displayText = "Change The Sound of any Tower " + requiredInteractionCount + " Times to Unlock";
     }
 
     public override void DeconstructGoal()
     {
-        TowerUI.OnSampleInteractionMade -= IncrementSampleCount;
+        // Nothing to unsubscribe
     }
 
     public override bool IsComplete()
     {
-        return currentInteractionCount >= requiredInteractionCount
-;
+        if (PlayerStats.Instance == null) return false;
+        return PlayerStats.Instance.TotalSoundChanges >= requiredInteractionCount;
     }
 
     public override float GetProgressNormalized()
     {
-        if (requiredInteractionCount <= 0) return 1f;
-        return Mathf.Clamp01((float)currentInteractionCount / requiredInteractionCount);
+        if (PlayerStats.Instance == null || requiredInteractionCount <= 0) return 0f;
+        return Mathf.Clamp01((float)PlayerStats.Instance.TotalSoundChanges / requiredInteractionCount);
     }
 
     public override string GetProgressText()
     {
-        return $"{currentInteractionCount}/{requiredInteractionCount}";
+        int current = PlayerStats.Instance != null ? PlayerStats.Instance.TotalSoundChanges : 0;
+        return $"{current}/{requiredInteractionCount}";
     }
 
     // This method is called whenever a tower is placed or removed

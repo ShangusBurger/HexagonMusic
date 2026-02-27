@@ -16,6 +16,7 @@ using UnityEngine.EventSystems;
 ///   SetMonoDirection – after placing Mono, click to set direction → back to PlaceTower
 ///   SetLobberDistance – after placing Lobber, click to set distance → back to PlaceTower
 ///   DraggingTower    – actively dragging a tower from one hex to another
+///   EraseTool        – click any non-source tower to delete it
 /// </summary>
 public class SelectionHandler : MonoBehaviour
 {
@@ -26,7 +27,8 @@ public class SelectionHandler : MonoBehaviour
     public static GroundTile currentHoveredTile = null;
     public static GroundTile currentSelectedTile = null;
     public static SelectionHandler Instance;
-    List<GroundTile> lowlightedTiles = new List<GroundTile>();
+    static List<GroundTile> lowlightedTiles = new List<GroundTile>();
+    static List<GroundTile> infoLowlightedTiles = new List<GroundTile>();
 
     // ── Events ────────────────────────────────────────────────────────
     public static event Action HideAllTowerUI;
@@ -40,6 +42,16 @@ public class SelectionHandler : MonoBehaviour
 
     // ── Tower placement ───────────────────────────────────────────────
     private TowerType activePlacementType;
+
+    // ── Default direction for Mono when cursor is on own tile ─────────
+    private const int DefaultMonoDirection = 5;
+
+    // ── Pending direction/distance for mid-placement tool switches ────
+    private int pendingMonoDirection = DefaultMonoDirection;
+    private int pendingLobDistance = -1;
+
+    // ── Right-click erase (hand tool only) ────────────────────────────
+    private bool rightClickErased = false;
 
     // ── Ghost preview ─────────────────────────────────────────────────
     [Header("Ghost Preview")]
@@ -70,13 +82,11 @@ public class SelectionHandler : MonoBehaviour
     void Start()
     {
         ToolbarUI.OnToolChanged += OnToolChanged;
-        ToolbarUI.OnEraseToolSelected += OnEraseToolSelected;
     }
 
     void OnDestroy()
     {
         ToolbarUI.OnToolChanged -= OnToolChanged;
-        ToolbarUI.OnEraseToolSelected -= OnEraseToolSelected;
         DestroyGhost();
     }
 
@@ -106,10 +116,6 @@ public class SelectionHandler : MonoBehaviour
                 UpdateGhostToHoveredTile();
                 HandleDragUpdate();
                 break;
-            case MouseState.EraseTool:
-                HandleMouseHover();
-                HandleEraseInput();
-                break;
         }
     }
 
@@ -120,6 +126,7 @@ public class SelectionHandler : MonoBehaviour
     void OnToolChanged(TowerType? type)
     {
         CancelSecondaryState();
+        ClearInfoLowlight();
 
         if (type == null)
         {
@@ -137,19 +144,23 @@ public class SelectionHandler : MonoBehaviour
         HideAllTowerUI?.Invoke();
     }
 
-    void OnEraseToolSelected()
-    {
-        CancelSecondaryState();
-        DestroyGhost();
-        DeselectCurrent();
-        HideAllTowerUI?.Invoke();
-        currentMouseState = MouseState.EraseTool;
-    }
-
     void CancelSecondaryState()
     {
+        // Finalize tower direction/distance if switching away mid-placement
+        if (currentMouseState == MouseState.SetMonoDirection && currentSelectedTile?.tower != null)
+        {
+            currentSelectedTile.tower.SetDirection(pendingMonoDirection);
+        }
+        else if (currentMouseState == MouseState.SetLobberDistance && currentSelectedTile?.tower != null)
+        {
+            LobberTower lobber = currentSelectedTile.tower as LobberTower;
+            if (lobber != null)
+                lobber.lobDistance = pendingLobDistance > 0 ? pendingLobDistance : lobber.minLobDistance;
+        }
+
         SelectionUtility.DeselectListOfTiles(lowlightedTiles);
         lowlightedTiles.Clear();
+        ClearInfoLowlight();
         if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
         {
             currentHoveredTile.Deselect();
@@ -282,7 +293,7 @@ public class SelectionHandler : MonoBehaviour
             case TowerType.Sprayer:  return TileMapConstructor.Instance.sprayerTowerPrefab;
             case TowerType.Buffer:   return TileMapConstructor.Instance.bufferTowerPrefab;
             case TowerType.Switcher: return TileMapConstructor.Instance.switcherTowerPrefab;
-            case TowerType.Passer:  return TileMapConstructor.Instance.passerTowerPrefab;
+            case TowerType.Passer:   return TileMapConstructor.Instance.passerTowerPrefab;
             default: return null;
         }
     }
@@ -291,10 +302,6 @@ public class SelectionHandler : MonoBehaviour
     // Sample name lookup — reverse-lookup from AudioClip
     // ══════════════════════════════════════════════════════════════════
 
-    /// <summary>
-    /// Finds the sample name in SampleLibrary that matches the given AudioClip.
-    /// Returns null if not found.
-    /// </summary>
     string GetSampleNameFromClip(AudioClip clip)
     {
         if (clip == null || SampleLibrary.Instance == null) return null;
@@ -305,14 +312,9 @@ public class SelectionHandler : MonoBehaviour
         return null;
     }
 
-    /// <summary>
-    /// Waits one frame (so Tower.Start() has run and TowerUI is initialized),
-    /// then applies the saved sample name via TowerUI so both the clip AND
-    /// the dropdown stay in sync.
-    /// </summary>
     IEnumerator ApplyDeferredSample(Tower tower, string sampleName)
     {
-        yield return null; // wait for Start() + InitializeDropdown + SetSelfUI to finish
+        yield return null;
         if (tower != null && tower.towerUI != null && !string.IsNullOrEmpty(sampleName))
         {
             tower.towerUI.SetDropdown(sampleName);
@@ -320,10 +322,6 @@ public class SelectionHandler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Waits one frame then applies visual rotation (since visualModel
-    /// isn't assigned until Tower.Start() runs).
-    /// </summary>
     IEnumerator ApplyDeferredRotation(Tower tower, Quaternion rotation)
     {
         yield return null;
@@ -410,6 +408,60 @@ public class SelectionHandler : MonoBehaviour
     }
 
     // ══════════════════════════════════════════════════════════════════
+    // Info Lowlight — shows current tower state when TowerUI is open
+    // ══════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Shows a subtle info-lowlight indicating a tower's current direction (Mono)
+    /// or lob distance ring (Lobber) when TowerUI is opened via hand tool.
+    /// </summary>
+    void ShowTowerStateIndicator(GroundTile tile)
+    {
+        ClearInfoLowlight();
+
+        if (tile == null || tile.tower == null) return;
+
+        if (tile.tower is MonoTower && tile.tower.directions.Count > 0)
+        {
+            int dir = tile.tower.directions[0];
+            Coordinate targetCoord = GetFurthestCoordinateInDirection(tile.tileCoordinate, dir);
+            if (targetCoord != null)
+            {
+                List<Coordinate> line = Coordinates.Instance.GetLine(tile.tileCoordinate, targetCoord);
+                foreach (Coordinate coord in line)
+                {
+                    GroundTile coordTile = coord.go.GetComponent<GroundTile>();
+                    if (coordTile != null && coordTile != tile)
+                    {
+                        infoLowlightedTiles.Add(coordTile);
+                        coordTile.InfoLowlight();
+                    }
+                }
+            }
+        }
+        else if (tile.tower is LobberTower lobber && lobber.lobDistance > 0)
+        {
+            List<Coordinate> ringTiles = GetLobRingAtDistance(lobber.lobDistance, tile);
+            foreach (Coordinate coord in ringTiles)
+            {
+                GroundTile ringTile = coord.go.GetComponent<GroundTile>();
+                if (ringTile != null && ringTile != tile)
+                {
+                    infoLowlightedTiles.Add(ringTile);
+                    ringTile.InfoLowlight();
+                }
+            }
+        }
+    }
+
+    void ClearInfoLowlight()
+    {
+        foreach (GroundTile t in infoLowlightedTiles)
+            t.Deselect();
+        infoLowlightedTiles.Clear();
+    }
+
+    // ══════════════════════════════════════════════════════════════════
     // HAND TOOL  (click to open TowerUI, drag to move towers)
     // ══════════════════════════════════════════════════════════════════
 
@@ -417,7 +469,28 @@ public class SelectionHandler : MonoBehaviour
     {
         if (IsPointerOverUI()) return;
 
-        // --- Mouse Down: start potential click or drag ---
+        // ── Right-click: erase tower (except Source) ──
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            GroundTile tile = RaycastToTile();
+            if (tile != null && tile.tower != null && tile.tower.ownType != TowerType.Source)
+            {
+                tile.tower.DestroySelf();
+                ClearInfoLowlight();
+                DeselectCurrent();
+                HideAllTowerUI?.Invoke();
+                rightClickErased = true;
+            }
+            return;
+        }
+
+        if (Mouse.current.rightButton.wasReleasedThisFrame)
+        {
+            rightClickErased = false;
+            return;
+        }
+
+        // ── Left-click down: start potential click or drag ──
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             mouseDownTime = Time.unscaledTime;
@@ -431,7 +504,7 @@ public class SelectionHandler : MonoBehaviour
                 dragSourceTile = null;
         }
 
-        // --- Mouse Held: detect drag ---
+        // ── Left-click held: detect drag ──
         if (Mouse.current.leftButton.isPressed && dragSourceTile != null)
         {
             Vector2 delta = Mouse.current.position.ReadValue() - mouseDownPos;
@@ -448,7 +521,7 @@ public class SelectionHandler : MonoBehaviour
             }
         }
 
-        // --- Mouse Up: it was a click (not a drag) ---
+        // ── Left-click up: it was a click (not a drag) ──
         if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
             GroundTile tile = RaycastToTile();
@@ -460,19 +533,23 @@ public class SelectionHandler : MonoBehaviour
                     if (currentSelectedTile != null && currentSelectedTile != tile)
                         DeselectCurrent();
 
+                    ClearInfoLowlight();
                     currentSelectedTile = tile;
                     currentSelectedTile.Select();
                     HideAllTowerUI?.Invoke();
                     OpenTowerUI(tile);
+                    ShowTowerStateIndicator(tile);
                 }
                 else
                 {
+                    ClearInfoLowlight();
                     DeselectCurrent();
                     HideAllTowerUI?.Invoke();
                 }
             }
             else if (RaycastHitsNothing())
             {
+                ClearInfoLowlight();
                 DeselectCurrent();
                 HideAllTowerUI?.Invoke();
             }
@@ -562,28 +639,6 @@ public class SelectionHandler : MonoBehaviour
     }
 
     // ══════════════════════════════════════════════════════════════════
-    // ERASE TOOL  (click any tower to delete it)
-    // ══════════════════════════════════════════════════════════════════
-
-    void HandleEraseInput()
-    {
-        if (IsPointerOverUI()) return;
-
-        if (Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            GroundTile tile = RaycastToTile();
-            if (tile == null || tile.tower == null) return;
-
-            // Use the tower's existing DestroySelf which handles cleanup,
-            // interaction tracking, and event unsubscription.
-            tile.tower.DestroySelf();
-
-            DeselectCurrent();
-            HideAllTowerUI?.Invoke();
-        }
-    }
-
-    // ══════════════════════════════════════════════════════════════════
     // PLACE TOWER TOOL  (click any hex to place selected tower type)
     // ══════════════════════════════════════════════════════════════════
 
@@ -614,11 +669,13 @@ public class SelectionHandler : MonoBehaviour
         if (type == TowerType.Mono)
         {
             currentMouseState = MouseState.SetMonoDirection;
+            pendingMonoDirection = DefaultMonoDirection;
             SetGhostVisible(false);
         }
         else if (type == TowerType.Lobber)
         {
             currentMouseState = MouseState.SetLobberDistance;
+            pendingLobDistance = -1;
             SetGhostVisible(false);
         }
     }
@@ -648,11 +705,13 @@ public class SelectionHandler : MonoBehaviour
         if (newType == TowerType.Mono)
         {
             currentMouseState = MouseState.SetMonoDirection;
+            pendingMonoDirection = DefaultMonoDirection;
             SetGhostVisible(false);
         }
         else if (newType == TowerType.Lobber)
         {
             currentMouseState = MouseState.SetLobberDistance;
+            pendingLobDistance = -1;
             SetGhostVisible(false);
         }
     }
@@ -677,25 +736,19 @@ public class SelectionHandler : MonoBehaviour
             lowlightedTiles.Clear();
 
             currentHoveredTile = collidedTile;
+
             if (currentHoveredTile != currentSelectedTile)
             {
                 currentHoveredTile.Highlight();
                 int bestDir = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, currentHoveredTile.tileCoordinate);
-                Coordinate targetCoord = GetFurthestCoordinateInDirection(currentSelectedTile.tileCoordinate, bestDir);
-                List<Coordinate> coordsBetween = Coordinates.Instance.GetLine(currentSelectedTile.tileCoordinate, targetCoord);
-
-                foreach (Coordinate coord in coordsBetween)
-                {
-                    GroundTile coordTile = coord.go.GetComponent<GroundTile>();
-                    if (coordTile != currentSelectedTile && coordTile != null)
-                    {
-                        lowlightedTiles.Add(coordTile);
-                        coordTile.Lowlight();
-                    }
-                }
-
-                if (currentSelectedTile.tower?.visualModel != null)
-                    currentSelectedTile.tower.visualModel.transform.eulerAngles = new Vector3(0f, ((float)bestDir + 2f) * 60f + 150f, 0f);
+                pendingMonoDirection = bestDir;
+                ShowMonoDirectionLowlight(bestDir);
+            }
+            else
+            {
+                // Cursor is on the tower's own tile — show default direction
+                pendingMonoDirection = DefaultMonoDirection;
+                ShowMonoDirectionLowlight(DefaultMonoDirection);
             }
         }
         else
@@ -707,6 +760,32 @@ public class SelectionHandler : MonoBehaviour
             }
             SelectionUtility.DeselectListOfTiles(lowlightedTiles);
         }
+    }
+
+    /// <summary>
+    /// Shows lowlight tiles along a direction from the currently selected tile
+    /// and rotates the tower's visual model to face that direction.
+    /// </summary>
+    void ShowMonoDirectionLowlight(int direction)
+    {
+        Coordinate targetCoord = GetFurthestCoordinateInDirection(currentSelectedTile.tileCoordinate, direction);
+        if (targetCoord != null)
+        {
+            List<Coordinate> coordsBetween = Coordinates.Instance.GetLine(currentSelectedTile.tileCoordinate, targetCoord);
+            foreach (Coordinate coord in coordsBetween)
+            {
+                GroundTile coordTile = coord.go.GetComponent<GroundTile>();
+                if (coordTile != currentSelectedTile && coordTile != null)
+                {
+                    lowlightedTiles.Add(coordTile);
+                    coordTile.Lowlight();
+                }
+            }
+        }
+
+        if (currentSelectedTile.tower?.visualModel != null)
+            currentSelectedTile.tower.visualModel.transform.eulerAngles =
+                new Vector3(0f, ((float)direction + 2f) * 60f + 150f, 0f);
     }
 
     void HandleMonoTowerClick()
@@ -722,7 +801,12 @@ public class SelectionHandler : MonoBehaviour
 
                 if (currentSelectedTile != null && currentSelectedTile.tower != null)
                 {
-                    int direction = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, collidedTile.tileCoordinate);
+                    int direction;
+                    if (collidedTile == currentSelectedTile)
+                        direction = DefaultMonoDirection;
+                    else
+                        direction = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, collidedTile.tileCoordinate);
+
                     currentSelectedTile.tower.SetDirection(direction);
                 }
 
@@ -753,6 +837,7 @@ public class SelectionHandler : MonoBehaviour
 
             float mouseDistance = Cubes.GetDistanceBetweenTwoCubes(currentSelectedTile.tileCoordinate.cube, collidedTile.tileCoordinate.cube);
             int targetDistance = Mathf.Clamp(Mathf.RoundToInt(mouseDistance), lobberTower.minLobDistance, lobberTower.maxLobDistance);
+            pendingLobDistance = targetDistance;
             List<Coordinate> ringTiles = GetLobRingAtDistance(targetDistance, currentSelectedTile);
 
             if (currentHoveredTile != collidedTile)
@@ -879,6 +964,5 @@ public enum MouseState
     PlaceTower,
     SetMonoDirection,
     SetLobberDistance,
-    DraggingTower,
-    EraseTool
+    DraggingTower
 }

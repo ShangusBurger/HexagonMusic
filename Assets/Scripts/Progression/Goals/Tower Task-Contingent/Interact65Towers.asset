@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 82e476d5886ddef449ceb754763da2d5, type: 3}
-  m_Name: Interact100Towers
+  m_Name: Interact65Towers
   m_EditorClassIdentifier: 
-  displayText: Place or Delete 100 Towers
+  displayText: 
   rewards:
-  - {fileID: 11400000, guid: e9e010f47017627409000353f7dd3ff3, type: 2}
+  - {fileID: 11400000, guid: 809494feed0462846b6b5107b932bed5, type: 2}
   goalIcon: {fileID: 0}
-  requiredInteractionCount: 100
+  gatingTowerType: -1
+  requiredInteractionCount: 65

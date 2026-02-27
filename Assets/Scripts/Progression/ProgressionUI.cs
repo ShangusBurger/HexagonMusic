@@ -29,6 +29,12 @@ public class ProgressionUI : MonoBehaviour
         public TMP_Text unlockNotificationText;
         public Image unlockNotificationIcon;
         public float notificationDuration = 3f;
+
+        [Header("Manual Track / Puzzle Button")]
+        public Button puzzleRequestButton;      // "Give me a Puzzle" button
+        public TMP_Text puzzleButtonText;
+        public GameObject gatingInfoPanel;       // shows gating message when next puzzle is locked
+        public TMP_Text gatingInfoText;
     }
 
     [Header("Track UI Elements")]
@@ -54,9 +60,31 @@ public class ProgressionUI : MonoBehaviour
         ProgressHandler.OnTrackProgressChanged += OnTrackProgressChanged;
         ProgressHandler.OnTrackCompleted += OnTrackCompleted;
         ProgressHandler.OnAnyProgressChanged += RefreshAllUI;
+        ProgressHandler.OnPuzzleCompleted += OnPuzzleCompleted;
+
+        // Wire up puzzle request buttons
+        foreach (var ui in trackUIs)
+        {
+            if (ui.puzzleRequestButton != null)
+            {
+                string capturedId = ui.trackId;
+                ui.puzzleRequestButton.onClick.AddListener(() => OnPuzzleRequestClicked(capturedId));
+            }
+        }
 
         RefreshAllUI();
     }
+
+    void OnDestroy()
+    {
+        ProgressHandler.OnNewGoalStarted -= OnNewGoalStarted;
+        ProgressHandler.OnNextUnlockProgressChanged -= OnNextUnlockProgressChanged;
+        ProgressHandler.OnRewardsGranted -= OnRewardsGranted;
+        ProgressHandler.OnTrackProgressChanged -= OnTrackProgressChanged;
+        ProgressHandler.OnTrackCompleted -= OnTrackCompleted;
+        ProgressHandler.OnAnyProgressChanged -= RefreshAllUI;
+        ProgressHandler.OnPuzzleCompleted -= OnPuzzleCompleted;
+}
 
     void Update()
     {
@@ -71,16 +99,6 @@ public class ProgressionUI : MonoBehaviour
                 UpdateGoalProgressDisplay(kvp.Value, state.currentGoal);
             }
         }
-    }
-
-    void OnDestroy()
-    {
-        ProgressHandler.OnNewGoalStarted -= OnNewGoalStarted;
-        ProgressHandler.OnNextUnlockProgressChanged -= OnNextUnlockProgressChanged;
-        ProgressHandler.OnRewardsGranted -= OnRewardsGranted;
-        ProgressHandler.OnTrackProgressChanged -= OnTrackProgressChanged;
-        ProgressHandler.OnTrackCompleted -= OnTrackCompleted;
-        ProgressHandler.OnAnyProgressChanged -= RefreshAllUI;
     }
 
     void OnNewGoalStarted(string trackId, Goal goal)
@@ -114,6 +132,100 @@ public class ProgressionUI : MonoBehaviour
             if (ui.progressPanel != null) ui.progressPanel.SetActive(false);
         }
     }
+
+    void OnPuzzleRequestClicked(string trackId)
+{
+    if (ProgressHandler.Instance == null) return;
+
+    bool started = ProgressHandler.Instance.RequestNextGoal(trackId);
+    if (started)
+    {
+        RefreshManualTrackUI(trackId);
+    }
+}
+
+void OnPuzzleCompleted(string trackId)
+{
+    RefreshManualTrackUI(trackId);
+}
+
+void RefreshManualTrackUI(string trackId)
+{
+    if (!trackUIMap.TryGetValue(trackId, out var ui)) return;
+
+    var state = ProgressHandler.Instance?.GetTrackState(trackId);
+    if (state == null) return;
+
+    bool isManual = state.track.requiresManualStart;
+    bool hasActiveGoal = state.currentGoal != null;
+    bool isComplete = state.IsComplete;
+
+    if (!isManual)
+    {
+        // Non-manual tracks: hide puzzle button
+        if (ui.puzzleRequestButton != null)
+            ui.puzzleRequestButton.gameObject.SetActive(false);
+        if (ui.gatingInfoPanel != null)
+            ui.gatingInfoPanel.SetActive(false);
+        return;
+    }
+
+    if (isComplete)
+    {
+        // Track complete
+        if (ui.puzzleRequestButton != null)
+            ui.puzzleRequestButton.gameObject.SetActive(false);
+        if (ui.goalPanel != null)
+            ui.goalPanel.SetActive(false);
+        if (ui.progressPanel != null)
+            ui.progressPanel.SetActive(false);
+        if (ui.gatingInfoPanel != null)
+            ui.gatingInfoPanel.SetActive(false);
+        return;
+    }
+
+    if (hasActiveGoal)
+    {
+        // Puzzle is active: hide button, show goal + progress
+        if (ui.puzzleRequestButton != null)
+            ui.puzzleRequestButton.gameObject.SetActive(false);
+        if (ui.gatingInfoPanel != null)
+            ui.gatingInfoPanel.SetActive(false);
+        UpdateGoalDisplay(ui, state.currentGoal);
+        if (state.track.showGoalProgress)
+            UpdateGoalProgressDisplay(ui, state.currentGoal);
+    }
+    else
+    {
+        // No active puzzle: show button (or gating info), hide goal/progress
+        if (ui.goalPanel != null)
+            ui.goalPanel.SetActive(false);
+        if (ui.progressPanel != null)
+            ui.progressPanel.SetActive(false);
+
+        string gatingInfo = ProgressHandler.Instance.GetGatingInfoForNextGoal(trackId);
+        if (gatingInfo != null)
+        {
+            // Next puzzle is gated — show gating info, hide button
+            if (ui.puzzleRequestButton != null)
+                ui.puzzleRequestButton.gameObject.SetActive(false);
+            if (ui.gatingInfoPanel != null)
+            {
+                ui.gatingInfoPanel.SetActive(true);
+                if (ui.gatingInfoText != null)
+                    ui.gatingInfoText.text = gatingInfo;
+            }
+        }
+        else
+        {
+            // Next puzzle is available — show button
+            if (ui.gatingInfoPanel != null)
+                ui.gatingInfoPanel.SetActive(false);
+            if (ui.puzzleRequestButton != null)
+                ui.puzzleRequestButton.gameObject.SetActive(true);
+        }
+    }
+}
 
     void RefreshAllUI()
     {

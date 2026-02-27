@@ -13,10 +13,9 @@ MonoBehaviour:
   m_Name: LobOver1Tower
   m_EditorClassIdentifier: 
   displayText: Activate One Tower Underneath a Lobbed Signal
-  rewards:
-  - {fileID: 11400000, guid: b1efc768778d9fe4d9a2267dcff22f23, type: 2}
-  - {fileID: 11400000, guid: 62967c1a62bbd32408e6b15f475794d2, type: 2}
+  rewards: []
   goalIcon: {fileID: 0}
+  gatingTowerType: -1
   requiredHitCount: 1
   requireNonSourcePulse: 1
   excludeEndpoints: 1

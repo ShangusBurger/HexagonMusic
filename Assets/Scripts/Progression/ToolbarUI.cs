@@ -29,7 +29,6 @@ public class ToolbarUI : MonoBehaviour
     {
         [Header("Identity")]
         public bool isHandTool;
-        public bool isEraseTool;           // true only for the erase slot
         public TowerType towerType;
 
         [Header("References (assign in Inspector)")]
@@ -60,11 +59,8 @@ public class ToolbarUI : MonoBehaviour
     // ── Public state ──────────────────────────────────────────────────
 
     public TowerType? ActiveTowerType { get; private set; } = null;
-    public bool IsHandTool => ActiveTowerType == null && !IsEraseTool;
-    public bool IsEraseTool { get; private set; } = false;
-
+    public bool IsHandTool => ActiveTowerType == null;
     public static event Action<TowerType?> OnToolChanged;
-    public static event Action OnEraseToolSelected;
 
     // ── Private ───────────────────────────────────────────────────────
 
@@ -84,8 +80,6 @@ public class ToolbarUI : MonoBehaviour
         {
             if (slot.isHandTool)
                 handSlot = slot;
-            else if (slot.isEraseTool)
-                eraseSlot = slot;
             else
                 towerSlotMap[slot.towerType] = slot;
         }
@@ -136,16 +130,9 @@ public class ToolbarUI : MonoBehaviour
             return;
         }
 
-        if (slot.isEraseTool)
-        {
-            SelectEraseTool();
-            return;
-        }
-
         if (UnlockManager.Instance != null && !UnlockManager.Instance.IsTowerUnlocked(slot.towerType))
             return;
 
-        IsEraseTool = false;
         ActiveTowerType = slot.towerType;
         RefreshHighlights();
         OnToolChanged?.Invoke(ActiveTowerType);
@@ -153,25 +140,15 @@ public class ToolbarUI : MonoBehaviour
 
     public void SelectHandTool()
     {
-        IsEraseTool = false;
         ActiveTowerType = null;
         RefreshHighlights();
         OnToolChanged?.Invoke(null);
-    }
-
-    public void SelectEraseTool()
-    {
-        IsEraseTool = true;
-        ActiveTowerType = null;
-        RefreshHighlights();
-        OnEraseToolSelected?.Invoke();
     }
 
     public void SelectTowerTool(TowerType type)
     {
         if (UnlockManager.Instance != null && !UnlockManager.Instance.IsTowerUnlocked(type))
             return;
-        IsEraseTool = false;
         ActiveTowerType = type;
         RefreshHighlights();
         OnToolChanged?.Invoke(ActiveTowerType);
@@ -188,8 +165,6 @@ public class ToolbarUI : MonoBehaviour
             bool isActive;
             if (slot.isHandTool)
                 isActive = IsHandTool;
-            else if (slot.isEraseTool)
-                isActive = IsEraseTool;
             else
                 isActive = ActiveTowerType.HasValue && ActiveTowerType.Value == slot.towerType;
 
@@ -320,7 +295,7 @@ public class ToolbarUI : MonoBehaviour
 
     void AddInfoIconHoverListeners(ToolSlot slot)
     {
-        if (slot.isHandTool || slot.isEraseTool || slot.infoIcon == null || slot.infoBubble == null) return;
+        if (slot.isHandTool || slot.infoIcon == null || slot.infoBubble == null) return;
 
         // Attach EventTrigger to the info icon, NOT the button
         EventTrigger trigger = slot.infoIcon.GetComponent<EventTrigger>();

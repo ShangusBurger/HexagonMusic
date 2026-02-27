@@ -13,26 +13,32 @@ public class Goal : ScriptableObject
     [Header("Display")]
     public Sprite goalIcon;
 
+    [Header("Gating (optional)")]
+    [Tooltip("If set, this goal cannot be started until the specified tower type is unlocked.")]
+    public TowerType gatingTowerType = (TowerType)(-1);  // -1 = no gate
+    
     /// <summary>
-    /// Whether the progress UI (slider, text, icon) should be shown for this goal.
-    /// Override to false in subclasses to hide the progress panel.
+    /// Returns true if this goal has a gating requirement.
     /// </summary>
+    public bool HasGate => (int)gatingTowerType >= 0;
+
+    /// <summary>
+    /// Returns true if the gating condition is met (or if there is no gate).
+    /// </summary>
+    public bool IsGateSatisfied()
+    {
+        if (!HasGate) return true;
+        return UnlockManager.Instance != null 
+            && UnlockManager.Instance.IsTowerUnlocked(gatingTowerType);
+    }
+
     public virtual bool showProgressUI => true;
 
     public virtual void SetupGoal() { }
     public virtual void DeconstructGoal() { }
     public virtual bool IsComplete() => false;
 
-    /// <summary>
-    /// Returns normalized progress (0-1) toward completing this goal.
-    /// Override in subclasses to provide meaningful progress tracking.
-    /// </summary>
     public virtual float GetProgressNormalized() => IsComplete() ? 1f : 0f;
-
-    /// <summary>
-    /// Returns a display string for current progress (e.g., "3/5").
-    /// Override in subclasses for custom formatting.
-    /// </summary>
     public virtual string GetProgressText() => "";
 
     public virtual void GrantRewards()

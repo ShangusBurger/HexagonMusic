@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: 3LocTimed
   m_EditorClassIdentifier: 
   displayText: Get signal to the 3 Red Tiles On the Same Beat
-  rewards:
-  - {fileID: 11400000, guid: 24bb54ff18cd6a840906fc07b1e86cdb, type: 2}
+  rewards: []
   goalIcon: {fileID: 0}
+  gatingTowerType: -1
   targetHexCoords:
   - {x: 2, y: 3}
   - {x: -5, y: 2}

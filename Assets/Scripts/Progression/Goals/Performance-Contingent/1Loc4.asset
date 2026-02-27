@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: 1Loc4
   m_EditorClassIdentifier: 
   displayText: Get Signal to the Green Tile
-  rewards:
-  - {fileID: 11400000, guid: 7bd76eaebdb0d5e45be702c23112b1a3, type: 2}
+  rewards: []
   goalIcon: {fileID: 0}
+  gatingTowerType: -1
   targetHexCoords: {x: 0, y: 0}
   targetColor:
     serializedVersion: 2

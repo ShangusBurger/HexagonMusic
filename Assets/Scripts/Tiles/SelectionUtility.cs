@@ -11,7 +11,8 @@ public static class SelectionUtility
     {
         foreach (GroundTile tile in tilesToDeselect)
         {
-            tile.Deselect();
+            tile.ClearAllHighlights();
         }
     }
+    
 }

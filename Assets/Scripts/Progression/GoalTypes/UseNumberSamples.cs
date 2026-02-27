@@ -23,6 +23,7 @@ public class UseNumberSamples : Goal
 
     public override bool IsComplete()
     {
+        Debug.Log($"Samples used: {GetUniqueSampleCount()}");
         return GetUniqueSampleCount() >= numberOfSamplesNeeded;
     }
 

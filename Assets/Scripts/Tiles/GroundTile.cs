@@ -8,9 +8,10 @@ using UnityEngine.Tilemaps;
 
 public class GroundTile : MonoBehaviour
 {
-    //Selection Colors
+    // ── Selection Colors ──────────────────────────────────────────────
     [SerializeField] private Color highlightMaterialColor;
     [SerializeField] private Color lowlightMaterialColor;
+    [SerializeField] private Color infoLowlightMaterialColor;
     [SerializeField] private Color selectedMaterialColor;
     [SerializeField] private Color activeBeatMaterialColor;
     [SerializeField] private Color beatMaterialColor;
@@ -19,36 +20,42 @@ public class GroundTile : MonoBehaviour
 
     // original color, updated when goal is set to tile
     [SerializeField] private Color originalColor;
-    
+
     // default to white always
     [SerializeField] private Color defaultColor;
 
-    //Tile Contents and Identity
+    // ── Lowlight persistence flags ────────────────────────────────────
+    private bool isLowlighted = false;
+    private bool isInfoLowlighted = false;
+
+    // ── Tile Contents and Identity ────────────────────────────────────
     public Coordinate tileCoordinate;
     public Tower tower;
-    public List<Pulse> pulses; //List of directions toward which the signal is flowing on the next pulse of the beat
-    public List<Pulse> pulsesCached; //List of pulses to be processed on the next update
+    public List<Pulse> pulses;
+    public List<Pulse> pulsesCached;
     public int beatsUntilPulse = -1;
     public static event Action PulseExistsNotif;
     public bool isGoalTile = false;
     public bool goalTriggered = false;
 
-
-    //Handling Updates
+    // ── Handling Updates ──────────────────────────────────────────────
     private bool triggerBeatNextUpdate = false;
     public static event Action<Coordinate> OnTowerUpdated;
     public double visualDelay = 0.0;
     public static event Action OnTowerChangeMade;
 
-    // Fading variables
-    [SerializeField] private float fadeDuration = 1f; // Duration of fade in seconds
+    // ── Fading variables ──────────────────────────────────────────────
+    [SerializeField] private float fadeDuration = 1f;
     private bool isFading = false;
     private float fadeTimer = 0f;
     private float fadeDelay = 0f;
     private Color fadeStartColor;
     private Color fadeTargetColor;
 
-    // Instantiates Lists and sets variables when tilemap is created
+    // ══════════════════════════════════════════════════════════════════
+    // Lifecycle
+    // ══════════════════════════════════════════════════════════════════
+
     void Start()
     {
         tileRenderer = GetComponentInChildren<Renderer>();
@@ -63,7 +70,6 @@ public class GroundTile : MonoBehaviour
         }
     }
 
-    // Subscribe to beat event in TempoHandler
     void OnEnable()
     {
         TempoHandler.TriggerBeat += BeatRecieved;
@@ -88,7 +94,8 @@ public class GroundTile : MonoBehaviour
             }
         }
 
-        visualDelay -= (double) Time.deltaTime;
+        visualDelay -= (double)Time.deltaTime;
+
         // Handle color fading
         if (isFading)
         {
@@ -96,10 +103,18 @@ public class GroundTile : MonoBehaviour
             {
                 fadeTimer += Time.deltaTime;
                 float t = Mathf.Clamp01(fadeTimer / fadeDuration);
-                
+
                 if (SelectionHandler.currentSelectedTile != this && SelectionHandler.currentHoveredTile != this)
                 {
-                    tileRenderer.material.color = Color.Lerp(fadeStartColor, fadeTargetColor, t);
+                    Color target;
+                    if (isInfoLowlighted)
+                        target = infoLowlightMaterialColor;
+                    else if (isLowlighted)
+                        target = lowlightMaterialColor;
+                    else
+                        target = fadeTargetColor;
+
+                    tileRenderer.material.color = Color.Lerp(fadeStartColor, target, t);
                 }
 
                 if (t >= 1f)
@@ -113,18 +128,16 @@ public class GroundTile : MonoBehaviour
             }
         }
 
-        // if pulse happened last beat, propagate pulse to next tiles on next frame
+        // If pulse happened last beat, propagate pulse to next tiles on next frame
         if (pulsesCached.Count != 0 && visualDelay <= 0.0)
         {
-            //for each pulse cached, either return it to the list with delay, or send it to next tile
             foreach (Pulse pulse in pulsesCached)
             {
                 if (pulse.delay > 0 && pulse.life != 0)
                 {
                     pulse.delay -= 1;
                     pulse.life--;
-    
-                    //if delay is now 0 and a tower exists on the tile, play tower sound and notify tower of pulse, otherwise re-add to pulse list to propigate
+
                     if (pulse.delay == 0 && tower != null)
                     {
                         if (!tower.towerAlreadyActivatedThisBeat)
@@ -142,22 +155,22 @@ public class GroundTile : MonoBehaviour
                     }
                     continue;
                 }
-                
+
                 StartFade(beatMaterialColor, originalColor, pulse.direction);
-                
-                //whether or not the pulse actually continues to another tile is handled in PropagatePulse()
                 PropagatePulse(pulse);
             }
             pulsesCached.Clear();
         }
-        
-        //when a beat is triggered, add pulses to cache to be handled next tick, return normal state of tile
+
         if (triggerBeatNextUpdate)
         {
             triggerBeatNextUpdate = false;
-            
         }
     }
+
+    // ══════════════════════════════════════════════════════════════════
+    // Pulse / Beat
+    // ══════════════════════════════════════════════════════════════════
 
     private void StartFade(Color from, Color to, int direction)
     {
@@ -165,12 +178,12 @@ public class GroundTile : MonoBehaviour
         {
             tileRenderer.material.color = activeBeatMaterialColor;
         }
-        
+
         fadeStartColor = from;
         fadeTargetColor = to;
         fadeTimer = 0f;
         isFading = true;
-        fadeDelay = (float) TempoHandler.beatLength;
+        fadeDelay = (float)TempoHandler.beatLength;
 
         if (tower != null)
         {
@@ -178,7 +191,6 @@ public class GroundTile : MonoBehaviour
         }
     }
 
-    // used to create a new Pulse, either on this tile or to propagate to another tile
     public void SchedulePulse(Pulse pulse)
     {
         foreach (Pulse p in pulses)
@@ -190,11 +202,9 @@ public class GroundTile : MonoBehaviour
         pulse.originTile = tileCoordinate;
         pulses.Add(pulse);
 
-        //play tower sound and notify existing tower of pulse
         if (tower != null && pulse.delay <= 0)
         {
             pulse.continuous = false;
-            // Notify the tower that a pulse has been received
             if (!pulse.source)
             {
                 tower.OnPulseReceived(pulse);
@@ -204,53 +214,21 @@ public class GroundTile : MonoBehaviour
             {
                 tower.PlayScheduledClip();
             }
-            
-        }
-    }
-
-    public void Highlight()
-    {
-
-        tileRenderer.material.color = highlightMaterialColor;
-
-    }
-    public void Lowlight()
-    {
-        tileRenderer.material.color = lowlightMaterialColor;
-    }
-
-    //Called from SelectionHandler when this tile is selected
-    public void Select()
-    {
-        if (tileRenderer != null)
-        {
-            tileRenderer.material.color = selectedMaterialColor;
-        }
-        // REMOVED: OfferTowerPlacement / OpenTowerUI calls
-        // SelectionHandler now handles all interaction routing.
-    }
-
-    public void Deselect()
-    {
-        if (tileRenderer != null)
-        {
-            tileRenderer.material.color = originalColor;
         }
     }
 
     public void BeatRecieved()
     {
-        visualDelay = TempoHandler.beatLength * 1/2;
+        visualDelay = TempoHandler.beatLength * 1 / 2;
 
-            //if active pulse on tile, add to cache to be sent onward next update
-            if (pulses.Count > 0)
-            {  
-                foreach (Pulse p in pulses)
-                {
-                    pulsesCached.Add(p);
-                }
-                pulses.Clear();
+        if (pulses.Count > 0)
+        {
+            foreach (Pulse p in pulses)
+            {
+                pulsesCached.Add(p);
             }
+            pulses.Clear();
+        }
     }
 
     public void PropagatePulse(Pulse pulse)
@@ -266,6 +244,65 @@ public class GroundTile : MonoBehaviour
         }
     }
 
+    // ══════════════════════════════════════════════════════════════════
+    // Selection / Highlighting
+    // ══════════════════════════════════════════════════════════════════
+
+    public void Highlight()
+    {
+        tileRenderer.material.color = highlightMaterialColor;
+    }
+
+    public void Lowlight()
+    {
+        isLowlighted = true;
+        tileRenderer.material.color = lowlightMaterialColor;
+    }
+
+    public void InfoLowlight()
+    {
+        isInfoLowlighted = true;
+        tileRenderer.material.color = infoLowlightMaterialColor;
+    }
+
+    public void Select()
+    {
+        if (tileRenderer != null)
+        {
+            tileRenderer.material.color = selectedMaterialColor;
+        }
+    }
+
+    public void Deselect()
+    {
+        // Restores to lowlight color if flagged, otherwise originalColor
+        if (tileRenderer != null)
+        {
+            if (isInfoLowlighted)
+                tileRenderer.material.color = infoLowlightMaterialColor;
+            else if (isLowlighted)
+                tileRenderer.material.color = lowlightMaterialColor;
+            else
+                tileRenderer.material.color = originalColor;
+        }
+    }
+
+    /// <summary>
+    /// Fully clears all highlight/lowlight state and restores to originalColor.
+    /// Use this when intentionally removing lowlights, not for hover cleanup.
+    /// </summary>
+    public void ClearAllHighlights()
+    {
+        isLowlighted = false;
+        isInfoLowlighted = false;
+        if (tileRenderer != null)
+            tileRenderer.material.color = originalColor;
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // Tower Management
+    // ══════════════════════════════════════════════════════════════════
+
     public void RemoveTower()
     {
         if (tower != null)
@@ -278,9 +315,6 @@ public class GroundTile : MonoBehaviour
         OnTowerChangeMade?.Invoke();
     }
 
-    // ── AddTowerToTile(TowerType) — instantiation only ────────────────
-    // No longer sets SelectionHandler.currentMouseState or calls
-    // DeselectCurrent. SelectionHandler manages state transitions.
     public void AddTowerToTile(TowerType type)
     {
         switch (type)
@@ -319,12 +353,15 @@ public class GroundTile : MonoBehaviour
         OnTowerChangeMade?.Invoke();
     }
 
-    // ── AddTowerToTile() (no-arg overload) — unchanged ────────────────
     public void AddTowerToTile()
     {
         tower = Instantiate(TileMapConstructor.Instance.sourceTowerPrefab, transform).GetComponent<Tower>();
         tower.tile = this;
     }
+
+    // ══════════════════════════════════════════════════════════════════
+    // Goal Tiles
+    // ══════════════════════════════════════════════════════════════════
 
     public void SetAsGoalTile(Color goalColor, bool isUntimed)
     {
@@ -332,7 +369,7 @@ public class GroundTile : MonoBehaviour
         originalColor = goalColor;
         fadeTargetColor = goalColor;
         goalTriggered = false;
-        
+
         if (isUntimed)
         {
             isGoalTile = true;
@@ -346,9 +383,12 @@ public class GroundTile : MonoBehaviour
         tileRenderer.material.color = defaultColor;
         isGoalTile = false;
         goalTriggered = false;
-    }  
+    }
 
-    // ── NEW: Allow external scripts to notify of tower changes ────────
+    // ══════════════════════════════════════════════════════════════════
+    // Static Helpers
+    // ══════════════════════════════════════════════════════════════════
+
     public static void NotifyTowerChangeMade()
     {
         OnTowerChangeMade?.Invoke();

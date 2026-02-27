@@ -55,6 +55,15 @@ public class ProgressHandler : MonoBehaviour
     {
         foreach (var state in trackStates.Values)
         {
+            // Skip manual-start tracks — they wait for RequestNextGoal()
+            if (state.track.requiresManualStart)
+            {
+                // Still check completion of active goals
+                if (state.currentGoal != null && state.currentGoal.IsComplete())
+                    CompleteCurrentGoal(state);
+                continue;
+            }
+
             if (state.currentGoal == null && state.currentLevel < state.track.goals.Count)
                 SetCurrentGoal(state, state.track.goals[state.currentLevel]);
 
@@ -63,8 +72,9 @@ public class ProgressHandler : MonoBehaviour
         }
 
         // Debug: Skip goals with P key (track 0) and O key (track 1)
-        if (Input.GetKeyDown(KeyCode.P)) SkipCurrentGoal(0);
+        if (Input.GetKeyDown(KeyCode.L))SkipCurrentGoal(0);
         if (Input.GetKeyDown(KeyCode.O)) SkipCurrentGoal(1);
+        if (Input.GetKeyDown(KeyCode.P)) SkipCurrentGoal(2);
     }
 
     void SetCurrentGoal(TrackProgressState state, Goal goal)
@@ -102,10 +112,93 @@ public class ProgressHandler : MonoBehaviour
         OnAnyProgressChanged?.Invoke();
 
         if (state.IsComplete)
+        {
             OnTrackCompleted?.Invoke(state.track.trackId);
-        else if (state.currentLevel < state.track.goals.Count)
+        }
+        else if (!state.track.requiresManualStart && state.currentLevel < state.track.goals.Count)
+        {
             SetCurrentGoal(state, state.track.goals[state.currentLevel]);
+        }
+        else if (state.track.requiresManualStart)
+        {
+            // Puzzle completed — notify UI so it can show the button again
+            OnPuzzleCompleted?.Invoke(state.track.trackId);
+        }
     }
+
+    /// <summary>
+    /// Attempts to start the next available goal on a manual-start track.
+    /// Skips goals whose gating requirements are not met.
+    /// Returns true if a goal was started, false if no eligible goal exists.
+    /// </summary>
+    public bool RequestNextGoal(string trackId)
+    {
+        var state = GetTrackState(trackId);
+        if (state == null || state.IsComplete) return false;
+        if (state.currentGoal != null) return false; // already has an active goal
+
+        // Find the next goal whose gate is satisfied
+        while (state.currentLevel < state.track.goals.Count)
+        {
+            Goal candidate = state.track.goals[state.currentLevel];
+            if (candidate.IsGateSatisfied())
+            {
+                SetCurrentGoal(state, candidate);
+                return true;
+            }
+            else
+            {
+                // This goal is gated — stop here, don't skip past it
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Returns the next goal in a manual track (without starting it), 
+    /// or null if no eligible goal exists. Useful for UI preview.
+    /// </summary>
+    public Goal PeekNextGoal(string trackId)
+    {
+        var state = GetTrackState(trackId);
+        if (state == null || state.IsComplete) return null;
+        if (state.currentGoal != null) return null;
+        if (state.currentLevel >= state.track.goals.Count) return null;
+
+        Goal candidate = state.track.goals[state.currentLevel];
+        return candidate.IsGateSatisfied() ? candidate : null;
+    }
+
+    /// <summary>
+    /// Returns the gating info string if the next goal is gated, or null if not gated.
+    /// </summary>
+    public string GetGatingInfoForNextGoal(string trackId)
+    {
+        var state = GetTrackState(trackId);
+        if (state == null || state.IsComplete) return null;
+        if (state.currentGoal != null) return null;
+        if (state.currentLevel >= state.track.goals.Count) return null;
+
+        Goal candidate = state.track.goals[state.currentLevel];
+        if (!candidate.HasGate) return null;
+        if (candidate.IsGateSatisfied()) return null;
+
+        return $"Unlock the {candidate.gatingTowerType} tower to access more puzzles";
+    }
+
+    /// <summary>
+    /// Whether a manual track currently has an active puzzle.
+    /// </summary>
+    public bool HasActivePuzzle(string trackId)
+    {
+        var state = GetTrackState(trackId);
+        return state?.currentGoal != null;
+    }
+
+    // NEW event for puzzle-specific flow
+    public static event Action<string> OnPuzzleRequested;  // trackId
+    public static event Action<string> OnPuzzleCompleted;  // trackId
 
     void CacheNextUnlock(TrackProgressState state)
     {
