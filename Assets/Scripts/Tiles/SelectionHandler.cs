@@ -452,12 +452,37 @@ public class SelectionHandler : MonoBehaviour
                 }
             }
         }
+        else if (tile.tower is SourceTower)
+        {
+            List<int> dirs = new List<int>(){0, 3};
+            foreach (int dir in dirs)
+            {
+                Coordinate targetCoord = GetFurthestCoordinateInDirection(tile.tileCoordinate, dir);
+                if (targetCoord != null)
+                {
+                    List<Coordinate> line = Coordinates.Instance.GetLine(tile.tileCoordinate, targetCoord);
+                    foreach (Coordinate coord in line)
+                    {
+                        GroundTile coordTile = coord.go.GetComponent<GroundTile>();
+                        if (coordTile != null && coordTile != tile)
+                        {
+                            infoLowlightedTiles.Add(coordTile);
+                            coordTile.InfoLowlight();
+                        }
+                    }
+                }
+            }
+        }
     }
+
 
     void ClearInfoLowlight()
     {
         foreach (GroundTile t in infoLowlightedTiles)
+        {
+            t.RemoveInfoLowlight();
             t.Deselect();
+        }
         infoLowlightedTiles.Clear();
     }
 
@@ -952,6 +977,7 @@ public class SelectionHandler : MonoBehaviour
             currentSelectedTile.Deselect();
             currentSelectedTile = null;
         }
+        Instance.ClearInfoLowlight();
     }
 
     // Legacy stub

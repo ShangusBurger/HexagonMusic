@@ -500,6 +500,9 @@ MonoBehaviour:
     puzzleButtonText: {fileID: 632139168}
     gatingInfoPanel: {fileID: 0}
     gatingInfoText: {fileID: 0}
+  requestPuzzleColor: {r: 0.91372555, g: 0.6509804, b: 0.8980393, a: 1}
+  abandonPuzzleColor: {r: 0.9622642, g: 0.5410467, b: 0.5410467, a: 1}
+  gatedPuzzleColor: {r: 0.4716981, g: 0.4716981, b: 0.4716981, a: 1}
 --- !u!114 &48776581
 MonoBehaviour:
   m_ObjectHideFlags: 0

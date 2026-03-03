@@ -42,6 +42,11 @@ public class ProgressionUI : MonoBehaviour
 
     private Dictionary<string, TrackUIElements> trackUIMap = new Dictionary<string, TrackUIElements>();
 
+    [Header("UI Colors")]
+    public Color requestPuzzleColor;
+    public Color abandonPuzzleColor;
+    public Color gatedPuzzleColor;
+
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -61,6 +66,7 @@ public class ProgressionUI : MonoBehaviour
         ProgressHandler.OnTrackCompleted += OnTrackCompleted;
         ProgressHandler.OnAnyProgressChanged += RefreshAllUI;
         ProgressHandler.OnPuzzleCompleted += OnPuzzleCompleted;
+        ProgressHandler.OnPuzzleAbandoned += OnPuzzleAbandoned;
 
         // Wire up puzzle request buttons
         foreach (var ui in trackUIs)
@@ -84,6 +90,7 @@ public class ProgressionUI : MonoBehaviour
         ProgressHandler.OnTrackCompleted -= OnTrackCompleted;
         ProgressHandler.OnAnyProgressChanged -= RefreshAllUI;
         ProgressHandler.OnPuzzleCompleted -= OnPuzzleCompleted;
+        ProgressHandler.OnPuzzleAbandoned -= OnPuzzleAbandoned;
 }
 
     void Update()
@@ -134,106 +141,128 @@ public class ProgressionUI : MonoBehaviour
     }
 
     void OnPuzzleRequestClicked(string trackId)
-{
-    if (ProgressHandler.Instance == null) return;
-
-    bool started = ProgressHandler.Instance.RequestNextGoal(trackId);
-    if (started)
     {
-        RefreshManualTrackUI(trackId);
-    }
-}
+        if (ProgressHandler.Instance == null) return;
 
-void OnPuzzleCompleted(string trackId)
-{
-    RefreshManualTrackUI(trackId);
-}
-
-void RefreshManualTrackUI(string trackId)
-{
-    if (!trackUIMap.TryGetValue(trackId, out var ui)) return;
-
-    var state = ProgressHandler.Instance?.GetTrackState(trackId);
-    if (state == null) return;
-
-    bool isManual = state.track.requiresManualStart;
-    bool hasActiveGoal = state.currentGoal != null;
-    bool isComplete = state.IsComplete;
-
-    if (!isManual)
-    {
-        // Non-manual tracks: hide puzzle button
-        if (ui.puzzleRequestButton != null)
-            ui.puzzleRequestButton.gameObject.SetActive(false);
-        if (ui.gatingInfoPanel != null)
-            ui.gatingInfoPanel.SetActive(false);
-        return;
-    }
-
-    if (isComplete)
-    {
-        // Track complete
-        if (ui.puzzleRequestButton != null)
-            ui.puzzleRequestButton.gameObject.SetActive(false);
-        if (ui.goalPanel != null)
-            ui.goalPanel.SetActive(false);
-        if (ui.progressPanel != null)
-            ui.progressPanel.SetActive(false);
-        if (ui.gatingInfoPanel != null)
-            ui.gatingInfoPanel.SetActive(false);
-        return;
-    }
-
-    if (hasActiveGoal)
-    {
-        // Puzzle is active: hide button, show goal + progress
-        if (ui.puzzleRequestButton != null)
-            ui.puzzleRequestButton.gameObject.SetActive(false);
-        if (ui.gatingInfoPanel != null)
-            ui.gatingInfoPanel.SetActive(false);
-        UpdateGoalDisplay(ui, state.currentGoal);
-        if (state.track.showGoalProgress)
-            UpdateGoalProgressDisplay(ui, state.currentGoal);
-    }
-    else
-    {
-        // No active puzzle: show button (or gating info), hide goal/progress
-        if (ui.goalPanel != null)
-            ui.goalPanel.SetActive(false);
-        if (ui.progressPanel != null)
-            ui.progressPanel.SetActive(false);
-
-        string gatingInfo = ProgressHandler.Instance.GetGatingInfoForNextGoal(trackId);
-        if (gatingInfo != null)
+        // If there's an active puzzle, abandon it instead of starting a new one
+        if (ProgressHandler.Instance.HasActivePuzzle(trackId))
         {
-            // Next puzzle is gated — show gating info, hide button
-            if (ui.puzzleRequestButton != null)
-                ui.puzzleRequestButton.gameObject.SetActive(false);
-            if (ui.gatingInfoPanel != null)
-            {
-                ui.gatingInfoPanel.SetActive(true);
-                if (ui.gatingInfoText != null)
-                    ui.gatingInfoText.text = gatingInfo;
-            }
+            ProgressHandler.Instance.AbandonCurrentGoal(trackId);
         }
         else
         {
-            // Next puzzle is available — show button
+            ProgressHandler.Instance.RequestNextGoal(trackId);
+        }
+
+        RefreshManualTrackUI(trackId);
+    }
+
+    void OnPuzzleCompleted(string trackId)
+    {
+        RefreshManualTrackUI(trackId);
+    }
+
+    void OnPuzzleAbandoned(string trackId)
+    {
+        RefreshManualTrackUI(trackId);
+    }
+
+    void RefreshManualTrackUI(string trackId)
+    {
+        if (!trackUIMap.TryGetValue(trackId, out var ui)) return;
+
+        var state = ProgressHandler.Instance?.GetTrackState(trackId);
+        if (state == null) return;
+
+        bool isManual = state.track.requiresManualStart;
+        bool hasActiveGoal = state.currentGoal != null;
+        bool isComplete = state.IsComplete;
+
+        if (!isManual)
+        {
+            // Non-manual tracks: hide puzzle button
+            if (ui.puzzleRequestButton != null)
+                ui.puzzleRequestButton.gameObject.SetActive(false);
             if (ui.gatingInfoPanel != null)
                 ui.gatingInfoPanel.SetActive(false);
+            return;
+        }
+
+        if (isComplete)
+        {
+            // Track complete
             if (ui.puzzleRequestButton != null)
+                ui.puzzleRequestButton.gameObject.SetActive(false);
+            if (ui.goalPanel != null)
+                ui.goalPanel.SetActive(false);
+            if (ui.progressPanel != null)
+                ui.progressPanel.SetActive(false);
+            if (ui.gatingInfoPanel != null)
+                ui.gatingInfoPanel.SetActive(false);
+            return;
+        }
+
+        if (hasActiveGoal)
+        {
+            // Puzzle is active: keep button visible (as "Remove Puzzle"), show goal + progress
+            if (ui.puzzleRequestButton != null)
+            {
                 ui.puzzleRequestButton.gameObject.SetActive(true);
+                ui.puzzleRequestButton.interactable = true;
+                ui.puzzleRequestButton.image.color = abandonPuzzleColor;
+            }
+            if (ui.puzzleButtonText != null)
+                ui.puzzleButtonText.text = "Get That Puzzle Away From Me!";
+            UpdateGoalDisplay(ui, state.currentGoal);
+            if (state.track.showGoalProgress)
+                UpdateGoalProgressDisplay(ui, state.currentGoal);
+        }
+        else
+        {
+            // No active puzzle: show button (or gating info), hide goal/progress
+            if (ui.goalPanel != null)
+                ui.goalPanel.SetActive(false);
+            if (ui.progressPanel != null)
+                ui.progressPanel.SetActive(false);
+
+            string gatingInfo = ProgressHandler.Instance.GetGatingInfoForNextGoal(trackId);
+            if (gatingInfo != null)
+            {
+                // Next puzzle is gated — show gating info, hide button
+                if (ui.puzzleRequestButton != null)
+                {
+                    ui.puzzleRequestButton.image.color = gatedPuzzleColor;
+                    ui.puzzleRequestButton.interactable = false;
+                }
+                if (ui.puzzleButtonText != null)
+                    ui.puzzleButtonText.text = gatingInfo;
+            }
+            else
+            {
+                // Next puzzle is available — show button with start text
+                if (ui.gatingInfoPanel != null)
+                    ui.gatingInfoPanel.SetActive(false);
+                if (ui.puzzleRequestButton != null)
+                {
+                    ui.puzzleRequestButton.gameObject.SetActive(true);
+                    ui.puzzleRequestButton.interactable = true;
+                    ui.puzzleRequestButton.image.color = requestPuzzleColor;
+                }
+                if (ui.puzzleButtonText != null)
+                    ui.puzzleButtonText.text = "Give me a Puzzle!";
+            }
         }
     }
-}
 
     void RefreshAllUI()
     {
         if (ProgressHandler.Instance == null) return;
 
         foreach (var kvp in trackUIMap)
+        {
             RefreshTrackUI(kvp.Key, kvp.Value);
-
+            RefreshManualTrackUI(kvp.Key);
+        }
     }
 
     void RefreshTrackUI(string trackId, TrackUIElements ui)

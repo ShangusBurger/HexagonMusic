@@ -19,6 +19,7 @@ public class ProgressHandler : MonoBehaviour
     public static event Action<string, NextUnlockInfo> OnNextUnlockProgressChanged;  // trackId, info
     public static event Action<string> OnTrackProgressChanged;         // trackId
     public static event Action<string> OnTrackCompleted;               // trackId
+    public static event Action<string> OnPuzzleAbandoned;              // trackId
     public static event Action OnAnyProgressChanged;                   // fired when any track changes
 
     void Awake()
@@ -126,6 +127,39 @@ public class ProgressHandler : MonoBehaviour
         }
     }
 
+
+    // ──────────────────────────────────────────────────────────────
+    // ADD this new method (e.g. below RequestNextGoal)
+    // ──────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Abandons the active goal on a manual-start track without advancing
+    /// the progression level. Calls DeconstructGoal() to clean up visuals
+    /// (highlighted tiles, etc.) and resets the track to its "waiting for
+    /// player to request a puzzle" state.
+    /// Returns true if a goal was abandoned, false if there was nothing to abandon.
+    /// </summary>
+    public bool AbandonCurrentGoal(string trackId)
+    {
+        var state = GetTrackState(trackId);
+        if (state == null) return false;
+        if (!state.track.requiresManualStart) return false; // only manual tracks
+        if (state.currentGoal == null) return false;         // nothing active
+
+        // Clean up the goal (remove tile highlights, unsubscribe events, etc.)
+        state.currentGoal.DeconstructGoal();
+
+        // Clear the active goal WITHOUT advancing currentLevel
+        state.currentGoal = null;
+
+        // Notify listeners
+        OnPuzzleAbandoned?.Invoke(trackId);
+        OnTrackProgressChanged?.Invoke(trackId);
+        OnAnyProgressChanged?.Invoke();
+
+        return true;
+    }
+
     /// <summary>
     /// Attempts to start the next available goal on a manual-start track.
     /// Skips goals whose gating requirements are not met.
@@ -184,7 +218,7 @@ public class ProgressHandler : MonoBehaviour
         if (!candidate.HasGate) return null;
         if (candidate.IsGateSatisfied()) return null;
 
-        return $"Unlock the {candidate.gatingTowerType} tower to access more puzzles";
+        return "More puzzles later!";
     }
 
     /// <summary>

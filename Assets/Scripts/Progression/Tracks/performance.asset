@@ -19,7 +19,6 @@ MonoBehaviour:
   goals:
   - {fileID: 11400000, guid: 167377ae3aed42546a76ba60ed724d5b, type: 2}
   - {fileID: 11400000, guid: abacbf6917ef14844900d5d2b462e01d, type: 2}
-  - {fileID: 11400000, guid: f3496c573287e7c43893499a3226569b, type: 2}
   - {fileID: 11400000, guid: 03319d12f9d15df41a517c2b00051163, type: 2}
   - {fileID: 11400000, guid: f673767e768786d4393519e9b0ae653c, type: 2}
   - {fileID: 11400000, guid: af3ee34824ca92e4889a1c16bd0c8dff, type: 2}

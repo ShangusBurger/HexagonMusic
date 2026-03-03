@@ -287,6 +287,11 @@ public class GroundTile : MonoBehaviour
         }
     }
 
+    public void RemoveInfoLowlight()
+    {
+        isInfoLowlighted = false;
+    }
+
     /// <summary>
     /// Fully clears all highlight/lowlight state and restores to originalColor.
     /// Use this when intentionally removing lowlights, not for hover cleanup.
