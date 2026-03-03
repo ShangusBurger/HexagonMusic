@@ -81,7 +81,7 @@ public class TowerUI : MonoBehaviour
         if (dropdownList != null && !isDropdownOpen)
         {
             isDropdownOpen = true;
-            StartCoroutine(SetupLockedItemInDropdown(dropdownList));
+            StartCoroutine(SetupDropdownItemBehavior(dropdownList));
         }
         else if (dropdownList == null && isDropdownOpen)
         {
@@ -172,30 +172,23 @@ public class TowerUI : MonoBehaviour
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    // Inject lock sprite + hover into the spawned dropdown list
-    // ══════════════════════════════════════════════════════════════════
-
     /// <summary>
-    /// Called when the dropdown list appears. Finds the locked item,
-    /// replaces its visual with the lock sprite, and attaches hover events.
+    /// Called when the dropdown list appears. For EVERY item, removes
+    /// TMP_Dropdown's built-in toggle listener (which calls Hide()) and
+    /// replaces it so the dropdown stays open after selection.
+    /// Also handles locked-item visuals and hover as before.
     /// </summary>
-    IEnumerator SetupLockedItemInDropdown(Transform dropdownList)
+    IEnumerator SetupDropdownItemBehavior(Transform dropdownList)
     {
         yield return null;
 
-        if (lockedSoundIndex < 0 || dropdownList == null) yield break;
+        if (dropdownList == null) yield break;
 
-        // TMP_Dropdown structure: Dropdown List > Viewport > Content > Items
         Transform content = dropdownList.Find("Viewport/Content");
         if (content == null)
-        {
-            // Fallback — some setups skip the Viewport
             content = dropdownList.Find("Content");
-            if (content == null) yield break;
-        }
+        if (content == null) yield break;
 
-        // Count only ACTIVE children with Toggles (inactive template item is skipped)
         int activeIndex = 0;
         foreach (Transform child in content)
         {
@@ -204,15 +197,91 @@ public class TowerUI : MonoBehaviour
             Toggle toggle = child.GetComponent<Toggle>();
             if (toggle == null) continue;
 
-            if (activeIndex == lockedSoundIndex)
+            int capturedIndex = activeIndex;
+
+            // Strip TMP_Dropdown's internal listener that triggers Hide()
+            toggle.onValueChanged.RemoveAllListeners();
+
+            if (capturedIndex == lockedSoundIndex)
             {
+                // ── Locked item: visual setup + block selection ──
                 SetupLockedItemVisual(child.gameObject);
                 AttachHoverEvents(child.gameObject);
-                break;
+
+                toggle.onValueChanged.AddListener((isOn) =>
+                {
+                    if (!isOn) return;
+                    // Immediately revert the toggle visual — don't touch the value
+                    toggle.SetIsOnWithoutNotify(false);
+                    RestoreActiveToggle(content);
+                });
             }
+            else
+            {
+                // ── Normal item: apply selection, stay open ──
+                toggle.onValueChanged.AddListener((isOn) =>
+                {
+                    if (!isOn)
+                    {
+                        // Clicking the already-selected item turns it off. Force it back on.
+                        toggle.SetIsOnWithoutNotify(true);
+                        return;
+                    }
+
+                    if (capturedIndex < 0 || capturedIndex >= dropdownIndexToSampleName.Count)
+                        return;
+
+                    // Turn off the previously selected toggle before applying new value
+                    ClearAllToggles(content);
+                    toggle.SetIsOnWithoutNotify(true);
+
+                    // Set the value — this fires onValueChanged →
+                    // OnDropdownValueChanged handles sample swap + stats
+                    sampleDropdown.value = capturedIndex;
+                });
+            }
+
             activeIndex++;
         }
     }
+
+    /// <summary>
+    /// Turns off all toggles in the dropdown content without triggering callbacks.
+    /// Called before activating the newly selected toggle.
+    /// </summary>
+    void ClearAllToggles(Transform content)
+    {
+        foreach (Transform child in content)
+        {
+            if (!child.gameObject.activeSelf) continue;
+            Toggle t = child.GetComponent<Toggle>();
+            if (t != null)
+                t.SetIsOnWithoutNotify(false);
+        }
+    }
+
+    /// <summary>
+    /// Re-enables the toggle that matches the current dropdown value.
+    /// Used after reverting a locked-item click.
+    /// </summary>
+    void RestoreActiveToggle(Transform content)
+    {
+        int currentVal = sampleDropdown.value;
+        int idx = 0;
+        foreach (Transform child in content)
+        {
+            if (!child.gameObject.activeSelf) continue;
+            Toggle t = child.GetComponent<Toggle>();
+            if (t == null) continue;
+            if (idx == currentVal)
+            {
+                t.SetIsOnWithoutNotify(true);
+                return;
+            }
+            idx++;
+        }
+    }
+
 
     /// <summary>
     /// Replaces the locked item's text with the lock sprite image.
@@ -286,24 +355,42 @@ public class TowerUI : MonoBehaviour
     // Dropdown value changed
     // ══════════════════════════════════════════════════════════════════
 
+
     void OnDropdownValueChanged(int index)
     {
         if (_suppressDropdownCallback) return;
         if (tower == null || SampleLibrary.Instance == null) return;
         if (index < 0 || index >= dropdownIndexToSampleName.Count) return;
 
-        // Clicked the locked item — revert selection
+        // Clicked the locked item — revert selection and reopen
         if (index == lockedSoundIndex)
         {
             _suppressDropdownCallback = true;
             int revertIndex = FindCurrentSampleIndex();
             sampleDropdown.value = revertIndex;
             _suppressDropdownCallback = false;
+            StartCoroutine(ReopenDropdown());
             return;
         }
 
         OnSampleSelected(dropdownIndexToSampleName[index]);
         OnSampleInteractionMade?.Invoke();
+
+        // Keep the dropdown open so the player can audition multiple sounds
+        StartCoroutine(ReopenDropdown());
+    }
+
+    /// <summary>
+    /// Waits one frame for TMP_Dropdown to finish closing, then reopens it.
+    /// </summary>
+    IEnumerator ReopenDropdown()
+    {
+        yield return null; // wait for the dropdown to fully close
+
+        if (sampleDropdown != null && gameObject.activeInHierarchy)
+        {
+            sampleDropdown.Show();
+        }
     }
 
     /// <summary>
