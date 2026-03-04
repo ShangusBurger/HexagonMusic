@@ -16,6 +16,6 @@ MonoBehaviour:
     Buffer Sizes
   rewards: []
   goalIcon: {fileID: 0}
-  gatingTowerType: -1
+  gatingTowerType: 6
   targetNumber: 2
   bufferSizes: 

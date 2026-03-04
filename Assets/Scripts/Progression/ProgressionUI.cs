@@ -35,6 +35,9 @@ public class ProgressionUI : MonoBehaviour
         public TMP_Text puzzleButtonText;
         public GameObject gatingInfoPanel;       // shows gating message when next puzzle is locked
         public TMP_Text gatingInfoText;
+
+        [Header("Unlock Elements")]
+        public string unlockTextAdd; // Text to add after the unlockable name in notifications (e.g. "Unlocked!" or "Track Completed!")
     }
 
     [Header("Track UI Elements")]
@@ -212,7 +215,7 @@ public class ProgressionUI : MonoBehaviour
                 ui.puzzleRequestButton.image.color = abandonPuzzleColor;
             }
             if (ui.puzzleButtonText != null)
-                ui.puzzleButtonText.text = "Get That Puzzle Away From Me!";
+                ui.puzzleButtonText.text = "No! No More Puzzle!";
             UpdateGoalDisplay(ui, state.currentGoal);
             if (state.track.showGoalProgress)
                 UpdateGoalProgressDisplay(ui, state.currentGoal);
@@ -346,12 +349,17 @@ public class ProgressionUI : MonoBehaviour
         string trackName = state?.track.displayName ?? "";
 
         if (trackUIMap[trackId].unlockNotificationText != null)
-            trackUIMap[trackId].unlockNotificationText.text = $"{unlockable.displayName} Unlocked!";
+            trackUIMap[trackId].unlockNotificationText.text = $"{unlockable.displayName}{trackUIMap[trackId].unlockTextAdd}";
 
         if (trackUIMap[trackId].unlockNotificationIcon != null && unlockable.icon != null)
             trackUIMap[trackId].unlockNotificationIcon.sprite = unlockable.icon;
 
         trackUIMap[trackId].unlockNotificationPanel.SetActive(true);
+
+        if (trackId == "performance")
+        {
+            StartCoroutine(HideNotificationAfterDelay(trackId));
+        }
     }
 
     public void HideNotification(string trackId)

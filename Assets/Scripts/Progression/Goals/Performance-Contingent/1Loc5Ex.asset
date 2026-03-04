@@ -9,15 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c891d6e7b12dc554185d4e087d8bd48f, type: 3}
-  m_Name: 1Loc4
+  m_Script: {fileID: 11500000, guid: 7269d5fcf7230b04283c4e4b59f2a6c4, type: 3}
+  m_Name: 1Loc5Ex
   m_EditorClassIdentifier: 
-  displayText: Get Signal to the Green Tile
-  rewards:
-  - {fileID: 11400000, guid: bdc6a874a4fe7ba45be765785d916767, type: 2}
+  displayText: Get Signal to the Green Tile From a Different Direction
+  rewards: []
   goalIcon: {fileID: 0}
-  gatingTowerType: -1
-  targetHexCoords: {x: 0, y: 0}
+  gatingTowerType: 2
+  targetHexCoords: {x: -3, y: -3}
+  targetTile: {fileID: 0}
   targetColor:
     serializedVersion: 2
     rgba: 4283740452

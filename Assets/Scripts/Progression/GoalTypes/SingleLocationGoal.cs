@@ -7,9 +7,11 @@ using CubeCoordinates;
 public class SingleLocationGoal : Goal
 {
     public Vector2 targetHexCoords;
-    GroundTile targetTile;
+    public GroundTile targetTile;
 
-    //Coloration
+    public static List<int> stashedDirections = new List<int>(); // Used to store the direction of the pulse that completed the goal, for use in later goals
+
+    //Color
     public Color32 targetColor;
 
     public override void SetupGoal()
@@ -31,6 +33,7 @@ public class SingleLocationGoal : Goal
             {
                 if (!p.source)
                 {
+                    stashedDirections.Add(p.direction);
                     DeconstructGoal();
                     return true;
                 }

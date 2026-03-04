@@ -9,12 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82e476d5886ddef449ceb754763da2d5, type: 3}
-  m_Name: Interact120Towers
+  m_Script: {fileID: 11500000, guid: ad7add29a994d2f4ba26e5f84d75498b, type: 3}
+  m_Name: Nice
   m_EditorClassIdentifier: 
-  displayText: 
-  rewards:
-  - {fileID: 11400000, guid: b605d1ee6ac39004e84304cf85875d58, type: 2}
-  goalIcon: {fileID: 0}
-  gatingTowerType: -1
-  requiredInteractionCount: 120
+  displayName: Nice!
+  description: 
+  icon: {fileID: 0}

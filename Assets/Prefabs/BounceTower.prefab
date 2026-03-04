@@ -421,6 +421,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7044555038288560308}
     m_Modifications:
+    - target: {fileID: 365160883321812119, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 91d139a91e9084b43a18c27e78187c7a, type: 2}
+    - target: {fileID: 365160883321812119, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2634814377310614810, guid: a68bb2fea923de54781b07526865476e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -545,6 +553,14 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: -9099161421716354733}
+    - target: {fileID: 7531988577816471875, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 91d139a91e9084b43a18c27e78187c7a, type: 2}
+    - target: {fileID: 7531988577816471875, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8622037298956320071, guid: a68bb2fea923de54781b07526865476e, type: 3}
       propertyPath: m_Name
       value: TowerUICanvas
@@ -552,6 +568,14 @@ PrefabInstance:
     - target: {fileID: 8622037298956320071, guid: a68bb2fea923de54781b07526865476e, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8839519438540630765, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 91d139a91e9084b43a18c27e78187c7a, type: 2}
+    - target: {fileID: 8839519438540630765, guid: a68bb2fea923de54781b07526865476e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a68bb2fea923de54781b07526865476e, type: 3}

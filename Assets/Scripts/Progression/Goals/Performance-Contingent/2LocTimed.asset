@@ -18,7 +18,7 @@ MonoBehaviour:
   gatingTowerType: -1
   targetHexCoords:
   - {x: 2, y: 3}
-  - {x: -5, y: 2}
+  - {x: -7, y: 2}
   targetColor:
     serializedVersion: 2
     rgba: 4280295619

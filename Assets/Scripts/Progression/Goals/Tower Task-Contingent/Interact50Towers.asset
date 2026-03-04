@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayText: 
   rewards:
-  - {fileID: 11400000, guid: 6eb1403c78866b747be2addd002c81fe, type: 2}
+  - {fileID: 11400000, guid: 809494feed0462846b6b5107b932bed5, type: 2}
   goalIcon: {fileID: 0}
   gatingTowerType: -1
   requiredInteractionCount: 50

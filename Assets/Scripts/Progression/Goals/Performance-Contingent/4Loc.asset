@@ -15,7 +15,7 @@ MonoBehaviour:
   displayText: Get Signal to All of the Purple Tiles
   rewards: []
   goalIcon: {fileID: 0}
-  gatingTowerType: -1
+  gatingTowerType: 0
   targetHexCoords:
   - {x: -5, y: 1}
   - {x: -4, y: 2}

@@ -6,13 +6,23 @@ public class MenuUI : MonoBehaviour
 {
 
     public GameObject menuContents;
+    private bool isMenuOpen = false;
 
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            menuContents.SetActive(true);
+            if (isMenuOpen)
+            {
+                menuContents.SetActive(false);
+                isMenuOpen = false;
+            }
+            else
+            {
+                menuContents.SetActive(true);
+                isMenuOpen = true;
+            }
         }
     }
 

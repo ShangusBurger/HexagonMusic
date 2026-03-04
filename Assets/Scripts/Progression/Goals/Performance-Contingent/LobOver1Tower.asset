@@ -15,7 +15,7 @@ MonoBehaviour:
   displayText: Activate One Tower Underneath a Lobbed Signal
   rewards: []
   goalIcon: {fileID: 0}
-  gatingTowerType: -1
+  gatingTowerType: 4
   requiredHitCount: 1
   requireNonSourcePulse: 1
   excludeEndpoints: 1

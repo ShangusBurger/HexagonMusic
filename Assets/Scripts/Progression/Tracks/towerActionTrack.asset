@@ -31,7 +31,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2354a3ee37b345d4b89b46f31dc7c889, type: 2}
   - {fileID: 11400000, guid: 5e4c838691444eb4ab7bf8ade8587690, type: 2}
   - {fileID: 11400000, guid: 210a81deafcc75b45b4401e9d55d8f7f, type: 2}
-  - {fileID: 11400000, guid: 39d1089b69c006a4ba6597e3a38cfa12, type: 2}
   showGoalProgress: 0
   requiresManualStart: 0
   completionMessage: Track Complete!
