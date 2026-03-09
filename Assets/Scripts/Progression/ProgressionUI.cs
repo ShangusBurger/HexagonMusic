@@ -195,7 +195,12 @@ public class ProgressionUI : MonoBehaviour
         {
             // Track complete
             if (ui.puzzleRequestButton != null)
-                ui.puzzleRequestButton.gameObject.SetActive(false);
+            {
+                ui.puzzleRequestButton.image.color = gatedPuzzleColor;
+                ui.puzzleRequestButton.interactable = false;
+            }
+            if (ui.puzzleButtonText != null)
+                ui.puzzleButtonText.text = "You've done them all!";
             if (ui.goalPanel != null)
                 ui.goalPanel.SetActive(false);
             if (ui.progressPanel != null)

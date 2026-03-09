@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayText: Hit the Pink Hex with 2 Signals at the Same Time
   rewards:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: f42897788701cda4c94eb4e3cc7c193c, type: 2}
   goalIcon: {fileID: 0}
   gatingTowerType: -1
   targetHexCoords: {x: 2, y: -5}

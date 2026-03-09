@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: 3Loc
   m_EditorClassIdentifier: 
   displayText: Get Signal to All of the Purple Tiles
-  rewards: []
+  rewards:
+  - {fileID: 11400000, guid: ec65b1503c74fca4781b1ae5b438793c, type: 2}
   goalIcon: {fileID: 0}
   gatingTowerType: -1
   targetHexCoords:

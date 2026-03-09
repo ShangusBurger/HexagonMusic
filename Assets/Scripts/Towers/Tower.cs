@@ -156,5 +156,6 @@ public enum TowerType
     Sprayer,
     Buffer,
     Switcher,
-    Passer
+    Passer,
+    Mirror
 }

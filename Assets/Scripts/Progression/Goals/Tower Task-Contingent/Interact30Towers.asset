@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82e476d5886ddef449ceb754763da2d5, type: 3}
   m_Name: Interact30Towers
   m_EditorClassIdentifier: 
-  displayText: 
+  displayText: Place, Delete, or Move 30 Towers to Unlock
   rewards:
-  - {fileID: 11400000, guid: 798328925a64f084db06f8112dea1fdd, type: 2}
+  - {fileID: 11400000, guid: 6eb1403c78866b747be2addd002c81fe, type: 2}
   goalIcon: {fileID: 0}
   gatingTowerType: -1
   requiredInteractionCount: 30

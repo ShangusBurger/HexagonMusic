@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ce2b1bffd0a45043bd3191299b937bd, type: 3}
   m_Name: 3xHex2
   m_EditorClassIdentifier: 
-  displayText: Hit the Pink Hex with 2 Signals at the Same Time
+  displayText: Hit the Pink Hex with 3 Signals at the Same Time
   rewards:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: d1e940a32d95dea43aa8debedcd8df6f, type: 2}
   goalIcon: {fileID: 0}
   gatingTowerType: -1
   targetHexCoords: {x: -2, y: -4}
-  targetNumber: 2
+  targetNumber: 3
   targetColor:
     serializedVersion: 2
     rgba: 4294651903

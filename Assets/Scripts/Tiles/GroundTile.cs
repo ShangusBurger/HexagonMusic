@@ -351,6 +351,9 @@ public class GroundTile : MonoBehaviour
             case TowerType.Passer:
                 tower = Instantiate(TileMapConstructor.Instance.passerTowerPrefab, transform).GetComponent<Tower>();
                 break;
+            case TowerType.Mirror:
+                tower = Instantiate(TileMapConstructor.Instance.mirrorTowerPrefab, transform).GetComponent<Tower>();
+                break;
         }
 
         tower.tile = this;

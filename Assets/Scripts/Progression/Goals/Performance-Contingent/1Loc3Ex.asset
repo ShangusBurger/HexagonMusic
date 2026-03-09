@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: 1Loc3Ex
   m_EditorClassIdentifier: 
   displayText: Get Signal to the Green Tile From a Different Direction
-  rewards: []
+  rewards:
+  - {fileID: 11400000, guid: a09572416f162884e9b8efe288d22c79, type: 2}
   goalIcon: {fileID: 0}
   gatingTowerType: -1
   targetHexCoords: {x: -3, y: -3}

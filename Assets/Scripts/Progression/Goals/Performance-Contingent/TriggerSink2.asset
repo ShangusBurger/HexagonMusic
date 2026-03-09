@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: TriggerSink2
   m_EditorClassIdentifier: 
   displayText: Hit One Sinker Tower with 2 Signals at the Same Time
-  rewards: []
+  rewards:
+  - {fileID: 11400000, guid: 305c6aac5c192f249842df03a0cd936c, type: 2}
   goalIcon: {fileID: 0}
   gatingTowerType: -1
   targetTowerType: 3

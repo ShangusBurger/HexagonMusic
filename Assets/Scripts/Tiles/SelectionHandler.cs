@@ -114,6 +114,7 @@ public class SelectionHandler : MonoBehaviour
             case MouseState.DraggingTower:
                 HandleMouseHover();
                 UpdateGhostToHoveredTile();
+                UpdateDragInfoLowlight();
                 HandleDragUpdate();
                 break;
         }
@@ -417,21 +418,31 @@ public class SelectionHandler : MonoBehaviour
     /// </summary>
     void ShowTowerStateIndicator(GroundTile tile)
     {
+        ShowTowerStateIndicatorAt(tile, tile);
+    }
+
+    /// <summary>
+    /// Draws the info-lowlight for the given tower as if it were sitting
+    /// on <paramref name="centerTile"/>. Used during drag to keep the
+    /// indicator following the ghost.
+    /// </summary>
+    void ShowTowerStateIndicatorAt(GroundTile towerTile, GroundTile centerTile)
+    {
         ClearInfoLowlight();
 
-        if (tile == null || tile.tower == null) return;
+        if (towerTile == null || towerTile.tower == null || centerTile == null) return;
 
-        if (tile.tower is MonoTower && tile.tower.directions.Count > 0)
+        if (towerTile.tower is MonoTower && towerTile.tower.directions.Count > 0)
         {
-            int dir = tile.tower.directions[0];
-            Coordinate targetCoord = GetFurthestCoordinateInDirection(tile.tileCoordinate, dir);
+            int dir = towerTile.tower.directions[0];
+            Coordinate targetCoord = GetFurthestCoordinateInDirection(centerTile.tileCoordinate, dir);
             if (targetCoord != null)
             {
-                List<Coordinate> line = Coordinates.Instance.GetLine(tile.tileCoordinate, targetCoord);
+                List<Coordinate> line = Coordinates.Instance.GetLine(centerTile.tileCoordinate, targetCoord);
                 foreach (Coordinate coord in line)
                 {
                     GroundTile coordTile = coord.go.GetComponent<GroundTile>();
-                    if (coordTile != null && coordTile != tile)
+                    if (coordTile != null && coordTile != centerTile)
                     {
                         infoLowlightedTiles.Add(coordTile);
                         coordTile.InfoLowlight();
@@ -439,39 +450,50 @@ public class SelectionHandler : MonoBehaviour
                 }
             }
         }
-        else if (tile.tower is LobberTower lobber && lobber.lobDistance > 0)
+        else if (towerTile.tower is LobberTower lobber && lobber.lobDistance > 0)
         {
-            List<Coordinate> ringTiles = GetLobRingAtDistance(lobber.lobDistance, tile);
+            List<Coordinate> ringTiles = GetLobRingAtDistance(lobber.lobDistance, centerTile);
             foreach (Coordinate coord in ringTiles)
             {
                 GroundTile ringTile = coord.go.GetComponent<GroundTile>();
-                if (ringTile != null && ringTile != tile)
+                if (ringTile != null && ringTile != centerTile)
                 {
                     infoLowlightedTiles.Add(ringTile);
                     ringTile.InfoLowlight();
                 }
             }
         }
-        else if (tile.tower is SourceTower)
+    }
+
+    private GroundTile lastDragInfoTile = null;
+
+    /// <summary>
+    /// Called each frame during DraggingTower state. Redraws the tower's
+    /// info-lowlight (direction line / lob ring) centered on whichever
+    /// hex tile the ghost is currently hovering over.
+    /// </summary>
+    void UpdateDragInfoLowlight()
+    {
+        if (dragSourceTile == null || dragSourceTile.tower == null)
         {
-            List<int> dirs = new List<int>(){0, 3};
-            foreach (int dir in dirs)
-            {
-                Coordinate targetCoord = GetFurthestCoordinateInDirection(tile.tileCoordinate, dir);
-                if (targetCoord != null)
-                {
-                    List<Coordinate> line = Coordinates.Instance.GetLine(tile.tileCoordinate, targetCoord);
-                    foreach (Coordinate coord in line)
-                    {
-                        GroundTile coordTile = coord.go.GetComponent<GroundTile>();
-                        if (coordTile != null && coordTile != tile)
-                        {
-                            infoLowlightedTiles.Add(coordTile);
-                            coordTile.InfoLowlight();
-                        }
-                    }
-                }
-            }
+            ClearInfoLowlight();
+            lastDragInfoTile = null;
+            return;
+        }
+
+        GroundTile hoveredTile = IsPointerOverUI() ? null : currentHoveredTile;
+
+        // Only recalculate when the hovered tile actually changes
+        if (hoveredTile == lastDragInfoTile) return;
+        lastDragInfoTile = hoveredTile;
+
+        if (hoveredTile != null)
+        {
+            ShowTowerStateIndicatorAt(dragSourceTile, hoveredTile);
+        }
+        else
+        {
+            ClearInfoLowlight();
         }
     }
 
@@ -539,6 +561,9 @@ public class SelectionHandler : MonoBehaviour
                 currentSelectedTile = dragSourceTile;
                 currentSelectedTile.Select();
                 HideAllTowerUI?.Invoke();
+
+                ClearInfoLowlight();
+                lastDragInfoTile = null;
 
                 CreateGhostFromExistingTower(dragSourceTile.tower);
                 HideDragSourceVisual(dragSourceTile);
@@ -608,6 +633,8 @@ public class SelectionHandler : MonoBehaviour
                 RestoreDragSourceVisual();
             }
 
+            ClearInfoLowlight();
+            lastDragInfoTile = null;
             DestroyGhost();
             DeselectCurrent();
             dragSourceTile = null;
@@ -815,6 +842,11 @@ public class SelectionHandler : MonoBehaviour
 
     void HandleMonoTowerClick()
     {
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            CancelSecondaryPlacement();
+            return;
+        }
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             Vector3 mousePos = Mouse.current.position.ReadValue();
@@ -901,6 +933,11 @@ public class SelectionHandler : MonoBehaviour
 
     void HandleLobberTowerClick()
     {
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            CancelSecondaryPlacement();
+            return;
+        }
         if (Mouse.current.leftButton.wasPressedThisFrame && !IsPointerOverUI())
         {
             if (currentSelectedTile != null && currentSelectedTile.tower != null && lowlightedTiles.Count > 0)
@@ -913,8 +950,7 @@ public class SelectionHandler : MonoBehaviour
                     lobberTower.lobDistance = distance;
                 }
 
-                foreach (GroundTile tile in lowlightedTiles)
-                    tile.Deselect();
+                SelectionUtility.DeselectListOfTiles(lowlightedTiles);
                 lowlightedTiles.Clear();
 
                 if (currentHoveredTile != null) { currentHoveredTile.Deselect(); currentHoveredTile = null; }
@@ -924,6 +960,38 @@ public class SelectionHandler : MonoBehaviour
                 SetGhostVisible(true);
             }
         }
+    }
+
+        
+    /// <summary>
+    /// Cancels an in-progress direction/distance selection by deleting
+    /// the just-placed tower and returning to PlaceTower state.
+    /// </summary>
+    void CancelSecondaryPlacement()
+    {
+        // Destroy the tower that was just placed
+        if (currentSelectedTile != null && currentSelectedTile.tower != null)
+        {
+            currentSelectedTile.tower.DestroySelf();
+        }
+
+        // Clean up all visual state
+        SelectionUtility.DeselectListOfTiles(lowlightedTiles);
+        lowlightedTiles.Clear();
+        ClearInfoLowlight();
+
+        if (currentHoveredTile != null)
+        {
+            currentHoveredTile.Deselect();
+            currentHoveredTile = null;
+        }
+
+        DeselectCurrent();
+        HideAllTowerUI?.Invoke();
+
+        // Return to placement mode with ghost visible
+        currentMouseState = MouseState.PlaceTower;
+        SetGhostVisible(true);
     }
 
     // ══════════════════════════════════════════════════════════════════
