@@ -40,7 +40,6 @@ public class GroundTile : MonoBehaviour
 
     // ── Handling Updates ──────────────────────────────────────────────
     private bool triggerBeatNextUpdate = false;
-    public static event Action<Coordinate> OnTowerUpdated;
     public double visualDelay = 0.0;
     public static event Action OnTowerChangeMade;
 

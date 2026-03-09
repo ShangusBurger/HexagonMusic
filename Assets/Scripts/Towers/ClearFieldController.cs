@@ -6,7 +6,13 @@ using CubeCoordinates;
 
 public class ClearFieldController : MonoBehaviour
 {    
+    public static ClearFieldController Instance;
     public static event Action OnClearField;
+        
+    void Awake()
+    {
+        Instance = this;
+    }
     
     public void ClearAllTowers()
     {

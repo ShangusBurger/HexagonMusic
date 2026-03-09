@@ -59,7 +59,7 @@ public class PlayButtonController : MonoBehaviour
         }
         pulseFoundThisBeat = false;
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !InputFocusGuard.IsInputFieldFocused())
         {
             if (isPlaying)
             {

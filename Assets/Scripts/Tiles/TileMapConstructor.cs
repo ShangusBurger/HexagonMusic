@@ -36,6 +36,7 @@ public class TileMapConstructor : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+
         Instance = this;
         allTiles = ConstructGrid();
         
@@ -44,6 +45,8 @@ public class TileMapConstructor : MonoBehaviour
             GroundTile centerTile = Coordinates.Instance.GetContainer().GetCoordinate(Vector3.zero).go.GetComponent<GroundTile>();
             centerTile.AddTowerToTile(TowerType.Source);
         }
+
+        SaveManager.Instance.LoadProgress();
     }
 
     // Update is called once per frame

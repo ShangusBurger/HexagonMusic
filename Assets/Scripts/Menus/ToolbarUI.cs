@@ -111,6 +111,8 @@ public class ToolbarUI : MonoBehaviour
 
     void Update()
     {
+        if (InputFocusGuard.IsInputFieldFocused()) return;
+
         foreach (var slot in slots)
         {
             if (slot.hotkey != KeyCode.None && Input.GetKeyDown(slot.hotkey))

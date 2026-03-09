@@ -73,9 +73,12 @@ public class ProgressHandler : MonoBehaviour
         }
 
         // Debug: Skip goals with P key (track 0) and O key (track 1)
-        if (Input.GetKeyDown(KeyCode.L))SkipCurrentGoal(0);
-        if (Input.GetKeyDown(KeyCode.O)) SkipCurrentGoal(1);
-        if (Input.GetKeyDown(KeyCode.P)) SkipCurrentGoal(2);
+        if (!InputFocusGuard.IsInputFieldFocused())
+        {
+            if (Input.GetKeyDown(KeyCode.L)) SkipCurrentGoal(0);
+            if (Input.GetKeyDown(KeyCode.O)) SkipCurrentGoal(1);
+            if (Input.GetKeyDown(KeyCode.P)) SkipCurrentGoal(2);
+        }
     }
 
     void SetCurrentGoal(TrackProgressState state, Goal goal)
@@ -231,7 +234,6 @@ public class ProgressHandler : MonoBehaviour
     }
 
     // NEW event for puzzle-specific flow
-    public static event Action<string> OnPuzzleRequested;  // trackId
     public static event Action<string> OnPuzzleCompleted;  // trackId
 
     void CacheNextUnlock(TrackProgressState state)
@@ -308,6 +310,52 @@ public class ProgressHandler : MonoBehaviour
         state.lastUnlockGoalIndex = -1;
         state.cachedNextUnlock = null;
         CacheNextUnlock(state);
+        OnTrackProgressChanged?.Invoke(trackId);
+        OnAnyProgressChanged?.Invoke();
+    }
+
+        
+    /// <summary>
+    /// Sets a track's current level directly from save data.
+    /// Grants all rewards for goals up to (but not including) the given level,
+    /// then sets up the current goal at that level.
+    /// Called by SaveManager during progress load.
+    /// </summary>
+    public void SetTrackLevel(string trackId, int level)
+    {
+        var state = GetTrackState(trackId);
+        if (state == null)
+        {
+            Debug.LogWarning($"[ProgressHandler] Unknown track '{trackId}' in save data.");
+            return;
+        }
+
+        // Tear down any active goal
+        if (state.currentGoal != null)
+            state.currentGoal.DeconstructGoal();
+
+        // Silently grant rewards for all completed goals without firing events
+        for (int i = 0; i < level && i < state.track.goals.Count; i++)
+        {
+            Goal goal = state.track.goals[i];
+            if (goal.HasRewards())
+                goal.GrantRewards();
+        }
+
+        // Set the level
+        state.currentLevel = Mathf.Min(level, state.track.goals.Count);
+        state.currentGoal = null;
+        state.lastUnlockGoalIndex = level > 0 ? level - 1 : -1;
+
+        CacheNextUnlock(state);
+
+        // Start the current goal if the track auto-starts
+        if (!state.track.requiresManualStart
+            && state.currentLevel < state.track.goals.Count)
+        {
+            SetCurrentGoal(state, state.track.goals[state.currentLevel]);
+        }
+
         OnTrackProgressChanged?.Invoke(trackId);
         OnAnyProgressChanged?.Invoke();
     }

@@ -57,4 +57,16 @@ public class PlayerStats : MonoBehaviour
         TotalSoundChanges = 0;
         OnStatsChanged?.Invoke();
     }
+
+    
+    /// <summary>
+    /// Restores stats from a save file without triggering reset.
+    /// Called by SaveManager during progress load.
+    /// </summary>
+    public void SetStats(int towerInteractions, int soundChanges)
+    {
+        TotalTowerInteractions = towerInteractions;
+        TotalSoundChanges = soundChanges;
+        OnStatsChanged?.Invoke();
+    }
 }
