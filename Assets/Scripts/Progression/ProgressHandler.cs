@@ -75,9 +75,15 @@ public class ProgressHandler : MonoBehaviour
         // Debug: Skip goals with P key (track 0) and O key (track 1)
         if (!InputFocusGuard.IsInputFieldFocused())
         {
-            if (Input.GetKeyDown(KeyCode.L)) SkipCurrentGoal(0);
-            if (Input.GetKeyDown(KeyCode.O)) SkipCurrentGoal(1);
-            if (Input.GetKeyDown(KeyCode.P)) SkipCurrentGoal(2);
+            
+            if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+              && Input.GetKeyDown(KeyCode.L)) SkipCurrentGoal(0);
+            
+            if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+              && Input.GetKeyDown(KeyCode.O)) SkipCurrentGoal(1);
+
+            if ((Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+              && Input.GetKeyDown(KeyCode.P)) SkipCurrentGoal(2);
         }
     }
 
