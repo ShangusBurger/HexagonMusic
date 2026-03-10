@@ -6,6 +6,12 @@ public class Tower : MonoBehaviour
 {
     public static List<Tower> allTowers;
 
+    /// <summary>
+    /// When true, InteractionMade() does nothing. Set by SaveManager
+    /// during map loading so placed towers don't inflate stats.
+    /// </summary>
+    public static bool SuppressInteractions = false;
+
     //tempo-related
     public double goalTime;
 
@@ -142,6 +148,7 @@ public class Tower : MonoBehaviour
     //Called when a tower is manually placed or deleted, for tracking interaction goal
     public static void InteractionMade()
     {
+        if (SuppressInteractions) return;
         OnInteractionMade?.Invoke();
     }
 }

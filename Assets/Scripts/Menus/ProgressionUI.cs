@@ -38,12 +38,17 @@ public class ProgressionUI : MonoBehaviour
 
         [Header("Unlock Elements")]
         public string unlockTextAdd; // Text to add after the unlockable name in notifications (e.g. "Unlocked!" or "Track Completed!")
+
+        [Header("Tutorial (optional)")]
+        public Button learnMoreButton;  
     }
 
     [Header("Track UI Elements")]
     [SerializeField] private List<TrackUIElements> trackUIs = new List<TrackUIElements>();
 
     private Dictionary<string, TrackUIElements> trackUIMap = new Dictionary<string, TrackUIElements>();
+    
+    
 
     [Header("UI Colors")]
     public Color requestPuzzleColor;
@@ -354,10 +359,36 @@ public class ProgressionUI : MonoBehaviour
         string trackName = state?.track.displayName ?? "";
 
         if (trackUIMap[trackId].unlockNotificationText != null)
-            trackUIMap[trackId].unlockNotificationText.text = $"{unlockable.displayName}{trackUIMap[trackId].unlockTextAdd}";
+            trackUIMap[trackId].unlockNotificationText.text =
+                $"{unlockable.displayName}{trackUIMap[trackId].unlockTextAdd}";
 
         if (trackUIMap[trackId].unlockNotificationIcon != null && unlockable.icon != null)
             trackUIMap[trackId].unlockNotificationIcon.sprite = unlockable.icon;
+
+        // ── Show/hide "Learn More" button based on whether a tutorial exists ──
+        Button learnBtn = trackUIMap[trackId].learnMoreButton;
+        if (learnBtn != null)
+        {
+            // Check if this unlock has an associated tutorial
+            bool hasTutorial = false;
+            if (unlockable is TowerUnlockable tu && TutorialManager.Instance != null)
+                hasTutorial = TutorialManager.Instance.HasTowerTutorial(tu.towerType);
+
+            learnBtn.gameObject.SetActive(hasTutorial);
+
+            if (hasTutorial && unlockable is TowerUnlockable tuCapture)
+            {
+                learnBtn.onClick.RemoveAllListeners();
+                TowerType capturedType = tuCapture.towerType;
+                string capturedTrackId = trackId;
+                learnBtn.onClick.AddListener(() =>
+                {
+                    // Hide the notification, show the tutorial
+                    HideNotification(capturedTrackId);
+                    TutorialManager.Instance.ShowTowerTutorial(capturedType);
+                });
+            }
+        }
 
         trackUIMap[trackId].unlockNotificationPanel.SetActive(true);
 

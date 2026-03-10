@@ -522,6 +522,8 @@ public class SelectionHandler : MonoBehaviour
             GroundTile tile = RaycastToTile();
             if (tile != null && tile.tower != null && tile.tower.ownType != TowerType.Source)
             {
+                if (UndoManager.Instance != null)
+                    UndoManager.Instance.RecordDelete(tile);
                 tile.tower.DestroySelf();
                 ClearInfoLowlight();
                 DeselectCurrent();
@@ -647,6 +649,9 @@ public class SelectionHandler : MonoBehaviour
     {
         if (from.tower == null) return;
 
+        if (UndoManager.Instance != null)
+            UndoManager.Instance.RecordMove(from, to);
+
         // ── Cache ALL state ──
         string sampleName = GetSampleNameFromClip(from.tower.playbackClip);
         TowerType type = from.tower.ownType;
@@ -730,12 +735,21 @@ public class SelectionHandler : MonoBehaviour
             pendingLobDistance = -1;
             SetGhostVisible(false);
         }
+        else
+        {
+            // Non-directional tower — fully placed, record now
+            if (UndoManager.Instance != null)
+                UndoManager.Instance.RecordPlace(tile);
+        }
     }
 
     void ReplaceTowerOnTile(GroundTile tile, TowerType newType)
     {
         // Save sample name from existing tower (before destroying it)
         string savedSampleName = GetSampleNameFromClip(tile.tower.playbackClip);
+
+        if (UndoManager.Instance != null)
+            UndoManager.Instance.StorePendingReplace(tile);
 
         // Remove old tower
         ClearFieldController.OnClearField -= tile.tower.DestroySelf;
@@ -765,6 +779,12 @@ public class SelectionHandler : MonoBehaviour
             currentMouseState = MouseState.SetLobberDistance;
             pendingLobDistance = -1;
             SetGhostVisible(false);
+        }
+        else
+        {
+            // Non-directional replacement — fully placed, record now
+            if (UndoManager.Instance != null)
+                UndoManager.Instance.RecordPlace(tile);
         }
     }
 
@@ -865,6 +885,9 @@ public class SelectionHandler : MonoBehaviour
                         direction = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, collidedTile.tileCoordinate);
 
                     currentSelectedTile.tower.SetDirection(direction);
+
+                    if (UndoManager.Instance != null)
+                        UndoManager.Instance.RecordPlace(currentSelectedTile);
                 }
 
                 SelectionUtility.DeselectListOfTiles(lowlightedTiles);
@@ -948,6 +971,9 @@ public class SelectionHandler : MonoBehaviour
                     GroundTile anyRingTile = lowlightedTiles[0];
                     int distance = (int)Cubes.GetDistanceBetweenTwoCubes(currentSelectedTile.tileCoordinate.cube, anyRingTile.tileCoordinate.cube);
                     lobberTower.lobDistance = distance;
+
+                    if (UndoManager.Instance != null)
+                        UndoManager.Instance.RecordPlace(currentSelectedTile);
                 }
 
                 SelectionUtility.DeselectListOfTiles(lowlightedTiles);
@@ -969,6 +995,8 @@ public class SelectionHandler : MonoBehaviour
     /// </summary>
     void CancelSecondaryPlacement()
     {
+        if (UndoManager.Instance != null)
+            UndoManager.Instance.ClearPendingReplace();
         // Destroy the tower that was just placed
         if (currentSelectedTile != null && currentSelectedTile.tower != null)
         {
@@ -992,6 +1020,11 @@ public class SelectionHandler : MonoBehaviour
         // Return to placement mode with ghost visible
         currentMouseState = MouseState.PlaceTower;
         SetGhostVisible(true);
+
+        if (currentSelectedTile?.tower != null && UndoManager.Instance != null)
+        {
+            UndoManager.Instance.RecordPlace(currentSelectedTile);
+        }
     }
 
     // ══════════════════════════════════════════════════════════════════

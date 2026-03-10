@@ -5,27 +5,34 @@ using UnityEngine.UI;
 using CubeCoordinates;
 
 public class ClearFieldController : MonoBehaviour
-{    
+{
     public static ClearFieldController Instance;
     public static event Action OnClearField;
-        
+
     void Awake()
     {
         Instance = this;
     }
-    
+
     public void ClearAllTowers()
     {
-        // Invoke event for any listeners
+        // Suppress interaction counting — destroying towers calls
+        // InteractionMade() and should not inflate player stats
+        Tower.SuppressInteractions = true;
+
+        // Clear undo history since the entire field is being wiped
+        if (UndoManager.Instance != null)
+            UndoManager.Instance.ClearHistory();
+
         OnClearField?.Invoke();
-        
-        // Hide any open UI
+
         SelectionHandler.HideTowerUIs();
         SelectionHandler.DeselectCurrent();
         SelectionHandler.currentMouseState = MouseState.HandTool;
 
-        // Also reset toolbar to hand tool
         if (ToolbarUI.Instance != null)
             ToolbarUI.Instance.SelectHandTool();
+
+        Tower.SuppressInteractions = false;
     }
 }

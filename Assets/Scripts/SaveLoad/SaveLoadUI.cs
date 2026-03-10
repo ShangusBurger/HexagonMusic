@@ -11,10 +11,12 @@ public class SaveLoadUI : MonoBehaviour
 {
     [Header("Pause Menu")]
     [SerializeField] private GameObject pauseMenuPanel;       // The pause menu root panel (menuContents)
+    [SerializeField] private MenuUI menuUI;                   // Reference to MenuUI for full menu dismiss
     [SerializeField] private Button saveProgressButton;
     [SerializeField] private Button saveMapButton;
     [SerializeField] private Button loadMapButton;
     [SerializeField] private Button resetProgressButton;
+    [SerializeField] private Toggle fullscreenToggle;
 
     [Header("Map Save Panel")]
     [SerializeField] private GameObject mapSavePanel;
@@ -54,6 +56,12 @@ public class SaveLoadUI : MonoBehaviour
 
         if (resetProgressButton != null)
             resetProgressButton.onClick.AddListener(OnResetProgressClicked);
+
+        if (fullscreenToggle != null)
+        {
+            fullscreenToggle.isOn = Screen.fullScreen;
+            fullscreenToggle.onValueChanged.AddListener(OnFullscreenToggled);
+        }
 
         // ── Map Save ──
         if (saveMapButton != null)
@@ -110,6 +118,14 @@ public class SaveLoadUI : MonoBehaviour
                 ShowFeedback("All progress has been reset.");
             }
         );
+    }
+
+    void OnFullscreenToggled(bool isFullscreen)
+    {
+        if (isFullscreen)
+            Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
+        else
+            Screen.fullScreenMode = FullScreenMode.Windowed;
     }
 
     // ══════════════════════════════════════════════════════════════════
@@ -265,10 +281,35 @@ public class SaveLoadUI : MonoBehaviour
     {
         if (SaveManager.Instance == null) return;
 
-        bool success = SaveManager.Instance.LoadMapFromFile(mapName);
+        string encoded = SaveManager.Instance.ReadMapFileRaw(mapName);
+        if (string.IsNullOrEmpty(encoded))
+        {
+            ShowFeedback($"Failed to read '{mapName}'.");
+            return;
+        }
+
+        // Check for locked content
+        string warning = SaveManager.Instance.CheckMapForLockedContent(encoded);
+        if (warning != null)
+        {
+            ShowConfirmation(warning, () => ExecuteLoadMap(mapName, encoded));
+        }
+        else
+        {
+            ExecuteLoadMap(mapName, encoded);
+        }
+    }
+
+    void ExecuteLoadMap(string mapName, string encoded)
+    {
+        bool success = SaveManager.Instance.LoadMap(encoded);
         ShowFeedback(success ? $"Loaded '{mapName}'!" : $"Failed to load '{mapName}'.");
 
-        CloseSubPanel(mapLoadPanel);
+        // Dismiss everything — ResumeGame closes sub-panels + hides the menu
+        if (menuUI != null)
+            menuUI.ResumeGame();
+        else
+            CloseSubPanel(mapLoadPanel);
     }
 
     void OnDeleteSavedMap(string mapName)

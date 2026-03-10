@@ -68,8 +68,11 @@ public class EdgeCameraScroller : MonoBehaviour
             moveDirection.y = normalizedDistance;
         }
 
-        moveDirection.x += Input.GetAxisRaw("Horizontal") * 2f;
-        moveDirection.y += Input.GetAxisRaw("Vertical") * 2f;
+        if (!InputFocusGuard.IsInputFieldFocused())
+        {
+            moveDirection.x += Input.GetAxisRaw("Horizontal") * 2f;
+            moveDirection.y += Input.GetAxisRaw("Vertical") * 2f;
+        }
         
         // Apply movement to target position
         Vector3 movement = new Vector3(moveDirection.x, 0, moveDirection.y) * moveSpeed * Time.deltaTime;

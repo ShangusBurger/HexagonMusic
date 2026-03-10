@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f38a5a0f4d60a274a9cedae76614b188, type: 3}
+  m_Name: IntroBouncer
+  m_EditorClassIdentifier: 
+  tutorialText: 'When you have a Tower selected
+
+
+    Left Click to: Place the tower,
+    select the tower''s direction.
+
+
+    The Bouncer Tower will redirect signal in
+    the direction you set'
+  videoClip: {fileID: 32900000, guid: 4722135e185bce74684c239ddbc3cdd3, type: 3}
+  associatedTower: -1
+  associatedSample: 

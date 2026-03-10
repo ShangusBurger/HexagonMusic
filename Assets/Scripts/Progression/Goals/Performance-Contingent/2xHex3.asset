@@ -17,7 +17,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2ab80d99bf04ace44acc9ffcd39add04, type: 2}
   goalIcon: {fileID: 0}
   gatingTowerType: -1
-  targetHexCoords: {x: -2, y: -4}
+  targetHexCoords: {x: 5, y: -4}
   targetNumber: 2
   targetColor:
     serializedVersion: 2

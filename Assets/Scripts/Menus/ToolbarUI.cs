@@ -99,7 +99,7 @@ public class ToolbarUI : MonoBehaviour
         ProgressHandler.OnAnyProgressChanged += RefreshAllSlots;
 
         RefreshAllSlots();
-        SelectHandTool();
+        SelectTowerTool(TowerType.Mono);
     }
 
     void OnDestroy()

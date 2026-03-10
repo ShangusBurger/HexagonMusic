@@ -6,6 +6,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Audio;
 using CubeCoordinates;
+using UnityEngine.UI;
 
 /// <summary>
 /// Central save/load manager for HexMusic.
@@ -300,12 +301,80 @@ public class SaveManager : MonoBehaviour
             return false;
         }
 
+        // Suppress interaction counting for the clear + rebuild
+        Tower.SuppressInteractions = true;
+
+        // Clear undo history since the map state is being replaced
+        if (UndoManager.Instance != null)
+            UndoManager.Instance.ClearHistory();
+
         // Clear existing towers
         ClearFieldController.Instance?.ClearAllTowers();
 
         // Rebuild towers after a frame so the clear has time to process
-        StartCoroutine(RebuildTowersNextFrame(towers));
+        StartCoroutine(RebuildTowersNextFrame(towers, lastDecodedBpm));
         return true;
+    }
+
+    /// <summary>
+    /// Checks an encoded map string for towers or samples that the player
+    /// hasn't unlocked yet. Returns a human-readable warning message,
+    /// or null if everything is unlocked.
+    /// </summary>
+    public string CheckMapForLockedContent(string encodedMap)
+    {
+        if (string.IsNullOrEmpty(encodedMap) || UnlockManager.Instance == null)
+            return null;
+
+        List<TowerSaveEntry> towers = DecodeMap(encodedMap);
+        if (towers == null) return null;
+
+        var lockedTowers = new HashSet<string>();
+        var lockedSamples = new HashSet<string>();
+
+        foreach (var entry in towers)
+        {
+            // Check tower type
+            TowerType type = (TowerType)entry.towerType;
+            if (!UnlockManager.Instance.IsTowerUnlocked(type))
+                lockedTowers.Add(type.ToString());
+
+            // Check sample
+            if (!string.IsNullOrEmpty(entry.sampleName)
+                && !UnlockManager.Instance.IsSampleUnlocked(entry.sampleName))
+                lockedSamples.Add(entry.sampleName);
+        }
+
+        if (lockedTowers.Count == 0 && lockedSamples.Count == 0)
+            return null;
+
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("This map contains content you haven't unlocked yet:");
+        sb.AppendLine();
+
+        if (lockedTowers.Count > 0)
+            sb.AppendLine("Towers: " + string.Join(", ", lockedTowers));
+
+        if (lockedSamples.Count > 0)
+            sb.AppendLine("Sounds: " + string.Join(", ", lockedSamples));
+
+        sb.AppendLine();
+        sb.Append("Load anyway?");
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Reads the raw encoded string for a locally saved map file.
+    /// Returns null if the file doesn't exist.
+    /// </summary>
+    public string ReadMapFileRaw(string mapName)
+    {
+        string path = Path.Combine(MapFolderPath, mapName + ".hexmap");
+        if (!File.Exists(path)) return null;
+
+        try { return File.ReadAllText(path); }
+        catch { return null; }
     }
 
     /// <summary>
@@ -375,6 +444,10 @@ public class SaveManager : MonoBehaviour
         if (PlayerStats.Instance != null)
             PlayerStats.Instance.ResetStats();
 
+        // Reset tutorial seen state so intro tutorials replay
+        if (TutorialManager.Instance != null)
+            TutorialManager.Instance.ResetSeenTutorials();
+
         // Delete the save file so it doesn't reload on next launch
         DeleteProgressSave();
 
@@ -399,9 +472,10 @@ public class SaveManager : MonoBehaviour
     // ══════════════════════════════════════════════════════════════════
     //
     //  Format (before Base64):
-    //    <mapName>|<samplePalette>|<towerEntry>;<towerEntry>;...
+    //    <mapName>|<bpm>|<samplePalette>|<towerEntry>;<towerEntry>;...
     //
     //  mapName       = user-provided name for the composition
+    //  bpm           = tempo as a double
     //  samplePalette = comma-separated sample names used in the map
     //  towerEntry    = q,r,T,S,D,L,B,M
     //    q,r   = cube coords (s is implicit: s = -q - r)
@@ -422,9 +496,13 @@ public class SaveManager : MonoBehaviour
         sb.Append(mapName);
         sb.Append('|');
 
+        // Section 2: tempo
+        sb.Append(TempoHandler.bpm.ToString("F2", System.Globalization.CultureInfo.InvariantCulture));
+        sb.Append('|');
+
         if (Tower.allTowers == null || Tower.allTowers.Count == 0)
         {
-            // Empty map: just name + empty palette + no towers
+            // Empty map: name + bpm + empty palette + no towers
             sb.Append('|');
             string emptyB64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(sb.ToString()));
             return MAP_HEADER + emptyB64;
@@ -470,11 +548,11 @@ public class SaveManager : MonoBehaviour
             entries.Add(entry);
         }
 
-        // Section 2: sample palette
+        // Section 3: sample palette
         sb.Append(string.Join(",", palette));
         sb.Append('|');
 
-        // Section 3: tower entries
+        // Section 4: tower entries
         for (int i = 0; i < entries.Count; i++)
         {
             var e = entries[i];
@@ -519,8 +597,13 @@ public class SaveManager : MonoBehaviour
         return string.IsNullOrEmpty(name) ? "Untitled" : name;
     }
 
+    // ── Last decoded BPM (set by DecodeMap, read by LoadMap) ─────────
+    private double lastDecodedBpm = -1;
+
     private List<TowerSaveEntry> DecodeMap(string encoded)
     {
+        lastDecodedBpm = -1;
+
         if (!encoded.StartsWith(MAP_HEADER))
         {
             Debug.LogWarning("[SaveManager] Invalid map header.");
@@ -539,24 +622,26 @@ public class SaveManager : MonoBehaviour
             return null;
         }
 
-        // Split into 3 sections: name | palette | towers
-        string[] sections = raw.Split(new char[] { '|' }, 3);
-        if (sections.Length < 3)
+        // Split into 4 sections: name | bpm | palette | towers
+        string[] sections = raw.Split(new char[] { '|' }, 4);
+        if (sections.Length < 4)
         {
-            Debug.LogWarning("[SaveManager] Invalid map format (expected name|palette|towers).");
+            Debug.LogWarning("[SaveManager] Invalid map format (expected name|bpm|palette|towers).");
             return null;
         }
 
-        // sections[0] = map name (not needed for tower rebuild)
+        if (double.TryParse(sections[1], System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture, out double parsedBpm))
+            lastDecodedBpm = parsedBpm;
 
+        string paletteStr = sections[2];
+        string towersStr = sections[3];
         // Parse palette
-        string paletteStr = sections[1];
         string[] palette = paletteStr.Length > 0
             ? paletteStr.Split(',')
             : new string[0];
 
         // Parse tower entries
-        string towersStr = sections[2];
         if (string.IsNullOrEmpty(towersStr))
             return new List<TowerSaveEntry>();
 
@@ -607,15 +692,28 @@ public class SaveManager : MonoBehaviour
     //  TOWER REBUILDING
     // ══════════════════════════════════════════════════════════════════
 
-    private IEnumerator RebuildTowersNextFrame(List<TowerSaveEntry> towers)
+    private IEnumerator RebuildTowersNextFrame(List<TowerSaveEntry> towers, double bpm)
     {
+        // Suppress interaction counting for the entire rebuild
+        Tower.SuppressInteractions = true;
+
         // Wait one frame for ClearField to finish
         yield return null;
+
+        // Apply tempo if it was saved
+        if (bpm > 0)
+        {
+            TempoHandler.ChangeBPM(bpm);
+
+            // Update the Source tower's tempo slider UI to match
+            StartCoroutine(ApplyDeferredTempoSlider(bpm));
+        }
 
         Container allTiles = TileMapConstructor.allTiles;
         if (allTiles == null)
         {
             Debug.LogError("[SaveManager] TileMapConstructor.allTiles is null — cannot rebuild map.");
+            Tower.SuppressInteractions = false;
             yield break;
         }
 
@@ -672,7 +770,12 @@ public class SaveManager : MonoBehaviour
             }
         }
 
+        // Wait one more frame so all towers' Start() methods
+        // (which call InteractionMade) run while suppression is still active
+        yield return null;
+
         Debug.Log($"[SaveManager] Rebuilt {towers.Count} towers from map data.");
+        Tower.SuppressInteractions = false;
         OnMapLoaded?.Invoke();
     }
 
@@ -707,6 +810,32 @@ public class SaveManager : MonoBehaviour
         if (tower != null && tower.isMuted && tower.towerUI != null)
         {
             tower.towerUI.muteButtonImage.sprite = tower.towerUI.mutedSprite;
+        }
+    }
+
+    /// <summary>
+    /// Finds the Source tower's tempo slider and sets its value to match
+    /// the loaded BPM. Deferred so towers have finished Start().
+    /// </summary>
+    private IEnumerator ApplyDeferredTempoSlider(double bpm)
+    {
+        yield return null;
+        yield return null; // extra frame for tower UI init
+
+        if (Tower.allTowers == null) yield break;
+
+        foreach (Tower t in Tower.allTowers)
+        {
+            if (t == null || t.ownType != TowerType.Source) continue;
+            if (t.towerUI == null) continue;
+
+            // The tempo slider is inside tempoSliderContainer on the TowerUI
+            Slider slider = t.towerUI.GetComponentInChildren<Slider>(true);
+            if (slider != null)
+            {
+                slider.value = (float)bpm;
+            }
+            break; // Only one source tower
         }
     }
 
