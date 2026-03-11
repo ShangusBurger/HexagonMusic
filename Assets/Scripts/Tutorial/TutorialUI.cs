@@ -4,39 +4,53 @@ using UnityEngine.Video;
 using TMPro;
 
 /// <summary>
-/// Displays tutorial pages with text, a looping video, and a Continue button.
-/// Attach to the tutorial panel GameObject.
-///
-/// Required hierarchy:
-///   TutorialPanel (this component, starts disabled)
-///     ├── Background (Image, semi-transparent fullscreen overlay)
-///     ├── ContentPanel
-///     │   ├── VideoDisplay (RawImage — assign to videoImage)
-///     │   ├── TutorialText (TMP_Text — assign to tutorialText)
-///     │   └── ContinueButton (Button — assign to continueButton)
-///     └── VideoPlayer (VideoPlayer component — assign to videoPlayer)
-///
-/// The VideoPlayer renders to a RenderTexture which is assigned to the RawImage.
+/// Displays tutorial pages with selectable layouts, supporting images and videos.
+/// Each layout panel has two media slots for single or dual-media display.
 /// </summary>
 public class TutorialUI : MonoBehaviour
 {
-    [Header("UI References")]
+    [Header("Main Panel")]
     [SerializeField] private GameObject tutorialPanel;
-    [SerializeField] private TMP_Text tutorialText;
-    [SerializeField] private RawImage videoImage;
     [SerializeField] private Button continueButton;
     [SerializeField] private TMP_Text continueButtonText;
-
-    [Header("Video")]
-    [SerializeField] private VideoPlayer videoPlayer;
-    [SerializeField] private RenderTexture videoRenderTexture;
-
-    [Header("Page Indicator (optional)")]
     [SerializeField] private TMP_Text pageIndicatorText;
+
+    [Header("Layout Panels")]
+    [SerializeField] private LayoutPanel[] layoutPanels;
+
+    [Header("Video Playback")]
+    [SerializeField] private VideoPlayer videoPlayer1;
+    [SerializeField] private RenderTexture videoRenderTexture1;
+    [SerializeField] private VideoPlayer videoPlayer2;
+    [SerializeField] private RenderTexture videoRenderTexture2;
+
+    private LayoutPanel activeLayout;
+
+    /// <summary>
+    /// Maps TutorialLayout enum to a panel with dual media slots.
+    /// </summary>
+    [System.Serializable]
+    public class LayoutPanel
+    {
+        public TutorialLayout layoutType;
+        public GameObject panelRoot;
+        public TMP_Text textDisplay;
+
+        [Header("Media Slot 1")]
+        public GameObject media1Container;
+        public RawImage video1Display;
+        public Image image1Display;
+        public TMP_Text caption1Text;
+
+        [Header("Media Slot 2")]
+        public GameObject media2Container;
+        public RawImage video2Display;
+        public Image image2Display;
+        public TMP_Text caption2Text;
+    }
 
     void Awake()
     {
-        // Subscribe in Awake so we're listening before TutorialManager.Start() fires
         TutorialManager.OnShowPage += ShowPage;
         TutorialManager.OnTutorialClosed += HidePanel;
     }
@@ -48,6 +62,12 @@ public class TutorialUI : MonoBehaviour
 
         if (tutorialPanel != null)
             tutorialPanel.SetActive(false);
+
+        foreach (var lp in layoutPanels)
+        {
+            if (lp.panelRoot != null)
+                lp.panelRoot.SetActive(false);
+        }
     }
 
     void OnDestroy()
@@ -60,58 +80,154 @@ public class TutorialUI : MonoBehaviour
     {
         if (page == null) return;
 
-        // Show panel
         if (tutorialPanel != null)
             tutorialPanel.SetActive(true);
 
+        ActivateLayout(page.layout);
+
         // Set text
-        if (tutorialText != null)
-            tutorialText.text = page.tutorialText;
+        if (activeLayout?.textDisplay != null)
+            activeLayout.textDisplay.text = page.tutorialText ?? "";
 
-        // Set up video
-        if (videoPlayer != null && page.videoClip != null)
-        {
-            // Clear the render texture before playing a new clip
-            if (videoRenderTexture != null)
-            {
-                RenderTexture current = RenderTexture.active;
-                RenderTexture.active = videoRenderTexture;
-                GL.Clear(true, true, Color.clear);
-                RenderTexture.active = current;
-            }
+        // Stop any playing videos
+        StopAllVideos();
 
-            videoPlayer.clip = page.videoClip;
-            videoPlayer.isLooping = true;
-            videoPlayer.renderMode = VideoRenderMode.RenderTexture;
-            videoPlayer.targetTexture = videoRenderTexture;
-            videoPlayer.Play();
+        // Display media slots
+        DisplayMediaSlot(page.media1, 
+            activeLayout?.media1Container,
+            activeLayout?.image1Display, 
+            activeLayout?.video1Display, 
+            activeLayout?.caption1Text,
+            videoPlayer1, videoRenderTexture1);
 
-            if (videoImage != null)
-            {
-                videoImage.texture = videoRenderTexture;
-                videoImage.gameObject.SetActive(true);
-            }
-        }
-        else
-        {
-            // No video — hide the video area
-            if (videoPlayer != null)
-                videoPlayer.Stop();
-            if (videoImage != null)
-                videoImage.gameObject.SetActive(false);
-        }
+        DisplayMediaSlot(page.media2, 
+            activeLayout?.media2Container,
+            activeLayout?.image2Display, 
+            activeLayout?.video2Display, 
+            activeLayout?.caption2Text,
+            videoPlayer2, videoRenderTexture2);
 
-        // Update continue button text
         UpdateContinueButton();
-
-        // Update page indicator
         UpdatePageIndicator();
+    }
+
+    void ActivateLayout(TutorialLayout layout)
+    {
+        foreach (var lp in layoutPanels)
+        {
+            if (lp.panelRoot != null)
+                lp.panelRoot.SetActive(false);
+        }
+
+        activeLayout = null;
+        foreach (var lp in layoutPanels)
+        {
+            if (lp.layoutType == layout)
+            {
+                activeLayout = lp;
+                if (lp.panelRoot != null)
+                    lp.panelRoot.SetActive(true);
+                break;
+            }
+        }
+
+        if (activeLayout == null && layoutPanels.Length > 0)
+        {
+            activeLayout = layoutPanels[0];
+            if (activeLayout.panelRoot != null)
+                activeLayout.panelRoot.SetActive(true);
+        }
+    }
+
+    void DisplayMediaSlot(TutorialMediaItem item, GameObject container, 
+        Image imageDisplay, RawImage videoDisplay, TMP_Text captionText,
+        VideoPlayer player, RenderTexture renderTex)
+    {
+        bool hasContent = item != null && item.HasContent;
+
+        // Show/hide the entire container
+        if (container != null)
+            container.SetActive(hasContent);
+
+        if (!hasContent)
+        {
+            if (imageDisplay != null) imageDisplay.gameObject.SetActive(false);
+            if (videoDisplay != null) videoDisplay.gameObject.SetActive(false);
+            if (captionText != null) captionText.gameObject.SetActive(false);
+            return;
+        }
+
+        if (item.type == TutorialMediaItem.MediaType.Image)
+        {
+            if (imageDisplay != null)
+            {
+                imageDisplay.sprite = item.image;
+                imageDisplay.gameObject.SetActive(true);
+
+                // Set aspect ratio from image dimensions
+                var fitter = imageDisplay.GetComponent<AspectRatioFitter>();
+                if (fitter != null && item.image != null && item.image.texture != null)
+                {
+                    fitter.aspectRatio = (float)item.image.texture.width / item.image.texture.height;
+                }
+            }
+            if (videoDisplay != null)
+                videoDisplay.gameObject.SetActive(false);
+        }
+        else // Video
+        {
+            if (imageDisplay != null)
+                imageDisplay.gameObject.SetActive(false);
+
+            if (player != null && item.video != null && renderTex != null)
+            {
+                ClearRenderTexture(renderTex);
+                player.clip = item.video;
+                player.isLooping = true;
+                player.renderMode = VideoRenderMode.RenderTexture;
+                player.targetTexture = renderTex;
+                player.Play();
+
+                if (videoDisplay != null)
+                {
+                    videoDisplay.texture = renderTex;
+                    videoDisplay.gameObject.SetActive(true);
+
+                    // Set aspect ratio from video dimensions
+                    var fitter = videoDisplay.GetComponent<AspectRatioFitter>();
+                    if (fitter != null)
+                    {
+                        fitter.aspectRatio = (float)item.video.width / item.video.height;
+                    }
+                }
+            }
+        }
+
+        if (captionText != null)
+        {
+            captionText.text = item.caption ?? "";
+            captionText.gameObject.SetActive(!string.IsNullOrEmpty(item.caption));
+        }
+    }
+
+    void ClearRenderTexture(RenderTexture rt)
+    {
+        if (rt == null) return;
+        RenderTexture current = RenderTexture.active;
+        RenderTexture.active = rt;
+        GL.Clear(true, true, Color.clear);
+        RenderTexture.active = current;
+    }
+
+    void StopAllVideos()
+    {
+        if (videoPlayer1 != null) videoPlayer1.Stop();
+        if (videoPlayer2 != null) videoPlayer2.Stop();
     }
 
     void HidePanel()
     {
-        if (videoPlayer != null)
-            videoPlayer.Stop();
+        StopAllVideos();
 
         if (tutorialPanel != null)
             tutorialPanel.SetActive(false);
@@ -119,6 +235,9 @@ public class TutorialUI : MonoBehaviour
 
     void OnContinueClicked()
     {
+        // Clear selection so button returns to normal color
+        UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+
         if (TutorialManager.Instance != null)
             TutorialManager.Instance.OnContinuePressed();
     }
@@ -133,9 +252,8 @@ public class TutorialUI : MonoBehaviour
             return;
         }
 
-        // Check if there are more pages in the active sequence
-        bool hasMorePages = TutorialManager.Instance.HasMorePages();
-        continueButtonText.text = hasMorePages ? "Continue" : "Got it!";
+        bool hasMore = TutorialManager.Instance.HasMorePages();
+        continueButtonText.text = hasMore ? "Continue" : "Got it!";
     }
 
     void UpdatePageIndicator()

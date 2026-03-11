@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sequenceId: intro
   pages:
+  - {fileID: 11400000, guid: 9f73d1563a316b2459550501b454a6e0, type: 2}
   - {fileID: 11400000, guid: 2d508bbaaf56ba4428d42a4854f703e2, type: 2}
+  - {fileID: 11400000, guid: a65b257619fc41749a9af79b24870be1, type: 2}
   autoShowOnStart: 1
   onlyShowOnce: 0

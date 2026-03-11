@@ -77,16 +77,28 @@ public class SelectionHandler : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+
+        // Subscribe early so we don't miss events from other scripts' Start()
+        ToolbarUI.OnToolChanged += OnToolChanged;
+        TutorialManager.OnTutorialClosed += OnTutorialClosed;
     }
 
     void Start()
     {
-        ToolbarUI.OnToolChanged += OnToolChanged;
+        // Sync with ToolbarUI's current state in case it initialized before us
+        if (ToolbarUI.Instance != null && ToolbarUI.Instance.ActiveTowerType.HasValue)
+        {
+            activePlacementType = ToolbarUI.Instance.ActiveTowerType.Value;
+            currentMouseState = MouseState.PlaceTower;
+            CreateGhostFromPrefab(activePlacementType);
+        }
     }
+
 
     void OnDestroy()
     {
         ToolbarUI.OnToolChanged -= OnToolChanged;
+        TutorialManager.OnTutorialClosed -= OnTutorialClosed;
         DestroyGhost();
     }
 
@@ -120,12 +132,38 @@ public class SelectionHandler : MonoBehaviour
         }
     }
 
+    
+    void OnTutorialClosed()
+    {
+        // Wait a frame for EventSystem to update, then refresh hover state
+        StartCoroutine(RefreshHoverNextFrame());
+    }
+
+    
+    IEnumerator RefreshHoverNextFrame()
+    {
+        yield return null; // Wait one frame for UI to fully close
+        
+        // Force a hover check now that UI is gone
+        if (currentMouseState == MouseState.PlaceTower)
+        {
+            GroundTile tile = RaycastToTile();
+            if (tile != null)
+            {
+                currentHoveredTile = tile;
+                tile.Highlight();
+                UpdateGhostToHoveredTile();
+            }
+        }
+    }
+
     // ══════════════════════════════════════════════════════════════════
     // Tool changed callback (from ToolbarUI)
     // ══════════════════════════════════════════════════════════════════
 
     void OnToolChanged(TowerType? type)
     {
+        Debug.Log($"[SelectionHandler] OnToolChanged received: {type}");
         CancelSecondaryState();
         ClearInfoLowlight();
 
@@ -133,12 +171,14 @@ public class SelectionHandler : MonoBehaviour
         {
             currentMouseState = MouseState.HandTool;
             DestroyGhost();
+            Debug.Log("[SelectionHandler] Destroyed ghost (type was null)");
         }
         else
         {
             currentMouseState = MouseState.PlaceTower;
             activePlacementType = type.Value;
             CreateGhostFromPrefab(type.Value);
+            Debug.Log($"[SelectionHandler] After CreateGhostFromPrefab, ghost = {ghostPreview}");
         }
 
         DeselectCurrent();

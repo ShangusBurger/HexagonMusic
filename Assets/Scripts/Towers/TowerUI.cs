@@ -9,6 +9,8 @@ using TMPro;
 
 public class TowerUI : MonoBehaviour
 {
+    [Header("Mute Button")]
+    [SerializeField] private Button muteButton;
     public Image muteButtonImage;
     public Sprite mutedSprite;
     public Sprite unmutedSprite;
@@ -49,6 +51,9 @@ public class TowerUI : MonoBehaviour
     void Start()
     {
         SelectionHandler.HideAllTowerUI += HideSelf;
+        
+        if (muteButton != null)
+            muteButton.onClick.AddListener(OnMuteButtonClicked);
     }
 
     void OnEnable()
@@ -61,6 +66,8 @@ public class TowerUI : MonoBehaviour
         }
         if (lockedSoundTooltip != null)
             lockedSoundTooltip.SetActive(false);
+
+        UpdateMuteButtonSelection();
     }
 
     void OnDestroy()
@@ -87,6 +94,34 @@ public class TowerUI : MonoBehaviour
         {
             isDropdownOpen = false;
             HideLockedSoundTooltip();
+        }
+    }
+
+    
+    void OnMuteButtonClicked()
+    {
+        if (tower == null) return;
+        
+        tower.ToggleMute();
+        
+        // Keep selected while muted, deselect when unmuted
+        if (tower.isMuted)
+        {
+            EventSystem.current.SetSelectedGameObject(muteButton.gameObject);
+        }
+        else
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+        }
+    }
+
+    void UpdateMuteButtonSelection()
+    {
+        if (muteButton == null || tower == null) return;
+        
+        if (tower.isMuted)
+        {
+            EventSystem.current.SetSelectedGameObject(muteButton.gameObject);
         }
     }
 

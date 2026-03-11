@@ -10,33 +10,33 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f38a5a0f4d60a274a9cedae76614b188, type: 3}
-  m_Name: IntroBouncer
+  m_Name: IntroEdit
   m_EditorClassIdentifier: 
   layout: 0
-  tutorialText: 'Use towers to redirect signal across the map.
+  tutorialText: 'When you have the Edit Tool (Q) selected:
 
 
-    The Bouncer
-    Tower will redirect signal in the direction you set
+    <b>Left Click</b>
+    on an existing tower to mute, delete, or change the sound effect that tower plays
 
 
-    You can use the hotbar
-    to select what tool you have selected. When the Bouncer Tower is selected:
+    <b>Drag
+    and Drop</b> a tower to move its location
 
 
-    <b>Left
-    Click</b> to place the bouncer tower then again to select the tower''s direction.
+    <b>Right Click</b> on an existing
+    tower to delete it
 
 '
   media1:
-    type: 0
+    type: 1
     image: {fileID: 21300000, guid: cb5f8781bcd251545a11c8531da15bc2, type: 3}
-    video: {fileID: 0}
+    video: {fileID: 32900000, guid: e4d0ba1a529e3084595cb18f24a5966c, type: 3}
     caption: 
   media2:
     type: 1
     image: {fileID: 0}
-    video: {fileID: 32900000, guid: 4722135e185bce74684c239ddbc3cdd3, type: 3}
+    video: {fileID: 0}
     caption: 
   associatedTower: -1
   associatedSample: 
