@@ -85,7 +85,16 @@ public class SelectionHandler : MonoBehaviour
 
     void Start()
     {
-        // Sync with ToolbarUI's current state in case it initialized before us
+        StartCoroutine(SyncWithToolbarDelayed());
+    }
+
+    IEnumerator SyncWithToolbarDelayed()
+    {
+        // Wait until TileMapConstructor is ready
+        while (TileMapConstructor.Instance == null)
+            yield return null;
+
+        // Now sync with ToolbarUI's current state
         if (ToolbarUI.Instance != null && ToolbarUI.Instance.ActiveTowerType.HasValue)
         {
             activePlacementType = ToolbarUI.Instance.ActiveTowerType.Value;
@@ -163,7 +172,6 @@ public class SelectionHandler : MonoBehaviour
 
     void OnToolChanged(TowerType? type)
     {
-        Debug.Log($"[SelectionHandler] OnToolChanged received: {type}");
         CancelSecondaryState();
         ClearInfoLowlight();
 
@@ -171,14 +179,15 @@ public class SelectionHandler : MonoBehaviour
         {
             currentMouseState = MouseState.HandTool;
             DestroyGhost();
-            Debug.Log("[SelectionHandler] Destroyed ghost (type was null)");
         }
         else
         {
             currentMouseState = MouseState.PlaceTower;
             activePlacementType = type.Value;
-            CreateGhostFromPrefab(type.Value);
-            Debug.Log($"[SelectionHandler] After CreateGhostFromPrefab, ghost = {ghostPreview}");
+            
+            // Only create ghost if TileMapConstructor is ready
+            if (TileMapConstructor.Instance != null)
+                CreateGhostFromPrefab(type.Value);
         }
 
         DeselectCurrent();
@@ -219,11 +228,16 @@ public class SelectionHandler : MonoBehaviour
         GameObject prefab = GetTowerPrefab(type);
         if (prefab == null) return;
 
+        // Instantiate inactive so Tower scripts don't run
+        prefab.SetActive(false);
         ghostPreview = Instantiate(prefab);
+        prefab.SetActive(true); // Restore prefab state
+        
+        ghostPreview.transform.position = Vector3.down * 1000f;
         ghostType = type;
         StripGhostNonVisuals(ghostPreview);
         SetGhostTransparency(ghostPreview);
-        ghostPreview.SetActive(false);
+        // Leave inactive until positioned over a valid tile
     }
 
     void CreateGhostFromExistingTower(Tower tower)
@@ -262,7 +276,12 @@ public class SelectionHandler : MonoBehaviour
     {
         if (ghostPreview == null) return;
 
-        if (currentHoveredTile != null && !IsPointerOverUI())
+        bool canPlace = currentHoveredTile != null && 
+                        !IsPointerOverUI() &&
+                        !(currentHoveredTile.tower != null && 
+                        currentHoveredTile.tower.ownType == TowerType.Source);
+
+        if (canPlace)
         {
             ghostPreview.SetActive(true);
             ghostPreview.transform.position = currentHoveredTile.transform.position + Vector3.up * TowerYOffset;
@@ -747,6 +766,10 @@ public class SelectionHandler : MonoBehaviour
         {
             GroundTile tile = RaycastToTile();
             if (tile == null) return;
+
+            // Don't allow placing on source tower tile
+            if (tile.tower != null && tile.tower.ownType == TowerType.Source)
+                return;
 
             if (tile.tower != null)
                 ReplaceTowerOnTile(tile, activePlacementType);
