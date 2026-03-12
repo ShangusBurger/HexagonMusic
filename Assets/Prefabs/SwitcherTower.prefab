@@ -411,6 +411,7 @@ MonoBehaviour:
   playbackClip: {fileID: 0}
   towerAlreadyActivatedThisBeat: 0
   tile: {fileID: 0}
+  ownType: 0
   directions: 
   towerUI: {fileID: 2126638792072651365}
 --- !u!1001 &7813977163451707872

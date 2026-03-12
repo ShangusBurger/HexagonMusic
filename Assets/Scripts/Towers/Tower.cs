@@ -60,7 +60,13 @@ public class Tower : MonoBehaviour
 
         // Source towers shouldn't count as player interactions
         if (ownType != TowerType.Source)
+        {
             InteractionMade();
+            if (!SuppressInteractions && towerUI != null)
+            {
+                towerUI.RandomizeSample();
+            }
+        }
     }
 
     internal virtual void Update()

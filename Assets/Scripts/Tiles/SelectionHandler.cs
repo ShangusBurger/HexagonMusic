@@ -39,6 +39,7 @@ public class SelectionHandler : MonoBehaviour
     private Vector2 mouseDownPos;
     private const float DragThreshold = 8f;
     private const float ClickTimeThreshold = 0.25f;
+    private bool holdingFromPlacement = false;
 
     // ── Tower placement ───────────────────────────────────────────────
     private TowerType activePlacementType;
@@ -194,7 +195,8 @@ public class SelectionHandler : MonoBehaviour
 
     void CancelSecondaryState()
     {
-        // Finalize tower direction/distance if switching away mid-placement
+        holdingFromPlacement = false;
+
         if (currentMouseState == MouseState.SetMonoDirection && currentSelectedTile?.tower != null)
         {
             currentSelectedTile.tower.SetDirection(pendingMonoDirection);
@@ -805,17 +807,18 @@ public class SelectionHandler : MonoBehaviour
         {
             currentMouseState = MouseState.SetMonoDirection;
             pendingMonoDirection = DefaultMonoDirection;
+            holdingFromPlacement = true;           // ← NEW
             SetGhostVisible(false);
         }
         else if (type == TowerType.Lobber)
         {
             currentMouseState = MouseState.SetLobberDistance;
             pendingLobDistance = -1;
+            holdingFromPlacement = true;           // ← NEW
             SetGhostVisible(false);
         }
         else
         {
-            // Non-directional tower — fully placed, record now
             if (UndoManager.Instance != null)
                 UndoManager.Instance.RecordPlace(tile);
         }
@@ -823,13 +826,11 @@ public class SelectionHandler : MonoBehaviour
 
     void ReplaceTowerOnTile(GroundTile tile, TowerType newType)
     {
-        // Save sample name from existing tower (before destroying it)
         string savedSampleName = GetSampleNameFromClip(tile.tower.playbackClip);
 
         if (UndoManager.Instance != null)
             UndoManager.Instance.StorePendingReplace(tile);
 
-        // Remove old tower
         ClearFieldController.OnClearField -= tile.tower.DestroySelf;
         tile.tower.towerUI.RemoveFromReference();
         Tower.allTowers.Remove(tile.tower);
@@ -842,7 +843,6 @@ public class SelectionHandler : MonoBehaviour
         currentSelectedTile = tile;
         tile.AddTowerToTile(newType);
 
-        // Defer sample restoration to after Start() + SetSelfUI has run
         if (tile.tower != null && !string.IsNullOrEmpty(savedSampleName))
             StartCoroutine(ApplyDeferredSample(tile.tower, savedSampleName));
 
@@ -850,17 +850,18 @@ public class SelectionHandler : MonoBehaviour
         {
             currentMouseState = MouseState.SetMonoDirection;
             pendingMonoDirection = DefaultMonoDirection;
+            holdingFromPlacement = true;           // ← NEW
             SetGhostVisible(false);
         }
         else if (newType == TowerType.Lobber)
         {
             currentMouseState = MouseState.SetLobberDistance;
             pendingLobDistance = -1;
+            holdingFromPlacement = true;           // ← NEW
             SetGhostVisible(false);
         }
         else
         {
-            // Non-directional replacement — fully placed, record now
             if (UndoManager.Instance != null)
                 UndoManager.Instance.RecordPlace(tile);
         }
@@ -912,6 +913,50 @@ public class SelectionHandler : MonoBehaviour
         }
     }
 
+    void HandleMonoTowerClick()
+    {
+        // ── Right-click: cancel ──
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            holdingFromPlacement = false;
+            CancelSecondaryPlacement();
+            return;
+        }
+
+        // ── Drag-release flow ──
+        // User is still holding from the initial placement click.
+        if (holdingFromPlacement)
+        {
+            if (Mouse.current.leftButton.wasReleasedThisFrame)
+            {
+                holdingFromPlacement = false;
+
+                // If cursor is still on the tower's own tile (no drag),
+                // fall through to the normal click-to-confirm mode.
+                if (currentHoveredTile == null || currentHoveredTile == currentSelectedTile)
+                    return;
+
+                // Cursor is on a different tile → confirm direction now
+                ConfirmMonoDirection();
+            }
+            return; // Don't process click-to-confirm while still holding
+        }
+
+        // ── Click-to-confirm flow (existing behavior) ──
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            Vector3 mousePos = Mouse.current.position.ReadValue();
+            Ray ray = Camera.main.ScreenPointToRay(mousePos);
+
+            if (Physics.Raycast(ray, out RaycastHit hit)
+                && hit.collider.GetComponent<GroundTile>() != null
+                && !IsPointerOverUI())
+            {
+                ConfirmMonoDirection();
+            }
+        }
+    }
+
     /// <summary>
     /// Shows lowlight tiles along a direction from the currently selected tile
     /// and rotates the tower's visual model to face that direction.
@@ -938,45 +983,37 @@ public class SelectionHandler : MonoBehaviour
                 new Vector3(0f, ((float)direction + 2f) * 60f + 150f, 0f);
     }
 
-    void HandleMonoTowerClick()
+    /// <summary>
+    /// Finalizes the Mono tower's direction using the current pending
+    /// direction, records the undo action, and returns to PlaceTower.
+    /// Shared by both drag-release and click-to-confirm flows.
+    /// </summary>
+    void ConfirmMonoDirection()
     {
-        if (Mouse.current.rightButton.wasPressedThisFrame)
+        if (currentSelectedTile != null && currentSelectedTile.tower != null)
         {
-            CancelSecondaryPlacement();
-            return;
-        }
-        if (Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            Vector3 mousePos = Mouse.current.position.ReadValue();
-            Ray ray = Camera.main.ScreenPointToRay(mousePos);
-
-            if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.GetComponent<GroundTile>() != null && !IsPointerOverUI())
+            // If the hovered tile differs from the selected, compute
+            // direction; otherwise use the pending (which may be default).
+            if (currentHoveredTile != null && currentHoveredTile != currentSelectedTile)
             {
-                GroundTile collidedTile = hit.collider.transform.GetComponent<GroundTile>();
-
-                if (currentSelectedTile != null && currentSelectedTile.tower != null)
-                {
-                    int direction;
-                    if (collidedTile == currentSelectedTile)
-                        direction = DefaultMonoDirection;
-                    else
-                        direction = ExtraCubeUtility.GetBestDirectionToTile(currentSelectedTile.tileCoordinate, collidedTile.tileCoordinate);
-
-                    currentSelectedTile.tower.SetDirection(direction);
-
-                    if (UndoManager.Instance != null)
-                        UndoManager.Instance.RecordPlace(currentSelectedTile);
-                }
-
-                SelectionUtility.DeselectListOfTiles(lowlightedTiles);
-                lowlightedTiles.Clear();
-                if (currentHoveredTile != null) { currentHoveredTile.Deselect(); currentHoveredTile = null; }
-                DeselectCurrent();
-
-                currentMouseState = MouseState.PlaceTower;
-                SetGhostVisible(true);
+                pendingMonoDirection = ExtraCubeUtility.GetBestDirectionToTile(
+                    currentSelectedTile.tileCoordinate,
+                    currentHoveredTile.tileCoordinate);
             }
+
+            currentSelectedTile.tower.SetDirection(pendingMonoDirection);
+
+            if (UndoManager.Instance != null)
+                UndoManager.Instance.RecordPlace(currentSelectedTile);
         }
+
+        SelectionUtility.DeselectListOfTiles(lowlightedTiles);
+        lowlightedTiles.Clear();
+        if (currentHoveredTile != null) { currentHoveredTile.Deselect(); currentHoveredTile = null; }
+        DeselectCurrent();
+
+        currentMouseState = MouseState.PlaceTower;
+        SetGhostVisible(true);
     }
 
     // ══════════════════════════════════════════════════════════════════
@@ -1034,36 +1071,79 @@ public class SelectionHandler : MonoBehaviour
 
     void HandleLobberTowerClick()
     {
+        // ── Right-click: cancel ──
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
+            holdingFromPlacement = false;
             CancelSecondaryPlacement();
             return;
         }
+
+        // ── Drag-release flow ──
+        if (holdingFromPlacement)
+        {
+            if (Mouse.current.leftButton.wasReleasedThisFrame)
+            {
+                holdingFromPlacement = false;
+
+                // If cursor is still on the tower's own tile (no drag),
+                // fall through to click-to-confirm mode.
+                if (currentHoveredTile == null || currentHoveredTile == currentSelectedTile)
+                    return;
+
+                // Cursor is on a different tile → confirm distance now
+                ConfirmLobberDistance();
+            }
+            return;
+        }
+
+        // ── Click-to-confirm flow (existing behavior) ──
         if (Mouse.current.leftButton.wasPressedThisFrame && !IsPointerOverUI())
         {
             if (currentSelectedTile != null && currentSelectedTile.tower != null && lowlightedTiles.Count > 0)
             {
-                LobberTower lobberTower = currentSelectedTile.tower as LobberTower;
-                if (lobberTower != null && currentSelectedTile.tileCoordinate != null)
-                {
-                    GroundTile anyRingTile = lowlightedTiles[0];
-                    int distance = (int)Cubes.GetDistanceBetweenTwoCubes(currentSelectedTile.tileCoordinate.cube, anyRingTile.tileCoordinate.cube);
-                    lobberTower.lobDistance = distance;
-
-                    if (UndoManager.Instance != null)
-                        UndoManager.Instance.RecordPlace(currentSelectedTile);
-                }
-
-                SelectionUtility.DeselectListOfTiles(lowlightedTiles);
-                lowlightedTiles.Clear();
-
-                if (currentHoveredTile != null) { currentHoveredTile.Deselect(); currentHoveredTile = null; }
-                DeselectCurrent();
-
-                currentMouseState = MouseState.PlaceTower;
-                SetGhostVisible(true);
+                ConfirmLobberDistance();
             }
         }
+    }
+
+    /// <summary>
+    /// Finalizes the Lobber tower's distance using the current pending
+    /// distance, records the undo action, and returns to PlaceTower.
+    /// Shared by both drag-release and click-to-confirm flows.
+    /// </summary>
+    void ConfirmLobberDistance()
+    {
+        if (currentSelectedTile != null && currentSelectedTile.tower != null)
+        {
+            LobberTower lobberTower = currentSelectedTile.tower as LobberTower;
+            if (lobberTower != null && currentSelectedTile.tileCoordinate != null)
+            {
+                if (lowlightedTiles.Count > 0)
+                {
+                    GroundTile anyRingTile = lowlightedTiles[0];
+                    int distance = (int)Cubes.GetDistanceBetweenTwoCubes(
+                        currentSelectedTile.tileCoordinate.cube,
+                        anyRingTile.tileCoordinate.cube);
+                    lobberTower.lobDistance = distance;
+                }
+                else if (pendingLobDistance > 0)
+                {
+                    lobberTower.lobDistance = pendingLobDistance;
+                }
+
+                if (UndoManager.Instance != null)
+                    UndoManager.Instance.RecordPlace(currentSelectedTile);
+            }
+        }
+
+        SelectionUtility.DeselectListOfTiles(lowlightedTiles);
+        lowlightedTiles.Clear();
+        if (currentHoveredTile != null) { currentHoveredTile.Deselect(); currentHoveredTile = null; }
+        DeselectCurrent();
+
+        currentMouseState = MouseState.PlaceTower;
+        SetGhostVisible(true);
     }
 
 
@@ -1073,15 +1153,16 @@ public class SelectionHandler : MonoBehaviour
     /// </summary>
     void CancelSecondaryPlacement()
     {
+        holdingFromPlacement = false;              // ← NEW (add at top)
+
         if (UndoManager.Instance != null)
             UndoManager.Instance.ClearPendingReplace();
-        // Destroy the tower that was just placed
+
         if (currentSelectedTile != null && currentSelectedTile.tower != null)
         {
             currentSelectedTile.tower.DestroySelf();
         }
 
-        // Clean up all visual state
         SelectionUtility.DeselectListOfTiles(lowlightedTiles);
         lowlightedTiles.Clear();
         ClearInfoLowlight();
@@ -1095,7 +1176,6 @@ public class SelectionHandler : MonoBehaviour
         DeselectCurrent();
         HideAllTowerUI?.Invoke();
 
-        // Return to placement mode with ghost visible
         currentMouseState = MouseState.PlaceTower;
         SetGhostVisible(true);
 
@@ -1104,6 +1184,7 @@ public class SelectionHandler : MonoBehaviour
             UndoManager.Instance.RecordPlace(currentSelectedTile);
         }
     }
+
 
     // ══════════════════════════════════════════════════════════════════
     // Utility

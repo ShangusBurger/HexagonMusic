@@ -15,6 +15,12 @@ public class BufferTower : Tower
 
     //Visual feedback of buffer
     [SerializeField] private Transform bufferIndicatorTransform;
+    internal override void Start()
+    {
+        base.Start();
+        UpdateBufferVisual();
+    }
+    
     internal override void Update()
     {
         base.Update();
@@ -60,15 +66,27 @@ public class BufferTower : Tower
     {
         yield return new WaitForSeconds((float) beatDelay);
 
-        float indicatorDifference = ((float) currentAccumulated + 1f) / (float) threshold;
-        bufferIndicatorTransform.position = new Vector3(bufferIndicatorTransform.position.x, indicatorDifference + .001f, bufferIndicatorTransform.position.z);
-        bufferIndicatorTransform.localScale = new Vector3(bufferIndicatorTransform.localScale.x, 2 * indicatorDifference, bufferIndicatorTransform.localScale.z);
-    }
+        UpdateBufferVisual();
+        }
 
     public void UpdateBufferSize(float value)
     {
         threshold = (int) value;
         bufferSizeText.text = value.ToString();
+        UpdateBufferVisual();
+    }
+
+    /// <summary>
+    /// Immediately updates the buffer indicator visual based on current state.
+    /// Shows as full if accumulated >= threshold (will trigger next beat).
+    /// </summary>
+    private void UpdateBufferVisual()
+    {
+        if (bufferIndicatorTransform == null) return;
+
+        float indicatorDifference = Mathf.Min(((float) currentAccumulated + 1f) / (float) threshold, 1f);
+        bufferIndicatorTransform.position = new Vector3(bufferIndicatorTransform.position.x, indicatorDifference + .001f, bufferIndicatorTransform.position.z);
+        bufferIndicatorTransform.localScale = new Vector3(bufferIndicatorTransform.localScale.x, 2 * indicatorDifference, bufferIndicatorTransform.localScale.z);
     }
 
     public override void SetSelfUI()

@@ -152,6 +152,22 @@ public class TowerUI : MonoBehaviour
         _suppressDropdownCallback = false;
     }
 
+    public void RandomizeSample()
+    {
+        if (tower == null || UnlockManager.Instance == null || SampleLibrary.Instance == null) 
+            return;
+
+        List<string> unlocked = UnlockManager.Instance.GetUnlockedSamples();
+        if (unlocked.Count == 0) return;
+
+        string randomSample = unlocked[UnityEngine.Random.Range(0, unlocked.Count)];
+        
+        _suppressDropdownCallback = true;
+        OnSampleSelected(randomSample);
+        SetDropdown(randomSample);
+        _suppressDropdownCallback = false;
+    }
+
     // ══════════════════════════════════════════════════════════════════
     // Dropdown options — unlocked samples + one locked preview
     // ══════════════════════════════════════════════════════════════════
