@@ -18,4 +18,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2d508bbaaf56ba4428d42a4854f703e2, type: 2}
   - {fileID: 11400000, guid: a65b257619fc41749a9af79b24870be1, type: 2}
   autoShowOnStart: 1
-  onlyShowOnce: 0
+  onlyShowOnce: 1

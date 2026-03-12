@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f38a5a0f4d60a274a9cedae76614b188, type: 3}
+  m_Name: SwitcherTut
+  m_EditorClassIdentifier: 
+  layout: 0
+  tutorialText: The Switcher Tower acts similar to the Splitter tower, except it
+    will switch between the left and right outputs every time it's hit.
+  media1:
+    type: 1
+    image: {fileID: 0}
+    video: {fileID: 32900000, guid: 814cc6702eb985043ab8fccc2d4a30aa, type: 3}
+    caption: 
+  media2:
+    type: 0
+    image: {fileID: 0}
+    video: {fileID: 0}
+    caption: 
+  associatedTower: -1
+  associatedSample: 

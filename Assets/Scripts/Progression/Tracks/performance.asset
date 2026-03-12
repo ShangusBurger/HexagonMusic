@@ -17,7 +17,6 @@ MonoBehaviour:
   trackIcon: {fileID: 0}
   trackColor: {r: 0.6415094, g: 0.25176218, b: 0.25176218, a: 1}
   goals:
-  - {fileID: 11400000, guid: 167377ae3aed42546a76ba60ed724d5b, type: 2}
   - {fileID: 11400000, guid: abacbf6917ef14844900d5d2b462e01d, type: 2}
   - {fileID: 11400000, guid: a17b57eb3f2aeaa44a9961eb6c3619fe, type: 2}
   - {fileID: 11400000, guid: 03319d12f9d15df41a517c2b00051163, type: 2}
@@ -32,7 +31,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 253b291df6808514bafcfcf149769636, type: 2}
   - {fileID: 11400000, guid: 801a40fbe142bfe4880f449d8bd68a87, type: 2}
   - {fileID: 11400000, guid: a16d53d9eedfcc04293ea16ec53e3dcf, type: 2}
-  - {fileID: 11400000, guid: 133b734f43e55e846a92b4048c207904, type: 2}
   - {fileID: 11400000, guid: 4adad647ea45d6f47b03377a274c520d, type: 2}
   - {fileID: 11400000, guid: bbe7fb8f4768bfa4eaa095509bc1c223, type: 2}
   - {fileID: 11400000, guid: 62b3a1d26ae3a2647bc48a35c9b6850b, type: 2}

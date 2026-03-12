@@ -11286,19 +11286,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1012097575}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 136633308}
-        m_TargetAssemblyTypeName: MenuUI, Assembly-CSharp
-        m_MethodName: ExitGame
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1012097575
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12328,19 +12316,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1094381716}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 136633308}
-        m_TargetAssemblyTypeName: MenuUI, Assembly-CSharp
-        m_MethodName: ResumeGame
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1094381716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12623,7 +12599,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ghostAlpha: 0.35
-  towerSelectCanvas: {fileID: 0}
+  ghostMaterial: {fileID: 2100000, guid: a413487b62587ac41b42f3e9b71902a4, type: 2}
 --- !u!1 &1124629410
 GameObject:
   m_ObjectHideFlags: 0
@@ -15313,19 +15289,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1414040075}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 136633308}
-        m_TargetAssemblyTypeName: MenuUI, Assembly-CSharp
-        m_MethodName: ResumeGame
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1414040075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17683,19 +17647,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1727672307}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 48776580}
-        m_TargetAssemblyTypeName: ProgressionUI, Assembly-CSharp
-        m_MethodName: HideNotification
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: soundAction
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1727672307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19160,19 +19112,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1872187882}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 136633308}
-        m_TargetAssemblyTypeName: MenuUI, Assembly-CSharp
-        m_MethodName: ResumeGame
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1872187882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20513,7 +20453,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   allSequences:
   - {fileID: 11400000, guid: 6c401b8eac995b8428bb3532f92f17b9, type: 2}
-  towerTutorials: []
+  towerTutorials:
+  - towerType: 2
+    page: {fileID: 11400000, guid: 62d95b218ba57fb4e91f29b42773ca26, type: 2}
+  - towerType: 3
+    page: {fileID: 11400000, guid: 4e7f63ebcd0ebed499362a228ac6020c, type: 2}
+  - towerType: 8
+    page: {fileID: 11400000, guid: d33de9e066ce6884fa8a8ace1fb7a5c1, type: 2}
+  - towerType: 6
+    page: {fileID: 11400000, guid: 91a0992116c32b948b98f21fa9c1001b, type: 2}
+  - towerType: 4
+    page: {fileID: 11400000, guid: 35f21c85f1d23e549a58679f16cdc131, type: 2}
+  - towerType: 7
+    page: {fileID: 11400000, guid: b8d9dceee1cb9e249b4c2b7a2edcae8b, type: 2}
 --- !u!1 &2066949285
 GameObject:
   m_ObjectHideFlags: 0

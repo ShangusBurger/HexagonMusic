@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f38a5a0f4d60a274a9cedae76614b188, type: 3}
+  m_Name: LobberTut
+  m_EditorClassIdentifier: 
+  layout: 0
+  tutorialText: The Lobberr Tower will 'Lob' signal back in the direction the signal
+    came from. <b>Left Click</b> once to place the tower, and <b>Left Click</b> again
+    to set the distance the Lobber Lobs.
+  media1:
+    type: 1
+    image: {fileID: 0}
+    video: {fileID: 32900000, guid: 54c20d68a30644c42b7cb4b73a1a5a8b, type: 3}
+    caption: 
+  media2:
+    type: 0
+    image: {fileID: 0}
+    video: {fileID: 0}
+    caption: 
+  associatedTower: -1
+  associatedSample: 

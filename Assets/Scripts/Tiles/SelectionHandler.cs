@@ -56,15 +56,13 @@ public class SelectionHandler : MonoBehaviour
     // ── Ghost preview ─────────────────────────────────────────────────
     [Header("Ghost Preview")]
     [SerializeField] private float ghostAlpha = 0.35f;
+    [SerializeField] private Material ghostMaterial;
     private GameObject ghostPreview;
     private TowerType? ghostType = null;
     private const float TowerYOffset = 1f;
 
     // ── Drag visual state ─────────────────────────────────────────────
     private GameObject dragHiddenVisual = null;
-
-    // ── References ────────────────────────────────────────────────────
-    [SerializeField] private GameObject towerSelectCanvas; // legacy; safe to remove
 
     // ══════════════════════════════════════════════════════════════════
     // Lifecycle
@@ -141,18 +139,18 @@ public class SelectionHandler : MonoBehaviour
         }
     }
 
-    
+
     void OnTutorialClosed()
     {
         // Wait a frame for EventSystem to update, then refresh hover state
         StartCoroutine(RefreshHoverNextFrame());
     }
 
-    
+
     IEnumerator RefreshHoverNextFrame()
     {
         yield return null; // Wait one frame for UI to fully close
-        
+
         // Force a hover check now that UI is gone
         if (currentMouseState == MouseState.PlaceTower)
         {
@@ -184,7 +182,7 @@ public class SelectionHandler : MonoBehaviour
         {
             currentMouseState = MouseState.PlaceTower;
             activePlacementType = type.Value;
-            
+
             // Only create ghost if TileMapConstructor is ready
             if (TileMapConstructor.Instance != null)
                 CreateGhostFromPrefab(type.Value);
@@ -232,7 +230,7 @@ public class SelectionHandler : MonoBehaviour
         prefab.SetActive(false);
         ghostPreview = Instantiate(prefab);
         prefab.SetActive(true); // Restore prefab state
-        
+
         ghostPreview.transform.position = Vector3.down * 1000f;
         ghostType = type;
         StripGhostNonVisuals(ghostPreview);
@@ -276,9 +274,9 @@ public class SelectionHandler : MonoBehaviour
     {
         if (ghostPreview == null) return;
 
-        bool canPlace = currentHoveredTile != null && 
+        bool canPlace = currentHoveredTile != null &&
                         !IsPointerOverUI() &&
-                        !(currentHoveredTile.tower != null && 
+                        !(currentHoveredTile.tower != null &&
                         currentHoveredTile.tower.ownType == TowerType.Source);
 
         if (canPlace)
@@ -316,10 +314,27 @@ public class SelectionHandler : MonoBehaviour
 
     void SetGhostTransparency(GameObject ghost)
     {
+        if (ghostMaterial == null) return;
+        
         foreach (var renderer in ghost.GetComponentsInChildren<Renderer>(true))
         {
-            foreach (var mat in renderer.materials)
-                SetMaterialTransparent(mat, ghostAlpha);
+            // Create instance of the ghost material with the original texture
+            Material[] newMats = new Material[renderer.materials.Length];
+            for (int i = 0; i < renderer.materials.Length; i++)
+            {
+                newMats[i] = new Material(ghostMaterial);
+                // Copy the main texture from original material
+                if (renderer.materials[i].HasProperty("_MainTex"))
+                    newMats[i].mainTexture = renderer.materials[i].mainTexture;
+                // Copy the color but with ghost alpha
+                if (renderer.materials[i].HasProperty("_Color"))
+                {
+                    Color c = renderer.materials[i].color;
+                    c.a = ghostAlpha;
+                    newMats[i].color = c;
+                }
+            }
+            renderer.materials = newMats;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         }
     }
@@ -345,15 +360,15 @@ public class SelectionHandler : MonoBehaviour
         if (TileMapConstructor.Instance == null) return null;
         switch (type)
         {
-            case TowerType.Source:   return TileMapConstructor.Instance.sourceTowerPrefab;
-            case TowerType.Mono:     return TileMapConstructor.Instance.monoTowerPrefab;
+            case TowerType.Source: return TileMapConstructor.Instance.sourceTowerPrefab;
+            case TowerType.Mono: return TileMapConstructor.Instance.monoTowerPrefab;
             case TowerType.Splitter: return TileMapConstructor.Instance.splitterTowerPrefab;
-            case TowerType.Sink:     return TileMapConstructor.Instance.sinkTowerPrefab;
-            case TowerType.Lobber:   return TileMapConstructor.Instance.lobberTowerPrefab;
-            case TowerType.Sprayer:  return TileMapConstructor.Instance.sprayerTowerPrefab;
-            case TowerType.Buffer:   return TileMapConstructor.Instance.bufferTowerPrefab;
+            case TowerType.Sink: return TileMapConstructor.Instance.sinkTowerPrefab;
+            case TowerType.Lobber: return TileMapConstructor.Instance.lobberTowerPrefab;
+            case TowerType.Sprayer: return TileMapConstructor.Instance.sprayerTowerPrefab;
+            case TowerType.Buffer: return TileMapConstructor.Instance.bufferTowerPrefab;
             case TowerType.Switcher: return TileMapConstructor.Instance.switcherTowerPrefab;
-            case TowerType.Passer:   return TileMapConstructor.Instance.passerTowerPrefab;
+            case TowerType.Passer: return TileMapConstructor.Instance.passerTowerPrefab;
             default: return null;
         }
     }
@@ -1051,7 +1066,7 @@ public class SelectionHandler : MonoBehaviour
         }
     }
 
-        
+
     /// <summary>
     /// Cancels an in-progress direction/distance selection by deleting
     /// the just-placed tower and returning to PlaceTower state.

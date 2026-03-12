@@ -30,7 +30,7 @@ MonoBehaviour:
 '
   media1:
     type: 0
-    image: {fileID: 21300000, guid: cb5f8781bcd251545a11c8531da15bc2, type: 3}
+    image: {fileID: 21300000, guid: d1ba8440453f59c49bbd1775731be7fb, type: 3}
     video: {fileID: 32900000, guid: e4d0ba1a529e3084595cb18f24a5966c, type: 3}
     caption: 
   media2:

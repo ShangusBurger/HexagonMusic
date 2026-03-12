@@ -23,6 +23,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 232ffdffa894eec4d8eef3e4a81a1d52, type: 2}
   - {fileID: 11400000, guid: 0102be7b3fc812a4d921c67d0674781d, type: 2}
   - {fileID: 11400000, guid: 900dbffbf2f12e5439674813e1fa90a1, type: 2}
+  - {fileID: 11400000, guid: 256730a45807d194db9f6b40c84529e9, type: 2}
   showGoalProgress: 1
   requiresManualStart: 0
   completionMessage: 
