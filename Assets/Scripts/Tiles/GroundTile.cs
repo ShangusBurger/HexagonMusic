@@ -37,6 +37,7 @@ public class GroundTile : MonoBehaviour
     public static event Action PulseExistsNotif;
     public bool isGoalTile = false;
     public bool goalTriggered = false;
+    private GroundTile[] _neighbors = new GroundTile[6];
 
     // ── Handling Updates ──────────────────────────────────────────────
     private bool triggerBeatNextUpdate = false;
@@ -54,6 +55,37 @@ public class GroundTile : MonoBehaviour
     // ══════════════════════════════════════════════════════════════════
     // Lifecycle
     // ══════════════════════════════════════════════════════════════════
+
+    
+    /// <summary>
+    /// Called by TileMapConstructor after all tiles are created.
+    /// Caches references to neighboring tiles for fast pulse propagation.
+    /// </summary>
+    public void CacheNeighbors()
+    {
+        if (tileCoordinate == null) return;
+
+        for (int dir = 0; dir < 6; dir++)
+        {
+            Coordinate neighborCoord = Coordinates.Instance.GetNeighbor(tileCoordinate, dir, 1);
+            if (neighborCoord != null && neighborCoord.go != null)
+            {
+                _neighbors[dir] = neighborCoord.go.GetComponent<GroundTile>();
+            }
+            else
+            {
+                _neighbors[dir] = null;
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Returns the cached neighbor GroundTile in the given direction, or null if none exists.
+    /// </summary>
+    public GroundTile GetNeighbor(int direction)
+    {
+        return _neighbors[direction];
+    }
 
     void Start()
     {
@@ -147,6 +179,12 @@ public class GroundTile : MonoBehaviour
                         {
                             tower.OnPulseReceived(pulse);
                         }
+
+                        // Queue a visual-only pulse for the next beat cycle.
+                        // source=true prevents re-triggering the tower
+                        // life=0 prevents propagation to neighboring tiles
+                        Pulse visualPulse = new Pulse(pulse.direction, source: true, life: 0);
+                        pulses.Add(visualPulse);
                     }
                     else
                     {
@@ -232,15 +270,15 @@ public class GroundTile : MonoBehaviour
 
     public void PropagatePulse(Pulse pulse)
     {
-        if (Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1) != null && (pulse.continuous || pulse.source) && pulse.life != 0)
-        {
-            if (pulse.life > 0)
-            {
-                pulse.life--;
-            }
-            Pulse nextPulse = new Pulse(pulse.direction, life: pulse.life);
-            Coordinates.Instance.GetNeighbor(tileCoordinate, pulse.direction, 1).go.GetComponent<GroundTile>().SchedulePulse(nextPulse);
-        }
+        if (!pulse.continuous && !pulse.source) return;
+        if (pulse.life == 0) return;
+
+        GroundTile neighbor = _neighbors[pulse.direction];
+        if (neighbor == null) return;
+
+        int newLife = pulse.life > 0 ? pulse.life - 1 : pulse.life;
+        Pulse nextPulse = new Pulse(pulse.direction, life: newLife);
+        neighbor.SchedulePulse(nextPulse);
     }
 
     // ══════════════════════════════════════════════════════════════════

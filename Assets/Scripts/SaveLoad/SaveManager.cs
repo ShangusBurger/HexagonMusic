@@ -750,7 +750,10 @@ public class SaveManager : MonoBehaviour
 
                 // Lobber distance
                 if (tile.tower is LobberTower lob && entry.lobDistance > 0)
+                {
                     lob.lobDistance = entry.lobDistance;
+                    StartCoroutine(ApplyDeferredLobCache(lob));
+                }
 
                 // Buffer threshold
                 if (tile.tower is BufferTower buf && entry.bufferThreshold > 0)
@@ -837,6 +840,13 @@ public class SaveManager : MonoBehaviour
             }
             break; // Only one source tower
         }
+    }
+    
+    private IEnumerator ApplyDeferredLobCache(LobberTower lob)
+    {
+        yield return null;  // Wait for Start() to run
+        yield return null;  // Extra frame for safety
+        lob.CacheLobTargets();
     }
 
     // ══════════════════════════════════════════════════════════════════

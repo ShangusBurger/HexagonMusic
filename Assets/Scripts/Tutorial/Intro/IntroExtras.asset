@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f38a5a0f4d60a274a9cedae76614b188, type: 3}
+  m_Name: IntroExtras
+  m_EditorClassIdentifier: 
+  layout: 3
+  tutorialText: 'If you need inspiration, you can ask for a puzzle by selecting the
+    <b>Pink Button</b>.
+
+
+    <b>''Clear All''</b> will remove all towers from the
+    map
+
+
+    You can access extra options in the pause menu with <b>Escape</b>'
+  media1:
+    type: 0
+    image: {fileID: 21300000, guid: 1b9459cd125fbf749a3a166acbd7e676, type: 3}
+    video: {fileID: 32900000, guid: 15647aa382d15604ba204934e17fcc7d, type: 3}
+    caption: 
+  media2:
+    type: 1
+    image: {fileID: 0}
+    video: {fileID: 32900000, guid: d9aa71c96d2c84b4d9febcb5f40faa65, type: 3}
+    caption: 
+  associatedTower: -1
+  associatedSample: 

@@ -41,9 +41,8 @@ public class MirrorTower : Tower
 
     public override void AnimatePulse(int direction)
     {
-        if (GetComponent<Animator>() != null)
+        if (anim != null)
         {
-            Animator anim = GetComponent<Animator>();
             anim.SetInteger("direction", direction % 2);
             anim.SetTrigger("Pulse");
         }

@@ -738,6 +738,10 @@ public class SelectionHandler : MonoBehaviour
         if (from.tower is LobberTower lt)
             lobDist = lt.lobDistance;
 
+        int bufferThreshold = -1;
+        if (from.tower is BufferTower bt)
+            bufferThreshold = bt.threshold;
+
         Quaternion visualRotation = Quaternion.identity;
         if (from.tower.visualModel != null)
             visualRotation = from.tower.visualModel.transform.rotation;
@@ -761,6 +765,9 @@ public class SelectionHandler : MonoBehaviour
 
             if (to.tower is LobberTower newLob && lobDist > 0)
                 newLob.lobDistance = lobDist;
+
+            if (to.tower is BufferTower newBuf && bufferThreshold > 0)
+                newBuf.UpdateBufferSize(bufferThreshold);
 
             // Defer sample + rotation to AFTER Start() runs
             if (!string.IsNullOrEmpty(sampleName))

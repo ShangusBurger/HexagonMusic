@@ -8,52 +8,101 @@ public class LobberTower : Tower
     public int minLobDistance = 2;
     public int maxLobDistance = 8;
     public int lobDelay = 2;
-    public int lobDistance = -1;
+
+    [SerializeField]
+    private int _lobDistance = -1;
+
+    public int lobDistance
+    {
+        get => _lobDistance;
+        set
+        {
+            _lobDistance = value;
+            CacheLobTargets();
+        }
+    }
 
     public GameObject lobProjectilePrefab;
-    
+
+    // Cached destination tiles for each of the 6 directions
+    private GroundTile[] _lobTargets = new GroundTile[6];
+
+    internal override void Start()
+    {
+        base.Start();
+        // Cache on start in case lobDistance was set before tile reference was ready
+        CacheLobTargets();
+    }
 
     internal override void Update()
     {
         base.Update();
     }
 
+    /// <summary>
+    /// Caches the 6 possible lob destination tiles based on current lobDistance.
+    /// Called automatically when lobDistance changes, and can be called manually
+    /// after the tower is moved or loaded.
+    /// </summary>
+    public void CacheLobTargets()
+    {
+        if (tile == null || tile.tileCoordinate == null || _lobDistance <= 0)
+        {
+            // Clear cache if we can't compute targets
+            for (int i = 0; i < 6; i++)
+                _lobTargets[i] = null;
+            return;
+        }
+
+        for (int dir = 0; dir < 6; dir++)
+        {
+            Coordinate targetCoord = Coordinates.Instance.GetNeighbor(tile.tileCoordinate, dir, _lobDistance);
+            if (targetCoord != null && targetCoord.go != null)
+            {
+                _lobTargets[dir] = targetCoord.go.GetComponent<GroundTile>();
+            }
+            else
+            {
+                _lobTargets[dir] = null;
+            }
+        }
+    }
+
     internal override void OnPulseReceived(Pulse incomingPulse)
     {
         base.OnPulseReceived(incomingPulse);
 
-        // Lob the pulse in the same direction it came from, at the set distance
-        Coordinate targetCoord = Coordinates.Instance.GetNeighbor(tile.tileCoordinate, (incomingPulse.direction + 3) % 6, lobDistance);
-        
-        if (targetCoord != null && lobDistance > 0)
-        {
-            GroundTile targetGroundTile = targetCoord.go.GetComponent<GroundTile>();
-            // Create a pulse that will continue in the same direction
-            Pulse lobbedPulse = new Pulse((incomingPulse.direction + 3) % 6, continuous: true, source: false, delay: lobDelay);
-            targetGroundTile.SchedulePulse(lobbedPulse);
+        if (_lobDistance <= 0) return;
 
-            // Spawn and launch the projectile
-            LaunchProjectile(targetGroundTile, lobbedPulse);
+        // Calculate outgoing direction (opposite of incoming)
+        int outDir = (incomingPulse.direction + 3) % 6;
+
+        // Use cached target instead of runtime lookup
+        GroundTile targetTile = _lobTargets[outDir];
+
+        if (targetTile != null)
+        {
+            Pulse lobbedPulse = new Pulse(outDir, continuous: true, source: false, delay: lobDelay);
+            targetTile.SchedulePulse(lobbedPulse);
+            LaunchProjectile(targetTile, lobbedPulse);
         }
     }
 
-     void LaunchProjectile(GroundTile targetTile, Pulse pulse)
+    void LaunchProjectile(GroundTile targetTile, Pulse pulse)
     {
-        // Calculate flight duration based on lobDelay (in beats)
         double flightDuration = TempoHandler.beatLength * lobDelay;
-        
-        // Get start and end positions
+
         Vector3 startPos = transform.position;
         Vector3 targetPos = targetTile.transform.position;
-        
-        // Instantiate projectile
+
         GameObject projectile = Instantiate(lobProjectilePrefab, startPos, Quaternion.identity);
         LobProjectile lobScript = projectile.GetComponent<LobProjectile>();
-        
+
         if (lobScript != null)
         {
-            lobScript.Initialize(startPos, targetPos, (float)flightDuration, targetTile, (float)(TempoHandler.nextBeatTime - AudioSettings.dspTime) + .1f);
-            lobScript.OriginTile = tile; // Pass origin tile for goal tracking
+            lobScript.Initialize(startPos, targetPos, (float)flightDuration, targetTile, 
+                (float)(TempoHandler.nextBeatTime - AudioSettings.dspTime) + .1f);
+            lobScript.OriginTile = tile;
         }
     }
 
@@ -61,8 +110,6 @@ public class LobberTower : Tower
     {
         goalTime = TempoHandler.nextBeatTime;
         base.PlayScheduledClip();
-
-        //pdInstance.SendBang("bang");
     }
 
     public override void SetSelfUI()

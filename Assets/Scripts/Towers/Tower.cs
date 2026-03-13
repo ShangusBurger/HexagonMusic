@@ -23,7 +23,7 @@ public class Tower : MonoBehaviour
     internal bool isMuted = false;
     internal GameObject visualModel;
 
-    //tower effects
+    //tower identity
     public GroundTile tile;
     public TowerType ownType;
 
@@ -32,8 +32,10 @@ public class Tower : MonoBehaviour
 
     //Tower UI reference
     public TowerUI towerUI;
-
     public static Action OnInteractionMade; // Event for when the tower is placed
+
+    //Animation
+    internal Animator anim;
 
     internal virtual void Start()
     {
@@ -67,6 +69,8 @@ public class Tower : MonoBehaviour
                 towerUI.RandomizeSample();
             }
         }
+
+        anim = GetComponent<Animator>();
     }
 
     internal virtual void Update()
@@ -135,9 +139,8 @@ public class Tower : MonoBehaviour
 
     public virtual void AnimatePulse(int direction)
     {
-        if (GetComponent<Animator>() != null)
+        if (anim != null)
         {
-            Animator anim = GetComponent<Animator>();
             anim.SetTrigger("Pulse");
         }
     }

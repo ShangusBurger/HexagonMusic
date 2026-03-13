@@ -396,7 +396,7 @@ MonoBehaviour:
   minLobDistance: 2
   maxLobDistance: 8
   lobDelay: 2
-  lobDistance: -1
+  _lobDistance: -1
   lobProjectilePrefab: {fileID: 4616752181272996383, guid: 14b6b8774a35c2948820574024da5abd, type: 3}
 --- !u!95 &4658547885821067086
 Animator:

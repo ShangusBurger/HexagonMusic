@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 917844d384a79c54a8788c4dd37b5a87, type: 3}
-  m_Name: Interact70Samples
+  m_Name: Interact65Samples
   m_EditorClassIdentifier: 
-  displayText: 
+  displayText: Change The Sound of any Tower 65 Times to Unlock
   rewards:
-  - {fileID: 11400000, guid: ceff1ceeba8c42649b62c3d1482bc12c, type: 2}
+  - {fileID: 11400000, guid: bff6099c35f2f2844a85971c5c873c26, type: 2}
   goalIcon: {fileID: 0}
   gatingTowerType: -1
-  requiredInteractionCount: 70
+  requiredInteractionCount: 65

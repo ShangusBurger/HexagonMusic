@@ -34,15 +34,18 @@ public class TileMapConstructor : MonoBehaviour
     public GameObject mirrorTowerPrefab;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
-
         Instance = this;
         allTiles = ConstructGrid();
-        
+
+        // Cache neighbor references for all tiles AFTER the grid is fully built
+        CacheAllTileNeighbors();
+
         if (startWithCenterTower)
         {
-            GroundTile centerTile = Coordinates.Instance.GetContainer().GetCoordinate(Vector3.zero).go.GetComponent<GroundTile>();
+            GroundTile centerTile = allTiles.GetCoordinate(Vector3.zero).go.GetComponent<GroundTile>();
             centerTile.AddTowerToTile(TowerType.Source);
         }
 
@@ -53,6 +56,25 @@ public class TileMapConstructor : MonoBehaviour
     void Update()
     {
 
+    }
+        
+    /// <summary>
+    /// Iterates through all tiles and caches their neighbor references.
+    /// Called once after grid construction for O(1) neighbor lookups during gameplay.
+    /// </summary>
+    private void CacheAllTileNeighbors()
+    {
+        foreach (Coordinate coord in allTiles.GetAllCoordinates())
+        {
+            if (coord.go != null)
+            {
+                GroundTile tile = coord.go.GetComponent<GroundTile>();
+                if (tile != null)
+                {
+                    tile.CacheNeighbors();
+                }
+            }
+        }
     }
 
     Container ConstructGrid(int gridRadius = -1)

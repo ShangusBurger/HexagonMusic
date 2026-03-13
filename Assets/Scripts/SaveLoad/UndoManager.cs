@@ -349,6 +349,9 @@ public class UndoManager : MonoBehaviour
             tile.tower.towerUI.OnSampleSelected(snap.sampleName);
         }
 
+        if (tile.tower is LobberTower restoredLob)
+            restoredLob.CacheLobTargets();
+
         // Only apply saved rotation for Mono towers — they are the only type
         // with a player-set direction. Other towers (Splitter, Mirror, etc.)
         // have their rotation driven by animations and pulse direction.

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 917844d384a79c54a8788c4dd37b5a87, type: 3}
   m_Name: Interact50Samples
   m_EditorClassIdentifier: 
-  displayText: 
+  displayText: Change The Sound of any Tower 50 Times to Unlock
   rewards:
-  - {fileID: 11400000, guid: 9c71391aeb84d0049b967a58aba61ebf, type: 2}
+  - {fileID: 11400000, guid: ceff1ceeba8c42649b62c3d1482bc12c, type: 2}
   goalIcon: {fileID: 0}
   gatingTowerType: -1
   requiredInteractionCount: 50
