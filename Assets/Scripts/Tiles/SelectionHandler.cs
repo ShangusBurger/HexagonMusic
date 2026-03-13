@@ -507,8 +507,29 @@ public class SelectionHandler : MonoBehaviour
         ClearInfoLowlight();
 
         if (towerTile == null || towerTile.tower == null || centerTile == null) return;
-
-        if (towerTile.tower is MonoTower && towerTile.tower.directions.Count > 0)
+        // Source tower — show lines in directions 0 and 3
+        if (towerTile.tower is SourceTower)
+        {
+            int[] sourceDirections = { 0, 3 };
+            foreach (int dir in sourceDirections)
+            {
+                Coordinate targetCoord = GetFurthestCoordinateInDirection(centerTile.tileCoordinate, dir);
+                if (targetCoord != null)
+                {
+                    List<Coordinate> line = Coordinates.Instance.GetLine(centerTile.tileCoordinate, targetCoord);
+                    foreach (Coordinate coord in line)
+                    {
+                        GroundTile coordTile = coord.go.GetComponent<GroundTile>();
+                        if (coordTile != null && coordTile != centerTile)
+                        {
+                            infoLowlightedTiles.Add(coordTile);
+                            coordTile.InfoLowlight();
+                        }
+                    }
+                }
+            }
+        }
+        else if (towerTile.tower is MonoTower && towerTile.tower.directions.Count > 0)
         {
             int dir = towerTile.tower.directions[0];
             Coordinate targetCoord = GetFurthestCoordinateInDirection(centerTile.tileCoordinate, dir);
@@ -582,6 +603,14 @@ public class SelectionHandler : MonoBehaviour
             t.Deselect();
         }
         infoLowlightedTiles.Clear();
+    }
+
+    
+    public void ClearInfoLowlightPublic()
+    {
+        ClearInfoLowlight();
+        DeselectCurrent();
+        HideAllTowerUI?.Invoke();
     }
 
     // ══════════════════════════════════════════════════════════════════

@@ -24,12 +24,12 @@ MonoBehaviour:
     You can access extra options in the pause menu with <b>Escape</b>'
   media1:
     type: 0
-    image: {fileID: 21300000, guid: 1b9459cd125fbf749a3a166acbd7e676, type: 3}
+    image: {fileID: 21300000, guid: fc881dba8bd381c45ba091c4e3f809f5, type: 3}
     video: {fileID: 32900000, guid: 15647aa382d15604ba204934e17fcc7d, type: 3}
     caption: 
   media2:
-    type: 1
-    image: {fileID: 0}
+    type: 0
+    image: {fileID: 21300000, guid: 5309f9ddd485d794cafd0a79df8f6670, type: 3}
     video: {fileID: 32900000, guid: d9aa71c96d2c84b4d9febcb5f40faa65, type: 3}
     caption: 
   associatedTower: -1

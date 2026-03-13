@@ -148,7 +148,11 @@ public class Tower : MonoBehaviour
     public void DestroySelf()
     {
         InteractionMade();
-        towerUI.RemoveFromReference(); // This broke
+        towerUI.RemoveFromReference();
+        
+        // Clear info lowlight before removing
+        SelectionHandler.Instance.ClearInfoLowlightPublic();
+        
         tile.RemoveTower();
         allTowers.Remove(this);
         ClearFieldController.OnClearField -= DestroySelf;
