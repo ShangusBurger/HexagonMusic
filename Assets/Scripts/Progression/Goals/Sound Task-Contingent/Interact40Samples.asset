@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 917844d384a79c54a8788c4dd37b5a87, type: 3}
   m_Name: Interact40Samples
   m_EditorClassIdentifier: 
-  displayText: Change The Sound of any Tower 40 Times to Unlock
+  displayText: 
   rewards:
   - {fileID: 11400000, guid: 9c71391aeb84d0049b967a58aba61ebf, type: 2}
   goalIcon: {fileID: 0}
