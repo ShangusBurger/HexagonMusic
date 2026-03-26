@@ -90,10 +90,12 @@ public class SaveLoadUI : MonoBehaviour
             confirmNoButton.onClick.AddListener(OnConfirmNo);
 
         // ── Hide panels initially ──
+        
         if (mapSavePanel != null) mapSavePanel.SetActive(false);
         if (mapLoadPanel != null) mapLoadPanel.SetActive(false);
         if (confirmPopupPanel != null) confirmPopupPanel.SetActive(false);
         if (feedbackPanel != null) feedbackPanel.SetActive(false);
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
     }
 
     // ══════════════════════════════════════════════════════════════════
